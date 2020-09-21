@@ -8,17 +8,15 @@ Our project will create a website for users to match with and send video corresp
 
 ## Technical Skills Required
 - Backend
-  - Django with Python
-  - Tenancy management
-  - Authentication and token management
+  - Next-Auth
   - Image processing engine
   - *Storage (Needs discussion)*
-  - FactoryBoy
-  - Faker
   - Linter
 
 - Frontend
-  - React with JS, possibly TS
+  - NextJS
+  - React
+  - Typescript
   - MaterialUI
   - *Some video library*
   - ReactRouter
