@@ -19,7 +19,7 @@ export const useToggle = (
   return [isToggled, toggle];
 };
 
-// A "burn after reading" style of hook.
+// A single-use hook.
 // Once consumed, the value can never be changed.
 // Consider making more abstract by allowing a hook to be passed in
 export const useOnce = <T>(
