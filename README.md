@@ -8,13 +8,12 @@ Our project will create a website for users to match with and send video corresp
 
 ## Technical Skills Required
 - Backend
-  - Next-Auth
+  - Django
   - Image processing engine
   - *Storage (Needs discussion)*
   - Linter
 
 - Frontend
-  - NextJS
   - React
   - Typescript
   - MaterialUI
@@ -28,5 +27,4 @@ Our project will create a website for users to match with and send video corresp
   - Git
   - *A CI library with git hooks*
   - Server host (Tux?)
-  - Discord and Discord bot
   - *Probably legal stuff*
