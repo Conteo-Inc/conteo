@@ -9,6 +9,10 @@
 #venv
 /venv
 
+#Django
+db.sqlite3
+conteo/settings.py
+
 # production
 /build
 
