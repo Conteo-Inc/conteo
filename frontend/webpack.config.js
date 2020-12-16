@@ -1,7 +1,10 @@
+const path = require("path");
+
 module.exports = {
     entry: "./src/App.tsx",
     output: {
-        filename: "./dist/bundle.js",
+        filename: "main.js",
+        path: path.resolve(__dirname, "static", "frontend"),
     },
     devtool: "source-map",
     resolve: {
