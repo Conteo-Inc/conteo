@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as Cookie from 'js-cookie';
 import {
     Link,
     Redirect,
@@ -8,18 +9,19 @@ import {
     useHistory,
     useLocation,
 } from 'react-router-dom';
+import { get, post } from './utils/fetch';
 
-const fakeAuth = {
-    isAuthenticated: false,
-    signin(cb: () => void) {
-        fakeAuth.isAuthenticated = true;
-        setTimeout(cb, 100);
-    },
-    signout(cb: () => void) {
-        fakeAuth.isAuthenticated = false;
-        setTimeout(cb, 100);
-    },
-};
+// const fakeAuth = {
+//     isAuthenticated: false,
+//     signin(cb: () => void) {
+//         fakeAuth.isAuthenticated = true;
+//         setTimeout(cb, 100);
+//     },
+//     signout(cb: () => void) {
+//         fakeAuth.isAuthenticated = false;
+//         setTimeout(cb, 100);
+//     },
+// };
 
 const authContext = React.createContext(null);
 function useAuth() {
@@ -29,10 +31,10 @@ function useProvideAuth() {
     const [user, setUser] = React.useState(null);
 
     const signin = (cb) => {
-        return fakeAuth.signin(() => {
-            setUser('user');
-            cb();
-        });
+        // return fakeAuth.signin(() => {
+        //     setUser('user');
+        //     cb();
+        // });
     };
     const signout = (cb) => {
         return fakeAuth.signout(() => {
