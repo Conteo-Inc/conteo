@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { render } from 'react-dom';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
+import AuthExample from './AuthExample';
 
 export default function App() {
     return (
@@ -9,10 +10,15 @@ export default function App() {
                 <li>
                     <Link to='/'>Home</Link>
                 </li>
-                {/* <li>
-                <Link to="/foo">Foo</Link>
-            </li> */}
+                <li>
+                <Link to="/AuthExample">Auth Example</Link>
+            </li>
             </ul>
+            <Switch>
+                <Route path="/AuthExample">
+                    <AuthExample />
+                </Route>
+            </Switch>
         </Router>
     );
 }
