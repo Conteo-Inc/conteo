@@ -1,22 +1,32 @@
 import * as React from 'react';
 import { render } from 'react-dom';
-import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
-import AuthExample from './AuthExample';
+import {
+    BrowserRouter as Router,
+    Switch,
+    Route,
+    Link,
+    LinkProps,
+} from 'react-router-dom';
+import LinkItem from './components/LinkItem';
+import TokenPage from './FullPageRoutes/TokenPage';
+
+function MainPage() {
+    return (
+        <ul>
+            <LinkItem to='/Tokens' text='Tokens' />
+        </ul>
+    );
+}
 
 export default function App() {
     return (
         <Router>
-            <ul>
-                <li>
-                    <Link to='/'>Home</Link>
-                </li>
-                <li>
-                <Link to="/AuthExample">Auth Example</Link>
-            </li>
-            </ul>
             <Switch>
-                <Route path="/AuthExample">
-                    <AuthExample />
+                <Route path='/Tokens'>
+                    <TokenPage />
+                </Route>
+                <Route path='/'>
+                    <MainPage />
                 </Route>
             </Switch>
         </Router>
