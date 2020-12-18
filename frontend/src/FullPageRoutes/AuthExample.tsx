@@ -9,7 +9,7 @@ import {
     useHistory,
     useLocation,
 } from 'react-router-dom';
-import { get, post } from './utils/fetch';
+import { get, post } from '../utils/fetch';
 
 // const fakeAuth = {
 //     isAuthenticated: false,
