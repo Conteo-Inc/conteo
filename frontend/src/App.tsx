@@ -9,11 +9,13 @@ import {
 } from 'react-router-dom';
 import LinkItem from './components/LinkItem';
 import TokenPage from './FullPageRoutes/TokenPage';
+import VideoPage from './FullPageRoutes/VideoPage';
 
 function MainPage() {
     return (
         <ul>
             <LinkItem to='/Tokens' text='Tokens' />
+            <LinkItem to='/Video' text='Video' />
         </ul>
     );
 }
@@ -24,6 +26,9 @@ export default function App() {
             <Switch>
                 <Route path='/Tokens'>
                     <TokenPage />
+                </Route>
+                <Route path='/Video'>
+                    <VideoPage />
                 </Route>
                 <Route path='/'>
                     <MainPage />

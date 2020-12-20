@@ -1,5 +1,4 @@
 import * as React from 'react';
-import * as Cookie from 'js-cookie';
 import {
     Link,
     Redirect,
@@ -37,10 +36,10 @@ function useProvideAuth() {
         // });
     };
     const signout = (cb) => {
-        return fakeAuth.signout(() => {
-            setUser(null);
-            cb();
-        });
+        // return fakeAuth.signout(() => {
+        //     setUser(null);
+        //     cb();
+        // });
     };
 
     return {
