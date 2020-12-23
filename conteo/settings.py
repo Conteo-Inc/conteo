@@ -44,14 +44,14 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "api.apps.APIConfig",
     "rest_framework",
-    'corsheaders',
+    "corsheaders",
     "frontend",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    'corsheaders.middleware.CorsMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     # "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -92,23 +92,17 @@ DATABASES = {
 
 REST_FRAMEWORK = {
     # "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_jwt.authentication.JSONWebTokenAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.BasicAuthentication",
     ),
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
-    )
 }
 
-CORS_ORIGIN_WHITELIST = (
-    'http://localhost:8000',
-)
+CORS_ORIGIN_WHITELIST = ("http://localhost:8000",)
 
-JWT_AUTH = {
-    'JWT_RESPONSE_PAYLOAD_HANDLER': 'api.utils.custom_jwt_response_handler'
-}
+JWT_AUTH = {"JWT_RESPONSE_PAYLOAD_HANDLER": "api.utils.custom_jwt_response_handler"}
 
 
 # Password validation
