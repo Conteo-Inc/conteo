@@ -1,5 +1,3 @@
-from django.contrib.auth.models import User
-from django.http import HttpResponseRedirect
 from rest_framework import generics, permissions, status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
