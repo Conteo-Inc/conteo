@@ -2,6 +2,16 @@ import * as React from 'react';
 import LinkItem from '../components/LinkItem';
 import LoginForm, { UserHandlerArgs } from '../components/LoginForm';
 import SignupForm from '../components/SignupForm';
+import { request } from '../utils/fetch';
+
+type User = {
+    username: string;
+} & any;
+
+type TokenResponse = {
+    username: string;
+    token: string;
+};
 
 type NavProps = {
     logged_in: boolean;
@@ -46,55 +56,40 @@ export default function TokenPage() {
 
     React.useEffect(() => {
         if (logged_in) {
-            //@TODO: Move to get, define type
-            fetch('/api/current_user/', {
-                headers: {
-                    Authorization: `JWT ${localStorage.getItem('token')}`,
-                },
-            })
-                .then((res) => res.json())
-                .then((json) => {
-                    setUsername(json.username);
-                });
+            request<User>('/api/current_user/', 'get', true, false).then(
+                (user) => {
+                    setUsername(user.parsedBody.username);
+                }
+            );
         }
     });
 
     const handle_login = ({ e, ...data }: UserHandlerArgs) => {
         e.preventDefault();
-        //@TODO: Move to post, define type
-        fetch('/api/token-auth/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-        })
-            .then((res) => res.json())
-            .then((json) => {
-                localStorage.setItem('token', json.token);
-                setLoggedIn(true);
-                setUsername(json.username);
-                setDisplayedForm(null);
-            });
+        request<TokenResponse>(
+            '/api/token-auth/',
+            'post',
+            false,
+            true,
+            data
+        ).then((json) => {
+            localStorage.setItem('token', json.parsedBody.token);
+            setLoggedIn(true);
+            setUsername(json.parsedBody.username);
+            setDisplayedForm(null);
+        });
     };
 
     const handle_signup = ({ e, ...data }: UserHandlerArgs) => {
         e.preventDefault();
-        //@TODO: Move to post, define type
-        fetch('/api/users/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-        })
-            .then((res) => res.json())
-            .then((json) => {
-                localStorage.setItem('token', json.token);
+        request<TokenResponse>('/api/users/', 'post', false, true, data).then(
+            (json) => {
+                localStorage.setItem('token', json.parsedBody.token);
                 setLoggedIn(true);
                 setDisplayedForm(null);
-                setUsername(json.username);
-            });
+                setUsername(json.parsedBody.username);
+            }
+        );
     };
 
     const handle_logout = () => {
@@ -126,7 +121,7 @@ export default function TokenPage() {
             ) : (
                 <></>
             )}
-            <h3>{logged_in ? `Hello, ${ username }` : 'Please Log In'}</h3>
+            <h3>{logged_in ? `Hello, ${username}` : 'Please Log In'}</h3>
         </>
     );
 }
