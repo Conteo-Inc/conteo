@@ -1,21 +1,17 @@
 import * as React from 'react';
 import { render } from 'react-dom';
-import {
-    BrowserRouter as Router,
-    Switch,
-    Route,
-    Link,
-    LinkProps,
-} from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import LinkItem from './components/LinkItem';
 import TokenPage from './FullPageRoutes/TokenPage';
-import VideoPage from './FullPageRoutes/VideoPage';
+import RecordPage from './FullPageRoutes/RecordPage';
+import VideoListPage from './FullPageRoutes/VideoListPage';
 
 function MainPage() {
     return (
         <ul>
             <LinkItem to='/Tokens' text='Tokens' />
-            <LinkItem to='/Video' text='Video' />
+            <LinkItem to='/Record' text='Record' />
+            <LinkItem to='/Watch' text='Watch' />
         </ul>
     );
 }
@@ -27,8 +23,11 @@ export default function App() {
                 <Route path='/Tokens'>
                     <TokenPage />
                 </Route>
-                <Route path='/Video'>
-                    <VideoPage />
+                <Route path='/Record'>
+                    <RecordPage />
+                </Route>
+                <Route path='/Watch'>
+                    <VideoListPage />
                 </Route>
                 <Route path='/'>
                     <MainPage />
