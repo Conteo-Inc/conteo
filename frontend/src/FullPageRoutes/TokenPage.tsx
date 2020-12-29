@@ -46,6 +46,7 @@ export default function TokenPage() {
 
     React.useEffect(() => {
         if (logged_in) {
+            //@TODO: Move to get, define type
             fetch('/api/current_user/', {
                 headers: {
                     Authorization: `JWT ${localStorage.getItem('token')}`,
@@ -60,6 +61,7 @@ export default function TokenPage() {
 
     const handle_login = ({ e, ...data }: UserHandlerArgs) => {
         e.preventDefault();
+        //@TODO: Move to post, define type
         fetch('/api/token-auth/', {
             method: 'POST',
             headers: {
@@ -78,6 +80,7 @@ export default function TokenPage() {
 
     const handle_signup = ({ e, ...data }: UserHandlerArgs) => {
         e.preventDefault();
+        //@TODO: Move to post, define type
         fetch('/api/users/', {
             method: 'POST',
             headers: {
