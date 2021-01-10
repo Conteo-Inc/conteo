@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models import F, Q
 
 
 class Video(models.Model):
@@ -8,16 +9,40 @@ class Video(models.Model):
     viewed_at = models.DateTimeField(null=True)
 
 
-# All possible relationships
-# (true,true), (true, null), (false, true/null/false), (null,null)
-# Note that we don't need to store (null,null)
 class MatchStatus(models.Model):
-    primary_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="+")
-    secondary_user = models.ForeignKey(
-        User, null=True, on_delete=models.CASCADE, related_name="+"
+    """
+    Represents the match status for two users.
+
+    A True response means that the user accepted the other user as a penpal.
+    A False response means that the user declined the other user as a penpal.
+    A null response means that the user is undecided.
+    """
+
+    user_lo = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="matchstatus_lo"
     )
-    primary_response = models.BooleanField()
-    secondary_response = models.BooleanField(null=True)
+    user_hi = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="matchstatus_hi"
+    )
+    user_lo_response = models.BooleanField(null=True)
+    user_hi_response = models.BooleanField(null=True)
+
+    class Meta:
+        constraints = [
+            # This constraint avoids duplicate/illegal records:
+            #   user1  user2   . . .
+            #   -----  -----
+            #   0034   0035     }
+            #   0035   0034     } Only one of these two records needs to exist
+            #   . . .
+            #   0022   0022     Users can't match with themselves
+            models.CheckConstraint(
+                check=Q(user_lo_id__lt=F("user_hi_id")), name="user_lo_lt_user_hi"
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.user_lo} [{self.user_lo_response}] - {self.user_hi} [{self.user_hi_response}]"  # noqa: E501
 
     @property
     def accepted(self):
