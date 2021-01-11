@@ -15,25 +15,34 @@ export async function http<T>(request: RequestInfo): Promise<HttpResponse<T>> {
     return res;
 }
 
-export async function get<T>(
+/*
+path: some api endpoint string, e.g. '/api/current-user/'
+method: fetch method
+includeAuth: if true, the request header will include the jwt authorization
+specifyJson: if true, the request header will include the Content-Type header with the value 'application/json'
+*/
+export async function request<T>(
     path: string,
-    args: RequestInit = { method: 'get' }
-): Promise<HttpResponse<T>> {
-    return await http<T>(new Request(path, args));
-}
+    method: 'get' | 'put' | 'post',
+    includeAuth: boolean = true,
+    specifyJson: boolean = true,
+    body?: any
+) {
+    const args: RequestInit = {
+        method: method,
+        headers: {
+            //The ...(<boolean> && obj) syntax will spread the obj if the boolean is true,
+            //otherwise it will exclude
 
-export async function post<T>(
-    path: string,
-    body: any,
-    args: RequestInit = { method: 'post', body: JSON.stringify(body) }
-): Promise<HttpResponse<T>> {
-    return await http<T>(new Request(path, args));
-}
-
-export async function put<T>(
-    path: string,
-    body: any,
-    args: RequestInit = { method: 'put', body: JSON.stringify(body) }
-): Promise<HttpResponse<T>> {
+            //conditionally adds the Authorization property
+            ...(includeAuth && {
+                Authorization: `JWT ${localStorage.getItem('token')}`,
+            }),
+            //conditionally adds the Content-Type property
+            ...(specifyJson && { 'Content-Type': 'application/json' }),
+        },
+        //conditionally adds the body
+        ...(body && { body: JSON.stringify(body) }),
+    };
     return await http<T>(new Request(path, args));
 }
