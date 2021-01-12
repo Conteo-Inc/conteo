@@ -53,6 +53,7 @@ export default function TokenPage() {
         localStorage.getItem('token') ? true : false
     );
     const [username, setUsername] = React.useState<string>(null);
+    const [errMessage, seterrMessage] = React.useState<string>(null);
 
     React.useEffect(() => {
         if (logged_in) {
@@ -64,7 +65,7 @@ export default function TokenPage() {
         }
     });
 
-    const handle_login = ({ e, ...data }: UserHandlerArgs) => {
+    const handle_login = ({ e, errorMessage, ...data }: UserHandlerArgs) => {
         e.preventDefault();
         request<TokenResponse>(
             '/api/token-auth/',
@@ -77,10 +78,13 @@ export default function TokenPage() {
             setLoggedIn(true);
             setUsername(json.parsedBody.username);
             setDisplayedForm(null);
+            seterrMessage(null)
+        }).catch(error =>{
+            seterrMessage("Issues found")   // Set error message based on error type
         });
     };
 
-    const handle_signup = ({ e, ...data }: UserHandlerArgs) => {
+    const handle_signup = ({ e, errorMessage, ...data }: UserHandlerArgs) => {
         e.preventDefault();
         request<TokenResponse>('/api/users/', 'post', false, true, data).then(
             (json) => {
@@ -89,7 +93,9 @@ export default function TokenPage() {
                 setDisplayedForm(null);
                 setUsername(json.parsedBody.username);
             }
-        );
+        ).catch(error =>{
+            seterrMessage("Issues found")   // Set error message based on error type
+        });
     };
 
     const handle_logout = () => {
@@ -115,9 +121,9 @@ export default function TokenPage() {
                 />
             </div>
             {displayedForm === 'login' ? (
-                <LoginForm handle_login={handle_login} />
+                <LoginForm handle_login={handle_login} errorMessage={errMessage}/>
             ) : displayedForm === 'signup' ? (
-                <SignupForm handle_signup={handle_signup} />
+                <SignupForm handle_signup={handle_signup} errorMessage={errMessage}/>
             ) : (
                 <></>
             )}
