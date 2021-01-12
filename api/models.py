@@ -30,12 +30,12 @@ class MatchStatus(models.Model):
     class Meta:
         constraints = [
             # This constraint avoids duplicate/illegal records:
-            #   user1  user2   . . .
-            #   -----  -----
-            #   0034   0035     }
-            #   0035   0034     } Only one of these two records needs to exist
+            #   user_lo  user_hi   . . .
+            #   -------  -------
+            #   0034     0035     }
+            #   0035     0034     } Only one of these two records needs to exist
             #   . . .
-            #   0022   0022     Users can't match with themselves
+            #   0022     0022     Users can't match with themselves
             models.CheckConstraint(
                 check=Q(user_lo_id__lt=F("user_hi_id")), name="user_lo_lt_user_hi"
             )
