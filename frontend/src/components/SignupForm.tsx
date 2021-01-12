@@ -16,14 +16,14 @@ export default function SignupForm({ handle_signup }: SignupFormProps) {
             <input
                 type='text'
                 name='username'
-                value={username}
+                value={username || ""}
                 onChange={(e) => setUsername(e.target.value)}
             />
             <label htmlFor='password'>Password</label>
             <input
                 type='password'
                 name='password'
-                value={password}
+                value={password || ""}
                 onChange={(e) => setPassword(e.target.value)}
             />
             <input type='submit' />
