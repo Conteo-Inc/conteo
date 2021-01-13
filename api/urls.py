@@ -4,7 +4,7 @@ from . import views
 
 urlpatterns = [
     path('api/video/', views.VideoListCreate.as_view()),
-    path('api/token-auth/', obtain_jwt_token),
-    path('api/current_user/', views.current_user),
-    path('api/users/', views.UserList.as_view())
+    path('api/signup/', views.UserRegistrationView.as_view()),
+    path('api/login/', views.UserLoginView.as_view()),
+    path('api/current_user/', views.UserProfileView.as_view()),
 ]
