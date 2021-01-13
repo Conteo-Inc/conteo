@@ -43,24 +43,3 @@ class MatchStatus(models.Model):
 
     def __str__(self):
         return f"{self.user_lo} [{self.user_lo_response}] - {self.user_hi} [{self.user_hi_response}]"  # noqa: E501
-
-    @property
-    def accepted(self):
-        return self.primary_response and self.secondary_accepted
-
-    @property
-    def secondary_accepted(self):
-        return self.secondary_response is not None and self.secondary_response
-
-
-# when matching page loads:
-# 1.(FE) getMatches(N: number, queued: id[])
-# 2.(BE) query users where
-#       a. not penpal
-#       b. not rejected
-#       c. not limbo
-#       d. not queued
-#                   Here we have X users
-# 3.(BE) With alg v1: randomize
-# 4.(BE) Return at most N
-# 5.(FE), display 5
