@@ -43,21 +43,26 @@ class Matches(generics.ListAPIView):
     serializer_class = UserSerializer
 
     def get_queryset(self):
-        req_user = self.request.user  # The user that is requesting matches
-        return (
-            User.objects.exclude(
-                Q(matchstatus_hi__user_lo=req_user)
-                & (
-                    Q(matchstatus_hi__user_lo_response__isnull=False)
-                    | Q(matchstatus_hi__user_hi_response=False)
-                )
-            )
-            .exclude(
+        """
+        Return a QuerySet of Users that can be served to the request user
+        as a match.
+        """
+        req_user = self.request.user  # The user that is requesting their matches
+        return User.objects.filter(
+            # Users not in MatchStatus table
+            Q(matchstatus_hi__isnull=True, matchstatus_lo__isnull=True)
+            | (
+                # user_hi = req_user AND
+                # user_hi has not responded and user_lo has not declined
                 Q(matchstatus_lo__user_hi=req_user)
-                & (
-                    Q(matchstatus_lo__user_hi_response__isnull=False)
-                    | Q(matchstatus_lo__user_lo_response=False)
-                )
+                & Q(matchstatus_lo__user_hi_response__isnull=True)
+                & ~Q(matchstatus_lo__user_lo_response=False)
             )
-            .exclude(pk=req_user.pk)
+            | (
+                # user_lo = req_user AND
+                # user_lo has not responded and user_hi has not declined
+                Q(matchstatus_hi__user_lo=req_user)
+                & Q(matchstatus_hi__user_lo_response__isnull=True)
+                & ~Q(matchstatus_hi__user_hi_response=False)
+            )
         )
