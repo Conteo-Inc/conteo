@@ -1,10 +1,7 @@
-from django.http import HttpResponseRedirect
 from rest_framework import generics, status
-from rest_framework.decorators import api_view
 from rest_framework.generics import CreateAPIView, RetrieveAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework_jwt.settings import api_settings
 
