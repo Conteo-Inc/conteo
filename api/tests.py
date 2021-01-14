@@ -43,7 +43,7 @@ class MatchesViewTestCase(TestCase):
             user_lo=boy, user_hi=fog, user_lo_response=None, user_hi_response=None
         )
 
-    def test_get_potential_matches_basic(self):
+    def test_get_matches_basic(self):
         """
         Test for basic matching criteria.
 
