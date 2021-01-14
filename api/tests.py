@@ -44,6 +44,14 @@ class MatchesViewTestCase(TestCase):
         )
 
     def test_get_potential_matches_basic(self):
+        """
+        Test for basic matching criteria.
+
+        Basic matching criteria includes matching with users not in the
+        MatchStatus model, users that have not matched with the requesting
+        user, users who have not declined the requesting user, and users
+        for which the requesting user has not already made a decision for.
+        """
         client = Client()
         client.login(username="ale", password="password")
         res = client.get("/api/match/")  # type: Response
@@ -55,3 +63,50 @@ class MatchesViewTestCase(TestCase):
         self.assertEqual(
             res.data, [OrderedDict(username="dig"), OrderedDict(username="fog")]
         )
+        client.login(username="cad", password="password")
+        res = client.get("/api/match/")  # type: Response
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(
+            res.data,
+            [
+                OrderedDict(username="dig"),
+                OrderedDict(username="eel"),
+                OrderedDict(username="fog"),
+            ],
+        )
+        client.login(username="dig", password="password")
+        res = client.get("/api/match/")  # type: Response
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(
+            res.data,
+            [
+                OrderedDict(username="ale"),
+                OrderedDict(username="cad"),
+                OrderedDict(username="eel"),
+                OrderedDict(username="fog"),
+            ],
+        )
+        client.login(username="eel", password="password")
+        res = client.get("/api/match/")  # type: Response
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(
+            res.data,
+            [
+                OrderedDict(username="cad"),
+                OrderedDict(username="dig"),
+                OrderedDict(username="fog"),
+            ],
+        )
+        client.login(username="fog", password="password")
+        res = client.get("/api/match/")  # type: Response
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(
+            res.data,
+            [
+                OrderedDict(username="boy"),
+                OrderedDict(username="cad"),
+                OrderedDict(username="dig"),
+                OrderedDict(username="eel"),
+            ],
+        )
+        # TODO check for matches with users not in the MatchStatus database
