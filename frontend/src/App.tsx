@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import LinkItem from './components/LinkItem';
 import TokenPage from './FullPageRoutes/TokenPage';
 import ProfilePage from './FullPageRoutes/Profile';
+import MatchingPage from './FullPageRoutes/Matching';
 
 export type User = {
     username: string;
@@ -28,6 +29,9 @@ export default function App() {
                 <Route path='/Profile'>
                     <ProfilePage />
                 </Route>
+                <Route path='/Matching'>
+                    <MatchingPage />
+                </Route>
                 <Route path='/'>
                     <MainPage />
                 </Route>
@@ -36,7 +40,5 @@ export default function App() {
     );
 }
 
-// export default App;
-
-const container = document.getElementById('app');
+const container = document.getElementById("app");
 render(<App />, container);
