@@ -71,7 +71,7 @@ Create an .env file under `conteo/` (See `.env.example`)
 
 Create the database
 
-    ./manage.py makemigrations && ./manage.py migrate
+    ./manage.py migrate
 
 Run the web server
 
