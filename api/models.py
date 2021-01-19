@@ -1,11 +1,13 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.conf import settings
 
-# Create your models here.
 class Video(models.Model):
-    title = models.CharField(max_length=100)
+    title = models.CharField(max_length=100)    #At some point this needs to be removed
     created_at = models.DateTimeField(auto_now_add=True)
     viewed_at = models.DateTimeField(null=True)
+    video_file = models.FileField(upload_to='media/', null=True, verbose_name="")
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="videos")
 
 #All possible relationships
 #(true,true), (true, null), (false, true/null/false), (null,null)

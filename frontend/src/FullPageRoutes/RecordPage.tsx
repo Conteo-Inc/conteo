@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { useReactMediaRecorder, StatusMessages } from 'react-media-recorder';
+import { useReactMediaRecorder } from 'react-media-recorder';
+import { request } from '../utils/fetch';
 
 function Preview({ stream }: { stream: MediaStream | null }) {
     const ref = React.useRef<HTMLVideoElement>(null);
@@ -14,11 +15,18 @@ function Preview({ stream }: { stream: MediaStream | null }) {
         return null;
     }
     return <video ref={ref} width={500} height={500} autoPlay controls />;
-
 }
 
-function onStopRecording(blobUrl: string, blob:Blob) {
-    console.log("blobUrl:", blobUrl, "blob object:", blob)
+function onStopRecording(blobUrl: string, blob: Blob) {
+    const reader = new FileReader();
+    reader.readAsDataURL(blob);
+    reader.onloadend = () => {
+        const data = reader.result;
+        request('/api/video/', 'post', true, true, {
+            title: 'foo', //Temp, remove soon
+            data: data,
+        });
+    };
 }
 
 export default function RecordPage() {
@@ -28,8 +36,7 @@ export default function RecordPage() {
         stopRecording,
         mediaBlobUrl,
         previewStream,
-    } = useReactMediaRecorder({ video: true, onStop:onStopRecording });
-    console.log(mediaBlobUrl);
+    } = useReactMediaRecorder({ video: true, onStop: onStopRecording });
     return (
         <div>
             <p>{status}</p>
@@ -41,7 +48,7 @@ export default function RecordPage() {
                 <button disabled>Loading...</button>
             )}
             {mediaBlobUrl ? (
-                <video src={mediaBlobUrl} controls autoPlay loop />
+                <video src={mediaBlobUrl} controls />
             ) : (
                 <Preview stream={previewStream} />
             )}

@@ -8,7 +8,6 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-
 @api_view(['GET'])
 def current_user(request):
     """
@@ -35,3 +34,11 @@ class UserList(APIView):
 class VideoListCreate(generics.ListCreateAPIView):
     queryset = Video.objects.all()
     serializer_class = VideoSerializer
+
+    def post(self, request, format=None):
+        data = request.data.pop('data')
+        serializer = self.serializer_class(data=request.data, context={'data': data, 'user': request.user})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
