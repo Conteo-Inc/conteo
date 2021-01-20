@@ -1,3 +1,5 @@
+import { strict } from 'assert';
+import { type } from 'os';
 import * as React from 'react';
 import LinkItem from '../components/LinkItem';
 import LoginForm, { UserHandlerArgs } from '../components/LoginForm';
@@ -5,11 +7,11 @@ import SignupForm from '../components/SignupForm';
 import { request } from '../utils/fetch';
 
 type User = {
-    username: string;
+    email: string;
 } & any;
 
 type TokenResponse = {
-    username: string;
+    email: string;
     token: string;
 };
 
@@ -47,61 +49,81 @@ function Nav({ logged_in, display_form, handle_logout }: NavProps) {
     return <div>{logged_in ? LoggedInNav : LoggedOutNav}</div>;
 }
 
+function handleErrors(response) {
+    if (!response.ok) {
+        throw Error(response.statusText);
+    }
+    return response;
+}
+
 export default function TokenPage() {
     const [displayedForm, setDisplayedForm] = React.useState<string>(null);
     const [logged_in, setLoggedIn] = React.useState<boolean>(
         localStorage.getItem('token') ? true : false
     );
-    const [username, setUsername] = React.useState<string>(null);
+    const [email, setEmail] = React.useState<string>(null);
     const [errMessage, seterrMessage] = React.useState<string>(null);
 
+
     React.useEffect(() => {
-        if (logged_in) {
-            request<User>('/api/current_user/', 'get', true, false).then(
-                (user) => {
-                    setUsername(user.parsedBody.username);
-                }
-            );
-        }
-    });
+        seterrMessage(null)    
+    }, [displayedForm]);
+
+    // The below code shouldn't be here. We should have a new page which is like dashboard or profile page to determine if we need to get the current user's data
+    // React.useEffect(() => {
+    //     if (logged_in) {
+    //         request<User>('/api/current_user/', 'get', true, false)
+    //         .then(handleErrors)
+    //         .then((user) => {
+    //             console.log("success")
+    //             console.log(user)
+    //                 // setEmail(user.parsedBody.email);
+    //         })
+    //         .catch(error =>{
+    //             // Set error message based on error type
+    //         });
+    //     }
+    // }, [displayedForm]);
 
     const handle_login = ({ e, errorMessage, ...data }: UserHandlerArgs) => {
         e.preventDefault();
         request<TokenResponse>(
-            '/api/token-auth/',
+            '/api/login/',
             'post',
             false,
             true,
             data
-        ).then((json) => {
+        ).then(handleErrors)
+        .then((json) => {
             localStorage.setItem('token', json.parsedBody.token);
             setLoggedIn(true);
-            setUsername(json.parsedBody.username);
+            setEmail(json.parsedBody.email);
             setDisplayedForm(null);
             seterrMessage(null)
         }).catch(error =>{
-            seterrMessage("Issues found")   // Set error message based on error type
+            seterrMessage("Incorrect email or password")   // Set error message based on error type
         });
     };
 
     const handle_signup = ({ e, errorMessage, ...data }: UserHandlerArgs) => {
         e.preventDefault();
-        request<TokenResponse>('/api/users/', 'post', false, true, data).then(
-            (json) => {
-                localStorage.setItem('token', json.parsedBody.token);
-                setLoggedIn(true);
-                setDisplayedForm(null);
-                setUsername(json.parsedBody.username);
-            }
-        ).catch(error =>{
-            seterrMessage("Issues found")   // Set error message based on error type
+        request<TokenResponse>('/api/signup/', 'post', false, true, data)
+        .then(handleErrors)
+        .then((resp)=>{
+            localStorage.setItem('token', resp.parsedBody.token);
+            setLoggedIn(true);
+            setDisplayedForm(null);
+            setEmail(resp.parsedBody.email);
+        })
+        .catch(error =>{
+            seterrMessage("Incorrect email or password")   // Set error message based on error type later
         });
-    };
+    }
 
     const handle_logout = () => {
         localStorage.removeItem('token');
         setLoggedIn(false);
-        setUsername(null);
+        setEmail(null);
     };
 
     const display_form = (form) => {
@@ -127,7 +149,7 @@ export default function TokenPage() {
             ) : (
                 <></>
             )}
-            <h3>{logged_in ? `Hello, ${username}` : 'Please Log In'}</h3>
+            <h3>{logged_in ? `Hello, ${email}` : 'Please Log In'}</h3>
         </>
     );
 }
