@@ -1,13 +1,11 @@
 import * as React from 'react';
 export declare type UserHandlerArgs = {
     e: React.FormEvent<HTMLFormElement>;
-    errorMessage: string | null;
-    email: string | null;
+    username: string | null;
     password: string | null;
 };
 declare type LoginFormProps = {
-    handle_login: ({ e, email, password }: UserHandlerArgs) => void;
-    errorMessage: string | null;
+    handle_login: ({ e, username, password }: UserHandlerArgs) => void;
 };
-export default function LoginForm({ handle_login, errorMessage }: LoginFormProps): JSX.Element;
+export default function LoginForm({ handle_login }: LoginFormProps): JSX.Element;
 export {};

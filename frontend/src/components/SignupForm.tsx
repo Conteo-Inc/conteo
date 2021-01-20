@@ -2,30 +2,23 @@ import * as React from 'react';
 import { UserHandlerArgs } from './LoginForm';
 
 type SignupFormProps = {
-    handle_signup: ({ e, email, password }: UserHandlerArgs) => void;
+    handle_signup: ({ e, username, password }: UserHandlerArgs) => void;
     errorMessage: string | null;
 };
-export default function SignupForm({ handle_signup, errorMessage }: SignupFormProps) {
-    const [email, setEmail] = React.useState<string>(null);
+export default function SignupForm({ handle_signup, errorMessage  }: SignupFormProps) {
+    const [username, setUsername] = React.useState<string>(null);
     const [password, setPassword] = React.useState<string>(null);
-
-
-    // Clear Error message
-    React.useEffect(() => {
-        errorMessage = ""
-    });
 
     return (
         //@TODO: This needs more info
-        <form onSubmit={(e) => handle_signup({ e, errorMessage,  email, password })}>
+        <form onSubmit={(e) => handle_signup({ e, errorMessage,  username, password })}>
             <h4>Sign Up</h4>
-            <label htmlFor='email'>Email</label>
+            <label htmlFor='username'>Username</label>
             <input
-                type='email'
-                name='email'
-                value={email || ""}
-                onChange={(e) => setEmail(e.target.value)}
-                required
+                type='text'
+                name='username'
+                value={username || ""}
+                onChange={(e) => setUsername(e.target.value)}
             />
             <br/>
             <br/>
@@ -35,7 +28,6 @@ export default function SignupForm({ handle_signup, errorMessage }: SignupFormPr
                 name='password'
                 value={password || ""}
                 onChange={(e) => setPassword(e.target.value)}
-                required
             />
             <br/>
             <span>{errorMessage}</span> 
