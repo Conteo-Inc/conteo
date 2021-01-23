@@ -43,6 +43,11 @@ class VideoListCreate(generics.ListCreateAPIView):
 
 
 class Matches(generics.GenericAPIView):
+    """
+    View for requesting new matches for a user.
+    """
+
+    # TODO Need a more appropriate serializer
     serializer_class = UserSerializer
 
     def get_queryset(self):
