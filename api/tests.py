@@ -1,13 +1,10 @@
-from collections import OrderedDict
-
 from django.contrib.auth.models import User
-from django.test import Client, TestCase
-from rest_framework.response import Response
+from rest_framework.test import APITestCase
 
 from api.models import MatchStatus
 
 
-class MatchesViewTestCase(TestCase):
+class MatchesViewTestCase(APITestCase):
     def setUp(self):
         ale = User.objects.create_user(username="ale", password="password")
         boy = User.objects.create_user(username="boy", password="password")
@@ -52,61 +49,58 @@ class MatchesViewTestCase(TestCase):
         user, users who have not declined the requesting user, and users
         for which the requesting user has not already made a decision for.
         """
-        client = Client()
-        client.login(username="ale", password="password")
-        res = client.get("/api/match/")  # type: Response
+        self.client.login(username="ale", password="password")
+        res = self.client.get("/api/match/", format="json")
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.data, [])
-        client.login(username="boy", password="password")
-        res = client.get("/api/match/")  # type: Response
+        self.assertCountEqual(res.json(), [])
+        self.client.login(username="boy", password="password")
+        res = self.client.get("/api/match/", format="json")
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(
-            res.data, [OrderedDict(username="dig"), OrderedDict(username="fog")]
-        )
-        client.login(username="cad", password="password")
-        res = client.get("/api/match/")  # type: Response
+        self.assertCountEqual(res.json(), [{"username": "dig"}, {"username": "fog"}])
+        self.client.login(username="cad", password="password")
+        res = self.client.get("/api/match/", format="json")
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(
-            res.data,
+        self.assertCountEqual(
+            res.json(),
             [
-                OrderedDict(username="dig"),
-                OrderedDict(username="eel"),
-                OrderedDict(username="fog"),
+                {"username": "dig"},
+                {"username": "eel"},
+                {"username": "fog"},
             ],
         )
-        client.login(username="dig", password="password")
-        res = client.get("/api/match/")  # type: Response
+        self.client.login(username="dig", password="password")
+        res = self.client.get("/api/match/", format="json")
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(
-            res.data,
+        self.assertCountEqual(
+            res.json(),
             [
-                OrderedDict(username="ale"),
-                OrderedDict(username="cad"),
-                OrderedDict(username="eel"),
-                OrderedDict(username="fog"),
+                {"username": "ale"},
+                {"username": "cad"},
+                {"username": "eel"},
+                {"username": "fog"},
             ],
         )
-        client.login(username="eel", password="password")
-        res = client.get("/api/match/")  # type: Response
+        self.client.login(username="eel", password="password")
+        res = self.client.get("/api/match/", format="json")
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(
-            res.data,
+        self.assertCountEqual(
+            res.json(),
             [
-                OrderedDict(username="cad"),
-                OrderedDict(username="dig"),
-                OrderedDict(username="fog"),
+                {"username": "cad"},
+                {"username": "dig"},
+                {"username": "fog"},
             ],
         )
-        client.login(username="fog", password="password")
-        res = client.get("/api/match/")  # type: Response
+        self.client.login(username="fog", password="password")
+        res = self.client.get("/api/match/", format="json")
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(
-            res.data,
+        self.assertCountEqual(
+            res.json(),
             [
-                OrderedDict(username="boy"),
-                OrderedDict(username="cad"),
-                OrderedDict(username="dig"),
-                OrderedDict(username="eel"),
+                {"username": "boy"},
+                {"username": "cad"},
+                {"username": "dig"},
+                {"username": "eel"},
             ],
         )
         # TODO check for matches with users not in the MatchStatus database

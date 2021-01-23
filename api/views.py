@@ -1,7 +1,10 @@
+import random
+
 from django.contrib.auth.models import User
 from django.db.models import Q
 from rest_framework import generics, permissions, status
 from rest_framework.decorators import api_view
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -39,7 +42,7 @@ class VideoListCreate(generics.ListCreateAPIView):
     serializer_class = VideoSerializer
 
 
-class Matches(generics.ListAPIView):
+class Matches(generics.GenericAPIView):
     serializer_class = UserSerializer
 
     def get_queryset(self):
@@ -47,7 +50,6 @@ class Matches(generics.ListAPIView):
         Return a QuerySet of Users that can be served to the request user
         as a match.
         """
-        # The user that is requesting their matches
         req_user = self.request.user
         # All users that have no matches i.e. not in the MatchStatus table
         unmatched_users = User.objects.filter(
@@ -72,3 +74,10 @@ class Matches(generics.ListAPIView):
             & ~Q(matchstatus_hi__user_hi_response=False)
         )
         return unmatched_users.union(q1, q2, q3)
+
+    def get(self, request: Request):
+        max_amount = request.query_params.get("amount", 20)
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset, many=True)
+        matches = random.sample(serializer.data, min(max_amount, len(serializer.data)))
+        return Response(matches)
