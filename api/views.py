@@ -59,7 +59,7 @@ class Matches(generics.GenericAPIView):
         # All users that have no matches i.e. not in the MatchStatus table
         unmatched_users = User.objects.filter(
             matchstatus_hi__isnull=True, matchstatus_lo__isnull=True
-        )
+        ).exclude(pk=req_user.pk)
         # All users that aren't matched with req_user
         q1 = User.objects.filter(
             ~Q(matchstatus_hi__user_lo=req_user) & ~Q(matchstatus_lo__user_hi=req_user)
@@ -70,14 +70,14 @@ class Matches(generics.GenericAPIView):
             Q(matchstatus_lo__user_hi=req_user)
             & Q(matchstatus_lo__user_hi_response__isnull=True)
             & ~Q(matchstatus_lo__user_lo_response=False)
-        )
+        ).exclude(pk=req_user.pk)
         # All users for which user_lo = req_user AND
         # user_lo has not responded and user_hi has not declined
         q3 = User.objects.filter(
             Q(matchstatus_hi__user_lo=req_user)
             & Q(matchstatus_hi__user_lo_response__isnull=True)
             & ~Q(matchstatus_hi__user_hi_response=False)
-        )
+        ).exclude(pk=req_user.pk)
         return unmatched_users.union(q1, q2, q3)
 
     def get(self, request: Request):

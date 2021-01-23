@@ -12,6 +12,7 @@ class MatchesViewTestCase(APITestCase):
         dig = User.objects.create_user(username="dig", password="password")
         eel = User.objects.create_user(username="eel", password="password")
         fog = User.objects.create_user(username="fog", password="password")
+        User.objects.create_user(username="gil", password="password")
         MatchStatus.objects.create(
             user_lo=ale, user_hi=boy, user_lo_response=True, user_hi_response=True
         )
@@ -52,11 +53,13 @@ class MatchesViewTestCase(APITestCase):
         self.client.login(username="ale", password="password")
         res = self.client.get("/api/match/", format="json")
         self.assertEqual(res.status_code, 200)
-        self.assertCountEqual(res.json(), [])
+        self.assertCountEqual(res.json(), [{"username": "gil"}])
         self.client.login(username="boy", password="password")
         res = self.client.get("/api/match/", format="json")
         self.assertEqual(res.status_code, 200)
-        self.assertCountEqual(res.json(), [{"username": "dig"}, {"username": "fog"}])
+        self.assertCountEqual(
+            res.json(), [{"username": "dig"}, {"username": "fog"}, {"username": "gil"}]
+        )
         self.client.login(username="cad", password="password")
         res = self.client.get("/api/match/", format="json")
         self.assertEqual(res.status_code, 200)
@@ -66,6 +69,7 @@ class MatchesViewTestCase(APITestCase):
                 {"username": "dig"},
                 {"username": "eel"},
                 {"username": "fog"},
+                {"username": "gil"},
             ],
         )
         self.client.login(username="dig", password="password")
@@ -78,6 +82,7 @@ class MatchesViewTestCase(APITestCase):
                 {"username": "cad"},
                 {"username": "eel"},
                 {"username": "fog"},
+                {"username": "gil"},
             ],
         )
         self.client.login(username="eel", password="password")
@@ -89,6 +94,7 @@ class MatchesViewTestCase(APITestCase):
                 {"username": "cad"},
                 {"username": "dig"},
                 {"username": "fog"},
+                {"username": "gil"},
             ],
         )
         self.client.login(username="fog", password="password")
@@ -101,6 +107,20 @@ class MatchesViewTestCase(APITestCase):
                 {"username": "cad"},
                 {"username": "dig"},
                 {"username": "eel"},
+                {"username": "gil"},
             ],
         )
-        # TODO check for matches with users not in the MatchStatus database
+        self.client.login(username="gil", password="password")
+        res = self.client.get("/api/match/", format="json")
+        self.assertEqual(res.status_code, 200)
+        self.assertCountEqual(
+            res.json(),
+            [
+                {"username": "ale"},
+                {"username": "boy"},
+                {"username": "cad"},
+                {"username": "dig"},
+                {"username": "eel"},
+                {"username": "fog"},
+            ],
+        )
