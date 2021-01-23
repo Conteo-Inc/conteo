@@ -58,6 +58,19 @@ class VideoSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        
+        video_file = instance.video_file
+        video_file.open()
+
+        #Raw base64 bytes need to be decoded to a string
+        #and the data needs the header
+        rep['video_file'] = "data:video/mp4;base64," + video_file.read().decode('UTF-8')
+        video_file.close()
+
+        return rep
+
     class Meta:
         model = Video
         fields = ('id', 'title', 'video_file')
