@@ -3,7 +3,7 @@ import { render } from 'react-dom';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import LinkItem from './components/LinkItem';
 import TokenPage from './FullPageRoutes/TokenPage';
-import { Grid, makeStyles, Typography } from '@material-ui/core';
+import { Box, Grid, makeStyles, Typography } from '@material-ui/core';
 
 const useStyles = makeStyles({
     header: {
@@ -18,6 +18,11 @@ const useStyles = makeStyles({
     },
     bannerText: {
         color: 'white',
+    },
+    app: {
+        height: '50rem',
+        display: 'flex',
+        flexDirection: 'column',
     },
 });
 
@@ -62,14 +67,17 @@ export default function App() {
                     </Grid>
                 </Grid>
             </Grid>
-            <Switch>
-                <Route path='/Tokens'>
-                    <TokenPage />
-                </Route>
-                <Route path='/'>
-                    <MainPage />
-                </Route>
-            </Switch>
+            {/* Here's where the body of the App will live */}
+            <Box className={classes.app}>
+                <Switch>
+                    <Route path='/Tokens'>
+                        <TokenPage />
+                    </Route>
+                    <Route path='/'>
+                        <MainPage />
+                    </Route>
+                </Switch>
+            </Box>
             <Grid
                 container
                 direction='row'
