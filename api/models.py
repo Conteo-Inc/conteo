@@ -1,4 +1,5 @@
-from django.db import models, F, Q
+from django.db import models
+from django.db.models import F,Q
 from django.contrib.auth.models import User, BaseUserManager, AbstractBaseUser, models
 import uuid
 

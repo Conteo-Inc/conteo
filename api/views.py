@@ -1,5 +1,5 @@
 from .models import Video, UserProfile, User
-from .serializers import VideoSerializer, UserRegistrationSerializer, UserLoginSerializer
+from .serializers import VideoSerializer, UserRegistrationSerializer, UserLoginSerializer, UserSerializer
 from rest_framework.generics import CreateAPIView, RetrieveAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
@@ -13,12 +13,9 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_jwt.settings import api_settings
-
 from .models import Video
-from .serializers import UserSerializer, UserSerializerWithToken, VideoSerializer
 
 
-<<<<<<< HEAD
 JWT_PAYLOAD_HANDLER = api_settings.JWT_PAYLOAD_HANDLER
 JWT_ENCODE_HANDLER = api_settings.JWT_ENCODE_HANDLER
 
