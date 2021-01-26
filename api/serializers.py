@@ -1,6 +1,6 @@
+from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework_jwt.settings import api_settings
-# from django.contrib.auth.models import User
 from .models import Video, User, UserProfile
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import update_last_login
@@ -9,8 +9,8 @@ JWT_PAYLOAD_HANDLER = api_settings.JWT_PAYLOAD_HANDLER
 JWT_ENCODE_HANDLER = api_settings.JWT_ENCODE_HANDLER
 
 
-class UserSerializer(serializers.ModelSerializer):
 
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
         fields = ('first_name', 'last_name', 'phone_number', 'age', 'gender')
@@ -72,4 +72,4 @@ class UserLoginSerializer(serializers.Serializer):
 class VideoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Video
-        fields = ('id', 'title')
+        fields = ("id", "title")
