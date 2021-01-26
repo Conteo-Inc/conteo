@@ -22,7 +22,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('email', 'password')
+        fields = ('username', 'password')
         # fields = ('email', 'password', 'profile') #We can use this if we need to make profile related data when creating an account
         extra_kwargs = {'password': {'write_only': True}}
 
@@ -43,14 +43,14 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
 class UserLoginSerializer(serializers.Serializer):
 
-    email = serializers.CharField(max_length=255)
+    username = serializers.CharField(max_length=255)
     password = serializers.CharField(max_length=128, write_only=True)
     token = serializers.CharField(max_length=255, read_only=True)
 
     def validate(self, data):
-        email = data.get("email", None)
+        username = data.get("username", None)
         password = data.get("password", None)
-        user = authenticate(email=email, password=password)
+        user = authenticate(username=username, password=password)
         if user is None:
             raise serializers.ValidationError(
                 'A user with this email and password is not found.'   #Not authenticated
@@ -64,7 +64,7 @@ class UserLoginSerializer(serializers.Serializer):
                 'User with given email and password does not exists'  #User not found
             )
         return {
-            'email':user.email,
+            'username':user.username,
             'token': jwt_token
         }
 

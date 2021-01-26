@@ -90,7 +90,6 @@ DATABASES = {
     }
 }
 
-AUTH_USER_MODEL = 'api.User'
 REST_FRAMEWORK = {
     # "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
     'DEFAULT_PERMISSION_CLASSES': (
@@ -105,7 +104,6 @@ REST_FRAMEWORK = {
 
 CORS_ORIGIN_WHITELIST = ("http://localhost:8000",)
 
-<<<<<<< HEAD
 # JWT_AUTH = {
 #     'JWT_RESPONSE_PAYLOAD_HANDLER': 'api.utils.custom_jwt_response_handler'
 # }
