@@ -1,5 +1,3 @@
-import { strict } from 'assert';
-import { type } from 'os';
 import * as React from 'react';
 import LinkItem from '../components/LinkItem';
 import LoginForm, { UserHandlerArgs } from '../components/LoginForm';
@@ -11,7 +9,7 @@ type User = {
 } & any;
 
 type TokenResponse = {
-    email: string;
+    username: string;
     token: string;
 };
 
@@ -69,22 +67,6 @@ export default function TokenPage() {
         seterrMessage(null)    
     }, [displayedForm]);
 
-    // The below code shouldn't be here. We should have a new page which is like dashboard or profile page to determine if we need to get the current user's data
-    // React.useEffect(() => {
-    //     if (logged_in) {
-    //         request<User>('/api/current_user/', 'get', true, false)
-    //         .then(handleErrors)
-    //         .then((user) => {
-    //             console.log("success")
-    //             console.log(user)
-    //                 // setEmail(user.parsedBody.email);
-    //         })
-    //         .catch(error =>{
-    //             // Set error message based on error type
-    //         });
-    //     }
-    // }, [displayedForm]);
-
     const handle_login = ({ e, errorMessage, ...data }: UserHandlerArgs) => {
         e.preventDefault();
         request<TokenResponse>(
@@ -97,7 +79,7 @@ export default function TokenPage() {
         .then((json) => {
             localStorage.setItem('token', json.parsedBody.token);
             setLoggedIn(true);
-            setEmail(json.parsedBody.email);
+            setEmail(json.parsedBody.username);
             setDisplayedForm(null);
             seterrMessage(null)
         }).catch(error =>{
@@ -107,13 +89,13 @@ export default function TokenPage() {
 
     const handle_signup = ({ e, errorMessage, ...data }: UserHandlerArgs) => {
         e.preventDefault();
-        request<TokenResponse>('/api/signup/', 'post', false, true, data)
+        request<TokenResponse>('/api/register/', 'post', false, true, data)
         .then(handleErrors)
         .then((resp)=>{
             localStorage.setItem('token', resp.parsedBody.token);
             setLoggedIn(true);
             setDisplayedForm(null);
-            setEmail(resp.parsedBody.email);
+            setEmail(resp.parsedBody.username);
         })
         .catch(error =>{
             seterrMessage("Incorrect email or password")   // Set error message based on error type later

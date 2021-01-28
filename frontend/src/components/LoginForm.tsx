@@ -3,16 +3,16 @@ import * as React from 'react';
 export type UserHandlerArgs = {
     e: React.FormEvent<HTMLFormElement>;
     errorMessage: string | null
-    email: string | null;
+    username: string | null;
     password: string | null;
 };
 type LoginFormProps = {
-    handle_login: ({ e, email, password }: UserHandlerArgs) => void;
+    handle_login: ({ e, username, password }: UserHandlerArgs) => void;
     errorMessage: string | null;
 };
 
 export default function LoginForm({ handle_login, errorMessage }: LoginFormProps) {
-    const [email, setEmail] = React.useState<string>(null);
+    const [username, setUsername] = React.useState<string>(null);
     const [password, setPassword] = React.useState<string>(null);
     
     // Clear Error message
@@ -22,14 +22,14 @@ export default function LoginForm({ handle_login, errorMessage }: LoginFormProps
 
 
     return (
-        <form onSubmit={(e) => handle_login({ e, errorMessage, email, password })}>
+        <form onSubmit={(e) => handle_login({ e, errorMessage, username, password })}>
             <h4>Log In</h4>
             <label htmlFor='email'>Email</label>
             <input
                 type='email'
                 name='email'
-                value={email || ""}
-                onChange={(e) => setEmail(e.target.value)}
+                value={username || ""}
+                onChange={(e) => setUsername(e.target.value)}
                 required
             />
             <br/>
