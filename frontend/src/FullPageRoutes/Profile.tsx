@@ -40,22 +40,28 @@ const useStyles = makeStyles({
     profile: {
         backgroundColor: 'rgb(234, 232, 224)',
     },
+    profileHeader: {
+        padding: 45,
+    },
     profileItem: {
-        padding: 20,
+        padding: 5,
+    },
+    profileItemEntry: {
+        fontSize: 2 + 'rem',
+        paddingLeft: 10,
+    },
+    profileAvatar: {
+        height: 200,
+        width: 200,
+    },
+    introVideo: {
+        height: 150,
+        width: 200,
+        backgroundColor: 'blue',
+        color: 'white',
+        textAlign: 'center',
     },
 });
-
-// const useStyles = makeStyles({
-//     root: {
-//         display: 'flex',
-//         flexWrap: 'wrap',
-//         justifyContent: 'space-around',
-//     },
-//     gridList: {
-//         width: 'auto',
-//         height: 600,
-//     },
-// });
 
 export default function Profile() {
     const [username, setUsername] = React.useState<string>(null);
@@ -160,41 +166,72 @@ export default function Profile() {
                     </Grid>
                 </Grid>
             </Grid>
-            <Grid item className={classes.profile} xs={9}>
-                <Typography className={classes.profileItem}>Remove</Typography>
-                <Typography className={classes.profileItem}>Remove</Typography>
+            <Grid container item className={classes.profile} xs={9}>
+                <Grid container item className={classes.profileHeader} xs={12}>
+                    <Grid container alignItems="center" justify="center" xs={6}>
+                        <Avatar alt={name} src={profileImg} className={classes.profileAvatar} />
+                    </Grid>
+                    <Grid container alignItems="center" justify="center" xs={6}>
+                        <div className={classes.introVideo}>Intro Video</div>
+                    </Grid>
+                </Grid>
+                <Grid container item className={classes.profileItem} xs={12}>
+                    <Grid container alignItems="center" justify="flex-end" xs={3}>
+                        <Typography>Full Name</Typography>
+                    </Grid>
+                    <Grid container alignItems="center" className={classes.profileItemEntry} xs={9}>
+                        <Typography>{name}</Typography>
+                    </Grid>
+                </Grid>
+                <Grid container item className={classes.profileItem} xs={12}>
+                    <Grid container alignItems="center" justify="flex-end" xs={3}>
+                        <Typography>Age</Typography>
+                    </Grid>
+                    <Grid container alignItems="center" className={classes.profileItemEntry} xs={9}>
+                        <Typography>{age}</Typography>
+                    </Grid>
+                </Grid>
+                <Grid container item className={classes.profileItem} xs={12}>
+                    <Grid container alignItems="center" justify="flex-end" xs={3}>
+                        <Typography>Gender</Typography>
+                    </Grid>
+                    <Grid container alignItems="center" className={classes.profileItemEntry} xs={9}>
+                        <Typography>{gender}</Typography>
+                    </Grid>
+                </Grid>
+                <Grid container item className={classes.profileItem} xs={12}>
+                    <Grid container alignItems="center" justify="flex-end" xs={3}>
+                        <Typography>Occupation</Typography>
+                    </Grid>
+                    <Grid container alignItems="center" className={classes.profileItemEntry} xs={9}>
+                        <Typography>{occupation}</Typography>
+                    </Grid>
+                </Grid>
+                <Grid container item className={classes.profileItem} xs={12}>
+                    <Grid container alignItems="center" justify="flex-end" xs={3}>
+                        <Typography>Location</Typography>
+                    </Grid>
+                    <Grid container alignItems="center" className={classes.profileItemEntry} xs={9}>
+                        <Typography>{location}</Typography>
+                    </Grid>
+                </Grid>
+                <Grid container item className={classes.profileItem} xs={12}>
+                    <Grid container alignItems="center" justify="flex-end" xs={3}>
+                        <Typography>Interests</Typography>
+                    </Grid>
+                    <Grid container alignItems="center" className={classes.profileItemEntry} xs={9}>
+                        <Typography>{interests.join(', ')}</Typography>
+                    </Grid>
+                </Grid>
+                <Grid container item className={classes.profileItem} xs={12}>
+                    <Grid container alignItems="center" justify="flex-end" xs={3}>
+                        <Typography>Religion</Typography>
+                    </Grid>
+                    <Grid container alignItems="center" className={classes.profileItemEntry} xs={9}>
+                        <Typography>{religion}</Typography>
+                    </Grid>
+                </Grid>
             </Grid>
         </Grid>
-
-        // <GridList cellHeight={400} className={classes.gridList} cols={2}>
-        //     <GridList cellHeight={100} cols={1}>
-        //         {sideBar.map((tile) => (
-        //             <GridListTile key={tile.title} cols={1}>
-        //                 <GridList cellHeight={100} cols={2}>
-        //                     <GridListTile cols={1}>
-        //                         <img src={tile.icon} alt={tile.title + ' icon'} />
-        //                     </GridListTile>
-        //                     <GridListTile cols={1}>
-        //                         <h4>{tile.title}</h4>
-        //                     </GridListTile>
-        //                 </GridList>
-        //             </GridListTile>
-        //         ))}
-        //     </GridList>
-        //     <GridList cellHeight={100} cols={1}>
-        //         {profileValues.map((tile) => (
-        //             <GridListTile key={tile.title} cols={2}>
-        //                 <GridList cellHeight={100} cols={2}>
-        //                     <GridListTile cols={1}>
-        //                         <h4>{tile.title}: </h4>
-        //                     </GridListTile>
-        //                     <GridListTile cols={1}>
-        //                         <h4>{tile.value}</h4>
-        //                     </GridListTile>
-        //                 </GridList>
-        //             </GridListTile>
-        //         ))}
-        //     </GridList>
-        // </GridList>
     );
 }
