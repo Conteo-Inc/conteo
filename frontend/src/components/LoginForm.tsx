@@ -18,7 +18,7 @@ type LoginFormProps = {
 export const useStyles = makeStyles({
     paperStyle : {
         padding: 20,
-        height: '50vh',
+        height: '70vh',
         width: 280,
         margin: "20px auto"
     },

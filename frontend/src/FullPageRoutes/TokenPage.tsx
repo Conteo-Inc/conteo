@@ -1,12 +1,12 @@
 import * as React from 'react';
-import LinkItem from '../components/LinkItem';
-import LoginForm, { UserHandlerArgs } from '../components/LoginForm';
+import LoginForm, { UserHandlerArgs, ColorButton } from '../components/LoginForm';
 import SignupForm from '../components/SignupForm';
+import Dashboard from '../components/Dashboard';
 import { request } from '../utils/fetch';
+import { Grid, Paper } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
 
-type User = {
-    email: string;
-} & any;
+
 
 type TokenResponse = {
     username: string;
@@ -18,34 +18,6 @@ type NavProps = {
     display_form: (form: string) => void;
     handle_logout: () => void;
 };
-function Nav({ logged_in, display_form, handle_logout }: NavProps) {
-    const LoggedOutNav = (
-        <ul>
-            <li
-                onClick={() => {
-                    display_form('login');
-                }}
-            >
-                Login
-            </li>
-            <li
-                onClick={() => {
-                    display_form('signup');
-                }}
-            >
-                Signup
-            </li>
-        </ul>
-    );
-
-    const LoggedInNav = (
-        <ul>
-            <li onClick={handle_logout}>Logout</li>
-        </ul>
-    );
-
-    return <div>{logged_in ? LoggedInNav : LoggedOutNav}</div>;
-}
 
 function handleErrors(response) {
     if (!response.ok) {
@@ -54,6 +26,20 @@ function handleErrors(response) {
     return response;
 }
 
+const useStyles = makeStyles({
+    paperStyle : {
+        padding: 20,
+        width: 280,
+        margin: "20px auto"
+    },
+    btnStyle : {
+        margin: '8px 0',
+    },
+    pageStyle: {
+        margin: "100px auto"
+    }
+});
+
 export default function TokenPage() {
     const [displayedForm, setDisplayedForm] = React.useState<string>(null);
     const [logged_in, setLoggedIn] = React.useState<boolean>(
@@ -61,11 +47,11 @@ export default function TokenPage() {
     );
     const [email, setEmail] = React.useState<string>(null);
     const [errMessage, seterrMessage] = React.useState<string>(null);
-
+    const classes = useStyles();
 
     React.useEffect(() => {
-        seterrMessage(null)    
-    }, [displayedForm]);
+        seterrMessage(null)   
+    }, [displayedForm, logged_in]);
 
     const handle_login = ({ e, errorMessage, ...data }: UserHandlerArgs) => {
         e.preventDefault();
@@ -114,24 +100,45 @@ export default function TokenPage() {
 
     return (
         <>
-            <ul>
-                <LinkItem to='/' text='Home' />
-            </ul>
-            <div>
-                <Nav
-                    logged_in={logged_in}
-                    display_form={display_form}
-                    handle_logout={handle_logout}
-                />
-            </div>
-            {displayedForm === 'login' ? (
-                <LoginForm handle_login={handle_login} errorMessage={errMessage}/>
-            ) : displayedForm === 'signup' ? (
-                <SignupForm handle_signup={handle_signup} errorMessage={errMessage}/>
-            ) : (
-                <></>
-            )}
-            <h3>{logged_in ? `Hello, ${email}` : 'Please Log In'}</h3>
+        {
+          logged_in === true? (
+            <Dashboard handle_logout={handle_logout} email={email} />
+        ):
+         displayedForm === 'signup' ? (
+            <SignupForm handle_signup={handle_signup} errorMessage={errMessage}/>
+        ) : 
+        (
+            <Grid 
+            container
+            className={classes.pageStyle}
+            >
+                <Grid 
+                container
+                spacing={0}
+                direction="column"
+                alignItems="center"
+                justify="center"
+                item 
+                sm
+                >
+                    <Paper className={classes.paperStyle} >
+                        <ColorButton type='submit' variant='contained' fullWidth className={classes.btnStyle} onClick={() => {display_form('signup')}}>Sign Up</ColorButton>
+                    </Paper>
+                </Grid>
+                <Grid 
+                container
+                spacing={0}
+                direction="column"
+                alignItems="center"
+                justify="center"
+                item 
+                sm
+                >
+                    <LoginForm handle_login={handle_login} errorMessage={errMessage}/>
+                </Grid>
+            </Grid>
+        )
+        }
         </>
     );
 }
