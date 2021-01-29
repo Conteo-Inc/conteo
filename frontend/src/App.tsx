@@ -2,6 +2,7 @@ import * as React from 'react';
 import { render } from 'react-dom';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import LinkItem from './components/LinkItem';
+import Dashboard from './FullPageRoutes/Dashboard';
 import TokenPage from './FullPageRoutes/TokenPage';
 
 function MainPage() {
@@ -20,7 +21,7 @@ export default function App() {
                     <TokenPage />
                 </Route>
                 <Route path='/'>
-                    <MainPage />
+                    <Dashboard />
                 </Route>
             </Switch>
         </Router>
