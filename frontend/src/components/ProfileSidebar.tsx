@@ -20,30 +20,26 @@ type SidebarItem = {
 }
 
 const useStyles = makeStyles({
-    sideBar: {
-        padding: 10,
-        backgroundColor: 'rgb(238, 235, 228)',
-    },
-    sideBarTab: {
+    tab: {
         padding: 15,
         borderBottom: '2px solid black',
         cursor: 'pointer',
     },
-    sideBarTabTitle: {
+    headerAvatar: {
+        height: 60,
+        width: 60,
+    },
+    headerName: {
+        fontSize: '2rem',
+        padding: '32px 0px',
+    },
+    tabTitle: {
         fontSize: '1rem',
         '@media (min-width:1100px)': {
             fontSize: '1.5rem',
         },
         fontWeight: 'bold',
         cursor: 'pointer',
-    },
-    sideBarHeaderAvatar: {
-        height: 60,
-        width: 60,
-    },
-    sideBarHeaderName: {
-        fontSize: '2rem',
-        padding: '32px 0px',
     },
 });
 
@@ -75,25 +71,25 @@ export default function ProfileSidebar(props: Props) {
     ];
 
     return (
-        <Grid container item className={classes.sideBar} xs={3}>
-            <Grid container item className={classes.sideBarTab} xs={12}>
+        <>
+        <Grid container item className={classes.tab} xs={12}>
+            <Grid container item alignItems="center" justify="center" xs={3}>
+                <Avatar alt={props.name} src={props.profileImg} className={classes.headerAvatar} />
+            </Grid>
+            <Grid container item alignItems="center" xs={9}>
+                <Typography className={`${classes.headerName} ${classes.tabTitle}`}>{props.name}</Typography>
+            </Grid>
+        </Grid>
+        {items.map(({ icon, title }: SidebarItem) => (
+            <Grid key={title} container item className={classes.tab} xs={12}>
                 <Grid container item alignItems="center" justify="center" xs={3}>
-                    <Avatar alt={props.name} src={props.profileImg} className={classes.sideBarHeaderAvatar} />
+                    {icon}
                 </Grid>
                 <Grid container item alignItems="center" xs={9}>
-                    <Typography className={`${classes.sideBarHeaderName} ${classes.sideBarTabTitle}`}>{props.name}</Typography>
+                    <Typography className={classes.tabTitle}>{title}</Typography>
                 </Grid>
             </Grid>
-            {items.map(({ icon, title }: SidebarItem) => (
-                <Grid key={title} container item className={classes.sideBarTab} xs={12}>
-                    <Grid container item alignItems="center" justify="center" xs={3}>
-                        {icon}
-                    </Grid>
-                    <Grid container item alignItems="center" xs={9}>
-                        <Typography className={classes.sideBarTabTitle}>{title}</Typography>
-                    </Grid>
-                </Grid>
-            ))}
-        </Grid>
+        ))}
+        </>
     );
 }

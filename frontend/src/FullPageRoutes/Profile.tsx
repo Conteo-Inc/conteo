@@ -11,7 +11,11 @@ const useStyles = makeStyles({
     root: {
         flexGrow: 1,
     },
-    userInfoSection: {
+    sideBar: {
+        padding: 10,
+        backgroundColor: 'rgb(238, 235, 228)',
+    },
+    section: {
         padding: 50,
         backgroundColor: 'rgb(234, 232, 224)',
     },
@@ -44,14 +48,17 @@ export default function Profile() {
 
     return (
         <Grid container className={classes.root}>
+        <Grid container item className={classes.sideBar} xs={3}>
             <ProfileSidebar name={content.name} profileImg={content.profileImg} />
-
-            <Grid container item className={classes.userInfoSection} xs={9}>
+            </Grid>
+            <Grid container item className={classes.section} xs={9}>
                 <ProfileContent username={content.username} name={content.name}
                     profileImg={content.profileImg} gender={content.gender}
                     religion={content.religion} location={content.location}
                     occupations={content.occupations} age={content.age}
                     interests={content.interests} />
+                {/* Other components (e.g. Notifications, Settings, and Privacy)
+                will be added here with attribute hidden */}
             </Grid>
         </Grid>
     );
