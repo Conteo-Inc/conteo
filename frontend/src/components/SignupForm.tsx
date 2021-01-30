@@ -11,11 +11,6 @@ export default function SignupForm({ handle_signup, errorMessage }: SignupFormPr
     const [username, setUsername] = React.useState<string>(null);
     const [password, setPassword] = React.useState<string>(null);
 
-
-    // Clear Error message
-    React.useEffect(() => {
-        errorMessage = ""
-    });
     const classes = useStyles();
 
     return (

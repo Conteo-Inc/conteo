@@ -46,10 +46,6 @@ export default function LoginForm({ handle_login, errorMessage }: LoginFormProps
 
     const classes = useStyles();
 
-    // Clear Error message
-    React.useEffect(() => {
-        errorMessage = ""
-    });
 
     return (
         <Grid>
