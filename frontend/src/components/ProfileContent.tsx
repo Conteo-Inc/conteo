@@ -2,9 +2,6 @@ import * as React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Grid, Avatar, Typography } from '@material-ui/core';
 
-// EDIT
-import EditIcon from '@material-ui/icons/Edit';
-
 // This is what the ProfileContent component expects to receive from storage.
 export type Props = {
     username: string;
@@ -53,19 +50,6 @@ const useStyles = makeStyles({
         padding: 5,
         paddingRight: 10,
     },
-
-
-    // EDIT
-    fieldEdit: {
-        position: 'absolute',
-        top: '0',
-        right: '0',
-        transform: 'translate(-50%, 50%)',
-        height: 30,
-        width: 30,
-        textAlign: 'center',
-        cursor: 'pointer',
-    }
 });
 
 export default function ProfileContent(props: Props) {
@@ -107,11 +91,6 @@ export default function ProfileContent(props: Props) {
         },
     ];
 
-    // EDIT
-    // toggleEditMode() {
-
-    // }
-
     return (
         <>
             <Grid container item className={classes.profileHeader} xs={12}>
@@ -123,11 +102,6 @@ export default function ProfileContent(props: Props) {
                 </Grid>
             </Grid>
             <Grid container item alignItems="center" className={classes.fieldsContainer} xs={12}>
-                {/* EDIT */}
-                <div className={classes.fieldEdit}>
-                    <EditIcon />
-                        Edit
-                    </div>
                 {profileFields.map(({ title, value }: ProfileField) => (
                     <Grid key={title} item className={classes.field} sm={12} md={6}>
                         <Typography>{title}: {value}</Typography>
