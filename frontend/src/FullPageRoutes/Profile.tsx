@@ -1,14 +1,18 @@
 import * as React from 'react';
-import { Link } from 'react-router-dom';
 import { request } from '../utils/fetch';
 import type { User } from '../App';
 import { makeStyles } from '@material-ui/core/styles';
-import { Grid, Avatar, Typography } from '@material-ui/core';
+import { Grid, Avatar, Typography, Paper } from '@material-ui/core';
 import PersonIcon from '@material-ui/icons/Person';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import SettingsIcon from '@material-ui/icons/Settings';
 import MailIcon from '@material-ui/icons/Mail';
 import LockIcon from '@material-ui/icons/Lock';
+
+type ProfileField = {
+    title: string;
+    value: string;
+};
 
 const useStyles = makeStyles({
     root: {
@@ -37,14 +41,26 @@ const useStyles = makeStyles({
         padding: '32px 0px',
     },
 
-    profile: {
+    userInfoSection: {
+        padding: 50,
         backgroundColor: 'rgb(234, 232, 224)',
     },
     profileHeader: {
-        padding: 45,
+        padding: '0 50',
     },
-    profileItem: {
-        padding: 5,
+    fieldsContainer: {
+        boxShadow: '0px 3px 3px -2px rgb(0 0 0 / 20%), 0px 3px 4px 0px rgb(0 0 0 / 14%), 0px 1px 8px 0px rgb(0 0 0 / 12%)',
+        borderRadius: 4,
+        color: 'rgba(0, 0, 0, 0.87)',
+        transition: 'box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
+        backgroundColor: '#fff',
+        padding: '0 100px',
+    },
+    leftField: {
+        padding: '5px 10px 5px 5px',
+    },
+    rightField: {
+        padding: '5px 5px 5px 10px',
     },
     profileItemEntry: {
         fontSize: 2 + 'rem',
@@ -75,7 +91,8 @@ export default function Profile() {
         );
     });
 
-    // Values defined according to user profile data.
+
+    // Dummy data that represents what could be retrieved from storage.
     const {
         name,
         profileImg,
@@ -99,7 +116,8 @@ export default function Profile() {
         interests: ['Acting', 'Film Producing'],
     }
 
-    const profileValues = [
+    // Add user profile values to list.
+    var fields: ProfileField[] = [
         {
             title: 'Full Name',
             value: name
@@ -109,15 +127,38 @@ export default function Profile() {
             value: age
         },
         {
+            title: 'Gender',
+            value: gender
+        },
+        {
+            title: 'Occupation',
+            value: occupation
+        },
+        {
+            title: 'Location',
+            value: location
+        },
+        {
             title: 'Interests',
-            value: interests
+            value: interests.join(', ')
+        },
+        {
+            title: 'Religion',
+            value: religion
         },
     ];
 
+    // let nameField: ProfileField = {
+    //     title: 'Full Name',
+    //     value: name
+    // }
+
     return (
         <Grid container className={classes.root}>
-            <Grid container item className={classes.sideBar} xs={3}>
-                <Grid container item className={classes.sideBarTab} xs={12}>
+            {/* BEGIN SIDEBAR */}
+            {/* TODO: move sidebar to component */}
+            <Grid container className={classes.sideBar} xs={3}>
+                <Grid container className={classes.sideBarTab} xs={12}>
                     <Grid container alignItems="center" justify="center" xs={3}>
                         <Avatar alt={name} src={profileImg} className={classes.sideBarHeaderAvatar} />
                     </Grid>
@@ -125,7 +166,7 @@ export default function Profile() {
                         <Typography className={`${classes.sideBarHeaderName} ${classes.sideBarTabTitle}`}>{name}</Typography>
                     </Grid>
                 </Grid>
-                <Grid container item className={classes.sideBarTab} xs={12}>
+                <Grid container className={classes.sideBarTab} xs={12}>
                     <Grid container alignItems="center" justify="center" xs={3}>
                         <PersonIcon />
                     </Grid>
@@ -133,7 +174,7 @@ export default function Profile() {
                         <Typography className={classes.sideBarTabTitle}>Bio</Typography>
                     </Grid>
                 </Grid>
-                <Grid container item className={classes.sideBarTab} xs={12}>
+                <Grid container className={classes.sideBarTab} xs={12}>
                     <Grid container alignItems="center" justify="center" xs={3}>
                         <NotificationsIcon />
                     </Grid>
@@ -141,7 +182,7 @@ export default function Profile() {
                         <Typography className={classes.sideBarTabTitle}>Notifications</Typography>
                     </Grid>
                 </Grid>
-                <Grid container item className={classes.sideBarTab} xs={12}>
+                <Grid container className={classes.sideBarTab} xs={12}>
                     <Grid container alignItems="center" justify="center" xs={3}>
                         <SettingsIcon />
                     </Grid>
@@ -149,7 +190,7 @@ export default function Profile() {
                         <Typography className={classes.sideBarTabTitle}>Settings</Typography>
                     </Grid>
                 </Grid>
-                <Grid container item className={classes.sideBarTab} xs={12}>
+                <Grid container className={classes.sideBarTab} xs={12}>
                     <Grid container alignItems="center" justify="center" xs={3}>
                         <MailIcon />
                     </Grid>
@@ -157,7 +198,7 @@ export default function Profile() {
                         <Typography className={classes.sideBarTabTitle}>Contact Us</Typography>
                     </Grid>
                 </Grid>
-                <Grid container item className={classes.sideBarTab} xs={12}>
+                <Grid container className={classes.sideBarTab} xs={12}>
                     <Grid container alignItems="center" justify="center" xs={3}>
                         <LockIcon />
                     </Grid>
@@ -166,8 +207,10 @@ export default function Profile() {
                     </Grid>
                 </Grid>
             </Grid>
-            <Grid container item className={classes.profile} xs={9}>
-                <Grid container item className={classes.profileHeader} xs={12}>
+            {/* END SIDEBARD */}
+            {/* BEGIN PROFILE SECTION */}
+            <Grid container className={classes.userInfoSection} xs={9}>
+                <Grid container className={classes.profileHeader} xs={12}>
                     <Grid container alignItems="center" justify="center" xs={6}>
                         <Avatar alt={name} src={profileImg} className={classes.profileAvatar} />
                     </Grid>
@@ -175,63 +218,23 @@ export default function Profile() {
                         <div className={classes.introVideo}>Intro Video</div>
                     </Grid>
                 </Grid>
-                <Grid container item className={classes.profileItem} xs={12}>
-                    <Grid container alignItems="center" justify="flex-end" xs={3}>
-                        <Typography>Full Name</Typography>
-                    </Grid>
-                    <Grid container alignItems="center" className={classes.profileItemEntry} xs={9}>
-                        <Typography>{name}</Typography>
-                    </Grid>
-                </Grid>
-                <Grid container item className={classes.profileItem} xs={12}>
-                    <Grid container alignItems="center" justify="flex-end" xs={3}>
-                        <Typography>Age</Typography>
-                    </Grid>
-                    <Grid container alignItems="center" className={classes.profileItemEntry} xs={9}>
-                        <Typography>{age}</Typography>
-                    </Grid>
-                </Grid>
-                <Grid container item className={classes.profileItem} xs={12}>
-                    <Grid container alignItems="center" justify="flex-end" xs={3}>
-                        <Typography>Gender</Typography>
-                    </Grid>
-                    <Grid container alignItems="center" className={classes.profileItemEntry} xs={9}>
-                        <Typography>{gender}</Typography>
-                    </Grid>
-                </Grid>
-                <Grid container item className={classes.profileItem} xs={12}>
-                    <Grid container alignItems="center" justify="flex-end" xs={3}>
-                        <Typography>Occupation</Typography>
-                    </Grid>
-                    <Grid container alignItems="center" className={classes.profileItemEntry} xs={9}>
-                        <Typography>{occupation}</Typography>
-                    </Grid>
-                </Grid>
-                <Grid container item className={classes.profileItem} xs={12}>
-                    <Grid container alignItems="center" justify="flex-end" xs={3}>
-                        <Typography>Location</Typography>
-                    </Grid>
-                    <Grid container alignItems="center" className={classes.profileItemEntry} xs={9}>
-                        <Typography>{location}</Typography>
-                    </Grid>
-                </Grid>
-                <Grid container item className={classes.profileItem} xs={12}>
-                    <Grid container alignItems="center" justify="flex-end" xs={3}>
-                        <Typography>Interests</Typography>
-                    </Grid>
-                    <Grid container alignItems="center" className={classes.profileItemEntry} xs={9}>
-                        <Typography>{interests.join(', ')}</Typography>
-                    </Grid>
-                </Grid>
-                <Grid container item className={classes.profileItem} xs={12}>
-                    <Grid container alignItems="center" justify="flex-end" xs={3}>
-                        <Typography>Religion</Typography>
-                    </Grid>
-                    <Grid container alignItems="center" className={classes.profileItemEntry} xs={9}>
-                        <Typography>{religion}</Typography>
-                    </Grid>
+                <Grid container alignItems="center" className={classes.fieldsContainer} xs={12}>
+                    {fields.map(({ title, value }: ProfileField, i) => {
+                        let className: string;
+                        if (i % 2 == 0)
+                            className = classes.leftField
+                        else
+                            className = classes.rightField
+
+                        return (
+                            <Grid item className={className} xs={6}>
+                                <Typography>{title}: {value}</Typography>
+                            </Grid>
+                        );
+                    })}
                 </Grid>
             </Grid>
+            {/* END PROFILE SECTION */}
         </Grid>
     );
 }
