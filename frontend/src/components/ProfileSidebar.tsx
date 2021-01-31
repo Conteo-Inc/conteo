@@ -8,7 +8,7 @@ import MailIcon from '@material-ui/icons/Mail';
 import LockIcon from '@material-ui/icons/Lock';
 
 // ProfileSidebar props.
-type Props = {
+type ProfileSidebarProps = {
     name: string;
     profileImg: string;
 }
@@ -43,7 +43,7 @@ const useStyles = makeStyles({
     },
 });
 
-export default function ProfileSidebar(props: Props) {
+export default function ProfileSidebar(props: ProfileSidebarProps) {
     const classes = useStyles();
 
     // Add sidebar items to list.

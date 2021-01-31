@@ -3,7 +3,7 @@ import { request } from '../utils/fetch';
 import type { User } from '../App';
 import ProfileSidebar from '../components/ProfileSidebar';
 import ProfileContent from '../components/ProfileContent';
-import type { Props as ProfileContentProps } from '../components/ProfileContent';
+import type { ProfileContentProps } from '../components/ProfileContent';
 import { makeStyles } from '@material-ui/core/styles';
 import { Grid } from '@material-ui/core';
 
