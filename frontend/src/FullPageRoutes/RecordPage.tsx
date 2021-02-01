@@ -1,9 +1,24 @@
 import * as React from 'react';
 import { useReactMediaRecorder } from 'react-media-recorder';
+import { Grid, makeStyles } from '@material-ui/core';
+import Controls from '../components/video/Controls';
 import { request } from '../utils/fetch';
+import useFocusedUser from '../utils/context';
 
-function Preview({ stream }: { stream: MediaStream | null }) {
+const useStyles = makeStyles({
+    video_root: {
+        backgroundColor: 'black',
+        width: 1066,
+        height: 700,
+    },
+});
+
+type PreviewProps = {
+    stream: MediaStream | null;
+};
+function Preview({ stream }: PreviewProps) {
     const ref = React.useRef<HTMLVideoElement>(null);
+    const classes = useStyles();
 
     React.useEffect(() => {
         if (ref.current && stream) {
@@ -14,44 +29,53 @@ function Preview({ stream }: { stream: MediaStream | null }) {
     if (!stream) {
         return null;
     }
-    return <video ref={ref} width={500} height={500} autoPlay controls />;
+    return <video ref={ref} className={classes.video_root} autoPlay />;
 }
 
-function onStopRecording(blobUrl: string, blob: Blob) {
+function sendVideo(blob: Blob, receiver: number) {
     const reader = new FileReader();
     reader.readAsDataURL(blob);
     reader.onloadend = () => {
-        const data = reader.result;
         request('/api/video/', 'post', true, true, {
-            title: 'foo', //Temp, remove soon
-            data: data,
+            receiver: receiver,
+            data: reader.result,
         });
     };
 }
 
 export default function RecordPage() {
+    const [videoBlob, setVideoBlob] = React.useState<Blob>(null);
+    const [focusedUser] = useFocusedUser();
+
     const {
         status,
         startRecording,
         stopRecording,
         mediaBlobUrl,
         previewStream,
-    } = useReactMediaRecorder({ video: true, onStop: onStopRecording });
+    } = useReactMediaRecorder({
+        video: true,
+        onStop: (_, blob) => setVideoBlob(blob),
+    });
+
+    const classes = useStyles();
     return (
-        <div>
-            <p>{status}</p>
-            {status === 'idle' ? (
-                <button onClick={startRecording}>Start Recording</button>
-            ) : status === 'recording' ? (
-                <button onClick={stopRecording}>Stop</button>
-            ) : (
-                <button disabled>Loading...</button>
-            )}
+        <Grid container justify='center'>
             {mediaBlobUrl ? (
-                <video src={mediaBlobUrl} controls />
+                <video
+                    src={mediaBlobUrl}
+                    controls
+                    className={classes.video_root}
+                />
             ) : (
                 <Preview stream={previewStream} />
             )}
-        </div>
+            <Controls
+                status={status}
+                startRecording={startRecording}
+                stopRecording={stopRecording}
+                sendVideo={() => sendVideo(videoBlob, focusedUser)}
+            />
+        </Grid>
     );
 }

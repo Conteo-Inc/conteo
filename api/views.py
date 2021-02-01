@@ -42,12 +42,15 @@ class VideoListCreate(generics.ListCreateAPIView):
     serializer_class = VideoSerializer
 
     def post(self, request, format=None):
-        data = request.data.pop('data')
-        serializer = self.serializer_class(data=request.data, context={'data': data, 'user': request.user})
+        data = request.data.pop("data")
+        serializer = self.serializer_class(
+            data=request.data, context={"data": data, "user": request.user}
+        )
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class Matches(generics.GenericAPIView):
     """

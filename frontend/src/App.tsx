@@ -5,7 +5,9 @@ import LinkItem from './components/LinkItem';
 import TokenPage from './FullPageRoutes/TokenPage';
 import RecordPage from './FullPageRoutes/RecordPage';
 import VideoListPage from './FullPageRoutes/VideoListPage';
+import { AppContext } from './utils/context';
 
+//@TODO: Move links to common file
 function MainPage() {
     return (
         <ul>
@@ -18,22 +20,26 @@ function MainPage() {
 
 export default function App() {
     return (
-        <Router>
-            <Switch>
-                <Route path='/Tokens'>
-                    <TokenPage />
-                </Route>
-                <Route path='/Record'>
-                    <RecordPage />
-                </Route>
-                <Route path='/Watch'>
-                    <VideoListPage />
-                </Route>
-                <Route path='/'>
-                    <MainPage />
-                </Route>
-            </Switch>
-        </Router>
+        <AppContext.Provider
+            value={{ focusedUser: React.useState<number>(null) }}
+        >
+            <Router>
+                <Switch>
+                    <Route path='/Tokens'>
+                        <TokenPage />
+                    </Route>
+                    <Route path='/Record'>
+                        <RecordPage />
+                    </Route>
+                    <Route path='/Watch'>
+                        <VideoListPage />
+                    </Route>
+                    <Route path='/'>
+                        <MainPage />
+                    </Route>
+                </Switch>
+            </Router>
+        </AppContext.Provider>
     );
 }
 
