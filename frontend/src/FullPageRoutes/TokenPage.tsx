@@ -7,6 +7,7 @@ import { Grid, Paper } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
 
+import type { User } from '../App';
 
 type TokenResponse = {
     username: string;
