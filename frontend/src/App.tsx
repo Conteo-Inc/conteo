@@ -15,6 +15,7 @@ function MainPage() {
         <ul>
             <LinkItem to='/Tokens' text='Tokens' />
             <LinkItem to='/Profile' text='Profile' />
+            <LinkItem to='/Matching' text='Matching' />
         </ul>
     );
 }
