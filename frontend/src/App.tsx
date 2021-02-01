@@ -6,6 +6,11 @@ import TokenPage from './FullPageRoutes/TokenPage';
 import RecordPage from './FullPageRoutes/RecordPage';
 import VideoListPage from './FullPageRoutes/VideoListPage';
 import { AppContext } from './utils/context';
+import ProfilePage from './FullPageRoutes/Profile';
+
+export type User = {
+    username: string;
+} & any;
 
 //@TODO: Move links to common file
 function MainPage() {
@@ -14,6 +19,7 @@ function MainPage() {
             <LinkItem to='/Tokens' text='Tokens' />
             <LinkItem to='/Record' text='Record' />
             <LinkItem to='/Watch' text='Watch' />
+            <LinkItem to='/Profile' text='Profile' />
         </ul>
     );
 }
@@ -33,6 +39,9 @@ export default function App() {
                     </Route>
                     <Route path='/Watch'>
                         <VideoListPage />
+                    </Route>
+                    <Route path='/Profile'>
+                        <ProfilePage />
                     </Route>
                     <Route path='/'>
                         <MainPage />

@@ -3,10 +3,7 @@ import LinkItem from '../components/LinkItem';
 import LoginForm, { UserHandlerArgs } from '../components/LoginForm';
 import SignupForm from '../components/SignupForm';
 import { request } from '../utils/fetch';
-
-type User = {
-    username: string;
-} & any;
+import type { User } from '../App';
 
 type TokenResponse = {
     username: string;
