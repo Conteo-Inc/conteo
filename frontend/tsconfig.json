@@ -1,10 +1,7 @@
 {
     "compilerOptions": {
         "jsx": "react",
-        "declaration": true,
-        "emitDeclarationOnly": false,
         "isolatedModules": true,
-        "outDir": "./built",
         "allowJs": true,
         "target": "es5"
     },
