@@ -1,6 +1,5 @@
 from django.urls import path
 from rest_framework_jwt.views import obtain_jwt_token
-
 from . import views
 
 urlpatterns = [
@@ -10,3 +9,4 @@ urlpatterns = [
     path("register/", views.UserRegistrationView.as_view()),
     path("match/", views.Matches.as_view()),
 ]
+
