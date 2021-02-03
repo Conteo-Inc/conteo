@@ -1,10 +1,4 @@
 #!/bin/sh
-set -e
-
-# Stash unstaged changes and pop them on script exit
-token="$(openssl rand 24 | base64)"
-git stash push --quiet --keep-index --message "pre-commit ($token)"
-git stash list | grep -q $token && trap 'git stash pop --quiet' EXIT
 
 # Find the python virtual environment
 # This assumes there is only 1 'pyvenv.cfg' under the project tree
@@ -14,17 +8,14 @@ if [ "$venvdir" = '.' ]; then
     exit 1
 fi
 
-# Format python source code
-staged_files="$(git diff --staged --name-only *.py)"
+# Check python source code style
+staged_files="$(git diff --staged --name-only | grep .py$)"
 if [ -n "$staged_files" ]; then
-    echo [isort]
-    "$venvdir/bin/isort" --profile black $staged_files
-    echo [black]
-    "$venvdir/bin/black" $staged_files
+    echo Running isort
+    "$venvdir/bin/isort" --profile black --check-only $staged_files
+    echo Running black
+    "$venvdir/bin/black" --check $staged_files
 fi
 
-# TODO Add typescript formatting
-
-# Add formatting changes to the index
-git add --update
+# TODO Add typescript style checking
 
