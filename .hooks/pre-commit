@@ -1,0 +1,17 @@
+#!/bin/sh
+
+set -e
+
+venvdir="$(dirname $(find -name pyvenv.cfg))"
+if [ "$venvdir" = '.' ]; then
+    echo Could not find python virtual environment >2
+    exit 1
+fi
+
+echo [black]
+"$venvdir/bin/black" --exclude "$venvdir" .
+echo [isort]
+"$venvdir/bin/isort" --gitignore --profile black .
+
+unset venvdir
+
