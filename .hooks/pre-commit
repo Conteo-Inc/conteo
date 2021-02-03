@@ -2,9 +2,12 @@
 
 # Find the python virtual environment
 # This assumes there is only 1 'pyvenv.cfg' under the project tree
-venvdir="$(dirname $(find -name pyvenv.cfg))"
-if [ "$venvdir" = '.' ]; then
-    >2 echo pre-commit: could not find python virtual environment
+venvdir="$(find -name pyvenv.cfg -type f -exec dirname {} \;)"
+if [ -z "$venvdir" -o "$venvdir" = '.' ]; then
+    >&2 echo 'pre-commit: could not find python virtual environment'
+    >&2 echo '    Make sure you have a created a python virtual environment'
+    >&2 echo '    for this project. See the README for instructions on how to'
+    >&2 echo '    setup up the development environment'
     exit 1
 fi
 
