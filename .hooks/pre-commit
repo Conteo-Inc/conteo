@@ -2,8 +2,9 @@
 set -e
 
 # Stash unstaged changes and pop them on script exit
-git stash push --quiet --keep-index --message 'pre-commit'
-trap 'git stash pop --quiet' EXIT
+token="$(openssl rand 24 | base64)"
+git stash push --quiet --keep-index --message "pre-commit ($token)"
+git stash list | grep -q $token && trap 'git stash pop --quiet' EXIT
 
 # Find the python virtual environment
 # This assumes there is only 1 'pyvenv.cfg' under the project tree
