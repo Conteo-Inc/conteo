@@ -11,14 +11,23 @@ if [ -z "$venvdir" -o "$venvdir" = '.' ]; then
     exit 1
 fi
 
+err=0
+
 # Check python source code style
 staged_files="$(git diff --staged --name-only | grep .py$)"
 if [ -n "$staged_files" ]; then
     echo Running isort
     "$venvdir/bin/isort" --profile black --check-only $staged_files
+    err=$((err|$?))
     echo Running black
     "$venvdir/bin/black" --check $staged_files
+    err=$((err|$?))
+    echo Running flake8
+    "$venvdir/bin/flake8" $staged_files
+    err=$((err|$?))
 fi
 
 # TODO Add typescript style checking
+
+exit $err
 
