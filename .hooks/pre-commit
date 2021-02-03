@@ -2,7 +2,7 @@
 set -e
 
 # Stash unstaged changes and pop them on script exit
-git stash push --quiet --keep-index --include-untracked --message 'pre-commit'
+git stash push --quiet --keep-index --message 'pre-commit'
 trap 'git stash pop --quiet' EXIT
 
 # Find the python virtual environment
