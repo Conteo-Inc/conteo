@@ -1,17 +1,29 @@
 #!/bin/sh
-
 set -e
 
+# Stash unstaged changes and pop them on script exit
+git stash push --quiet --keep-index --include-untracked --message 'pre-commit'
+trap 'git stash pop --quiet' EXIT
+
+# Find the python virtual environment
+# This assumes there is only 1 'pyvenv.cfg' under the project tree
 venvdir="$(dirname $(find -name pyvenv.cfg))"
 if [ "$venvdir" = '.' ]; then
-    echo Could not find python virtual environment >2
+    >2 echo pre-commit: could not find python virtual environment
     exit 1
 fi
 
-echo [black]
-"$venvdir/bin/black" --exclude "$venvdir" .
-echo [isort]
-"$venvdir/bin/isort" --gitignore --profile black .
+# Format python source code
+staged_files="$(git diff --staged --name-only *.py)"
+if [ -n "$staged_files" ]; then
+    echo [isort]
+    "$venvdir/bin/isort" --profile black $staged_files
+    echo [black]
+    "$venvdir/bin/black" $staged_files
+fi
 
-unset venvdir
+# TODO Add typescript formatting
+
+# Add formatting changes to the index
+git add --update
 
