@@ -1,8 +1,9 @@
+from django.contrib.auth import authenticate
 from django.contrib.auth.models import User, update_last_login
 from rest_framework import serializers
 from rest_framework_jwt.settings import api_settings
-from .models import Video, UserProfile
-from django.contrib.auth import authenticate
+
+from .models import UserProfile, Video
 
 JWT_PAYLOAD_HANDLER = api_settings.JWT_PAYLOAD_HANDLER
 JWT_ENCODE_HANDLER = api_settings.JWT_ENCODE_HANDLER
@@ -22,7 +23,10 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
-        UserProfile.objects.create(  # A profile with default data is created here. We can add more as needed in the profile model.
+
+        # A profile with default data is created here. We can add more as needed
+        # in the profile model.
+        UserProfile.objects.create(
             user=user,
         )
         return user
