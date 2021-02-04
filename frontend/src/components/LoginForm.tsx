@@ -54,8 +54,8 @@ export default function LoginForm({
   handle_login,
   errorMessage,
 }: LoginFormProps) {
-  const [username, setUsername] = React.useState<string>(null)
-  const [password, setPassword] = React.useState<string>(null)
+  const [username, setUsername] = React.useState<string | null>(null)
+  const [password, setPassword] = React.useState<string | null>(null)
 
   const classes = useStyles()
 

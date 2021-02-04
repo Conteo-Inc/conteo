@@ -24,7 +24,7 @@ const useStyles = makeStyles({
 export default function Profile() {
   const classes = useStyles()
 
-  const [username, setUsername] = React.useState<string>(null)
+  const [username, setUsername] = React.useState<string>("")
   React.useEffect(() => {
     request<User>("/api/current_user/", "get", true, false).then((user) => {
       setUsername(user.parsedBody.username)
