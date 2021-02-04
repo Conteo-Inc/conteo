@@ -30,4 +30,3 @@ fi
 # TODO Add typescript style checking
 
 exit $err
-
