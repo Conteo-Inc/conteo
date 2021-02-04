@@ -1,18 +1,18 @@
 type HttpResponse<T> = Response & {
-    parsedBody?: T;
-};
+  parsedBody?: T
+}
 
 export async function http<T>(request: RequestInfo): Promise<HttpResponse<T>> {
-    const res: HttpResponse<T> = await fetch(request);
+  const res: HttpResponse<T> = await fetch(request)
 
-    try {
-        res.parsedBody = await res.json();
-    } catch (ex) {}
+  try {
+    res.parsedBody = await res.json()
+  } catch (ex) {}
 
-    if (!res.ok) {
-        throw new Error(res.statusText);
-    }
-    return res;
+  if (!res.ok) {
+    throw new Error(res.statusText)
+  }
+  return res
 }
 
 /*
@@ -22,27 +22,27 @@ includeAuth: if true, the request header will include the jwt authorization
 specifyJson: if true, the request header will include the Content-Type header with the value 'application/json'
 */
 export async function request<T>(
-    path: string,
-    method: 'get' | 'put' | 'post',
-    includeAuth: boolean = true,
-    specifyJson: boolean = true,
-    body?: any
+  path: string,
+  method: "get" | "put" | "post",
+  includeAuth: boolean = true,
+  specifyJson: boolean = true,
+  body?: any
 ) {
-    const args: RequestInit = {
-        method: method,
-        headers: {
-            //The ...(<boolean> && obj) syntax will spread the obj if the boolean is true,
-            //otherwise it will exclude
+  const args: RequestInit = {
+    method: method,
+    headers: {
+      //The ...(<boolean> && obj) syntax will spread the obj if the boolean is true,
+      //otherwise it will exclude
 
-            //conditionally adds the Authorization property
-            ...(includeAuth && {
-                Authorization: `JWT ${localStorage.getItem('token')}`,
-            }),
-            //conditionally adds the Content-Type property
-            ...(specifyJson && { 'Content-Type': 'application/json' }),
-        },
-        //conditionally adds the body
-        ...(body && { body: JSON.stringify(body) }),
-    };
-    return await http<T>(new Request(path, args));
+      //conditionally adds the Authorization property
+      ...(includeAuth && {
+        Authorization: `JWT ${localStorage.getItem("token")}`,
+      }),
+      //conditionally adds the Content-Type property
+      ...(specifyJson && { "Content-Type": "application/json" }),
+    },
+    //conditionally adds the body
+    ...(body && { body: JSON.stringify(body) }),
+  }
+  return await http<T>(new Request(path, args))
 }
