@@ -6,6 +6,8 @@ import TokenPage from './FullPageRoutes/TokenPage';
 import ProfilePage from './FullPageRoutes/Profile';
 import Notification from './components/Notification';
 import {notificationType} from './components/Notification';
+import {modalType} from './components/AbstractModal';
+import AbstractModal from './components/AbstractModal';
 
 export type User = {
     username: string;
@@ -13,6 +15,7 @@ export type User = {
 
 function MainPage() {
     const [notify, setNotify] = React.useState<notificationType>({isOpen: false, message: 'Nothing works', type: 'success'});
+    const [modal, setModal] = React.useState<modalType>({isOpen: false, title: "", description: "", confirmText: "", cancelText: "", handleConfirm: null, handleCancel: null});
     
     const handleClick = (e) =>{
         e.preventDefault();
@@ -24,13 +27,38 @@ function MainPage() {
         setNotify(updatedDataObj);
     }
 
+    const handleModal = (e) =>{
+        e.preventDefault();
+        const modalupdatedDataObj: modalType = {
+            ...modal,
+            isOpen: true, 
+            title: "Are you sure you want to delete this dialog?", 
+            description: "You can't undo this operation", 
+            confirmText: "YES", 
+            cancelText: "NO",
+            handleCancel: cancel
+        };
+        setModal(modalupdatedDataObj);
+    }
+
+    const cancel = (e)=>{
+        e.preventDefault()
+        setModal({...modal, isOpen: false})
+    }
+
     return (
         <ul>
             <LinkItem to='/Tokens' text='Token' />
             <LinkItem to='/Profile' text='Profile' />
-            <button onClick={handleClick} >Click me</button>
+            <br/>
+            <br/>
+            <button onClick={handleClick} >Open Notification</button>
+            <br/>
             <br/> 
+            <br/>
+            <button onClick={handleModal}> Open Modal </button>
             <Notification {...notify} />
+            <AbstractModal {...modal} />
         </ul>
     );
 }

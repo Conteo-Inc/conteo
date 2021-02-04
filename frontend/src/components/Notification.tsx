@@ -26,7 +26,6 @@ export default function Notification(props) {
       }, [props]);
 
     const handleClose = (e) => { 
-        // event.preventDefault()
         setNotify({ 
             ...notify,
             isOpen: false
@@ -52,5 +51,5 @@ export default function Notification(props) {
 }
 
 
-
+// Usage: <Notification {...notify} />
  
