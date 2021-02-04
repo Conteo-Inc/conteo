@@ -21,8 +21,8 @@ export default function SignupForm({
   handle_signup,
   errorMessage,
 }: SignupFormProps) {
-  const [username, setUsername] = React.useState<string>(null)
-  const [password, setPassword] = React.useState<string>(null)
+  const [username, setUsername] = React.useState<string | null>(null)
+  const [password, setPassword] = React.useState<string | null>(null)
 
   const classes = useStyles()
 

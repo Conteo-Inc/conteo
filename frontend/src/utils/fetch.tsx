@@ -1,4 +1,4 @@
-type HttpResponse<T> = Response & {
+export type HttpResponse<T> = Response & {
   parsedBody?: T
 }
 
@@ -24,8 +24,8 @@ specifyJson: if true, the request header will include the Content-Type header wi
 export async function request<T>(
   path: string,
   method: "get" | "put" | "post",
-  includeAuth: boolean = true,
-  specifyJson: boolean = true,
+  includeAuth = true,
+  specifyJson = true,
   body?: any
 ) {
   const args: RequestInit = {

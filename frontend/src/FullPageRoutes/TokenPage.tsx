@@ -5,7 +5,7 @@ import LoginForm, {
 } from "../components/LoginForm"
 import SignupForm from "../components/SignupForm"
 import Dashboard from "../components/Dashboard"
-import { request } from "../utils/fetch"
+import { HttpResponse, request } from "../utils/fetch"
 import { Grid, Paper } from "@material-ui/core"
 import { makeStyles } from "@material-ui/core/styles"
 
@@ -22,7 +22,7 @@ type NavProps = {
   handle_logout: () => void
 }
 
-function handleErrors(response) {
+function handleErrors(response: HttpResponse<TokenResponse>) {
   if (!response.ok) {
     throw Error(response.statusText)
   }
@@ -44,12 +44,12 @@ const useStyles = makeStyles({
 })
 
 export default function TokenPage() {
-  const [displayedForm, setDisplayedForm] = React.useState<string>(null)
+  const [displayedForm, setDisplayedForm] = React.useState<string | null>(null)
   const [logged_in, setLoggedIn] = React.useState<boolean>(
     localStorage.getItem("token") ? true : false
   )
-  const [email, setEmail] = React.useState<string>(null)
-  const [errMessage, seterrMessage] = React.useState<string>(null)
+  const [email, setEmail] = React.useState<string | null>(null)
+  const [errMessage, seterrMessage] = React.useState<string | null>(null)
   const classes = useStyles()
 
   React.useEffect(() => {
@@ -61,11 +61,19 @@ export default function TokenPage() {
     request<TokenResponse>("/api/login/", "post", false, true, data)
       .then(handleErrors)
       .then((json) => {
-        localStorage.setItem("token", json.parsedBody.token)
-        setLoggedIn(true)
-        setEmail(json.parsedBody.username)
-        setDisplayedForm(null)
-        seterrMessage(null)
+        // FIXME: json.parsedBody can be undefined; this needs to be handled gracefully!
+        if (json.parsedBody) {
+          localStorage.setItem("token", json.parsedBody.token)
+          setLoggedIn(true)
+          setEmail(json.parsedBody.username)
+          setDisplayedForm(null)
+          seterrMessage(null)
+        } else {
+          console.error(
+            "FIXME: json.parsedBody was undefined and so the login failed. \
+            This is a problem with the code that needs to be addressed"
+          )
+        }
       })
       .catch((error) => {
         seterrMessage("Incorrect email or password") // Set error message based on error type
@@ -77,10 +85,18 @@ export default function TokenPage() {
     request<TokenResponse>("/api/register/", "post", false, true, data)
       .then(handleErrors)
       .then((resp) => {
-        localStorage.setItem("token", resp.parsedBody.token)
-        setLoggedIn(true)
-        setDisplayedForm(null)
-        setEmail(resp.parsedBody.username)
+        // FIXME: resp.parsedBody can be undefined; this needs to be handled gracefully!
+        if (resp.parsedBody) {
+          localStorage.setItem("token", resp.parsedBody.token)
+          setLoggedIn(true)
+          setDisplayedForm(null)
+          setEmail(resp.parsedBody.username)
+        } else {
+          console.error(
+            "FIXME: resp.parsedBody was undefined and so the login failed. \
+            This is a problem with the code that needs to be addressed"
+          )
+        }
       })
       .catch((error) => {
         seterrMessage("Incorrect email or password") // Set error message based on error type later
@@ -93,7 +109,7 @@ export default function TokenPage() {
     setEmail(null)
   }
 
-  const display_form = (form) => {
+  const display_form = (form: string) => {
     setDisplayedForm(form)
   }
 
