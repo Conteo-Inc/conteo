@@ -14,7 +14,7 @@ fi
 err=0
 
 # Check python source code style
-staged_files="$(git diff --staged --name-only --diff-filter=ACMR | grep .py$)"
+staged_files="$(git diff --staged --name-only --diff-filter=ACMR | egrep '\.pyi?$')"
 if [ -n "$staged_files" ]; then
     echo Running isort
     "$venvdir/bin/isort" --profile black --check-only $staged_files
