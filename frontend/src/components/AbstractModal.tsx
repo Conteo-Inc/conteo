@@ -1,7 +1,6 @@
-import { Dialog, DialogContent, DialogTitle, DialogActions, Typography, makeStyles, IconButton } from '@material-ui/core';
+import { Dialog, DialogContent, DialogTitle, DialogActions, Typography, makeStyles, IconButton, Button } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import * as React from 'react';
-import Button from './Button';
 
 
 export type ModalType =  {
@@ -54,8 +53,8 @@ export default function AbstractModal(props) {
                 </Typography>  
             </DialogContent>
             <DialogActions className={classes.modalAction}>
-                <Button onClick={modal.handleCancel} text={modal.cancelText} color="secondary" />
-                <Button onClick={modal.handleConfirm} text={modal.confirmText} color="default" />
+                <Button variant="contained" onClick={modal.handleCancel} color="secondary">{modal.cancelText}</Button>
+                <Button variant="contained" onClick={modal.handleConfirm} color="default">{modal.confirmText}</Button>
             </DialogActions>
         </Dialog>
     )
