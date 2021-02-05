@@ -4,7 +4,7 @@ import * as React from 'react';
 import Button from './Button';
 
 
-export type modalType =  {
+export type ModalType =  {
     title: string;
     description: string; 
     confirmText: string;
@@ -35,12 +35,8 @@ const useStyles = makeStyles(theme =>({
 
 
 export default function AbstractModal(props) {
-    const [modal, setModal] = React.useState<modalType>(props);
+    const {modal, setModal} = props;
     const classes = useStyles()
-
-    React.useEffect(() => {
-        setModal(props);
-      }, [props]);
 
     return (
         <Dialog open={modal.isOpen}  classes={{paper: classes.modal}}>

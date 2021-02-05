@@ -3,7 +3,7 @@ import * as React from 'react';
 import Alert from '@material-ui/lab/Alert';
 
 
-export type notificationType =  {
+export type NotificationType =  {
     isOpen: boolean;
     type: 'error' | 'info' | 'success' | 'warning'; 
     message: string;
@@ -18,12 +18,8 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function Notification(props) {
-    const [notify, setNotify] = React.useState<notificationType>(props);
+    const {notify, setNotify} = props
     const classes = useStyles()
-
-    React.useEffect(() => {
-        setNotify(props);
-      }, [props]);
 
     const handleClose = (e) => { 
         setNotify({ 
@@ -51,5 +47,5 @@ export default function Notification(props) {
 }
 
 
-// Usage: <Notification {...notify} />
+{/* <Notification notify ={notify} setNotify={setNotify} /> */}
  
