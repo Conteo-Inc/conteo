@@ -3,13 +3,13 @@ import * as React from 'react';
 import Alert from '@material-ui/lab/Alert';
 
 
-export type NotificationType =  {
+type NotificationType =  {
     isOpen: boolean;
     type: 'error' | 'info' | 'success' | 'warning'; 
     message: string;
+    setisOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    handleClose?: any
 };
-
-
 
 const useStyles = makeStyles(theme => ({
     root:{
@@ -17,35 +17,31 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-export default function Notification(props) {
-    const {notify, setNotify} = props
+export default function Notification(props: NotificationType) {
     const classes = useStyles()
 
     const handleClose = (e) => { 
-        setNotify({ 
-            ...notify,
-            isOpen: false
-        })
+        props.setisOpen(false)
+        if(props.handleClose != null){
+            props.handleClose()
+        }
     }
 
     return (
         <Snackbar
         className={classes.root}
-        open={notify.isOpen}
+        open={props.isOpen}
         autoHideDuration={2000}
         anchorOrigin={{vertical: 'top', horizontal:'right' }}
         onClose={handleClose}
         >
             <Alert 
-            severity={notify.type}
+            severity={props.type}
             onClose={handleClose}
             >
-                {notify.message}
+                {props.message}
             </Alert>
         </Snackbar>
     )
 }
-
-
-{/* <Notification notify ={notify} setNotify={setNotify} /> */}
  
