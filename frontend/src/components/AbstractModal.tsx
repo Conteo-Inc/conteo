@@ -66,8 +66,8 @@ export default function AbstractModal(props: ModalType) {
                 </Typography>  
             </DialogContent>
             <DialogActions className={classes.modalAction}>
-                <Button variant="contained" onClick={handleCancel} color="secondary">{props.cancelText}</Button>
-                <Button variant="contained" onClick={handleConfirm} color="default">{props.confirmText}</Button>
+                <Button variant="contained" onClick={handleCancel} color="secondary">{props.cancelText || "NO"}</Button>
+                <Button variant="contained" onClick={handleConfirm} color="default">{props.confirmText || "YES"}</Button>
             </DialogActions>
         </Dialog>
     )
