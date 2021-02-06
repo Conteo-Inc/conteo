@@ -1,0 +1,9 @@
+# For an overview of this file, see https://docs.github.com/en/github/using-git/configuring-git-to-handle-line-endings
+
+*           text=auto
+
+.hooks/**   text eol=lf
+*.sh        text eol=lf
+*.bash      text eol=lf
+*.bat       text eol=crlf
+

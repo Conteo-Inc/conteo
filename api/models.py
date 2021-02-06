@@ -1,7 +1,9 @@
+import uuid
+
+from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import F, Q
-from django.contrib.auth.models import User, models
-import uuid
+
 
 # Note that enforcement on these fields should be done on the frontend --- Very easy!
 class UserProfile(models.Model):
