@@ -3,10 +3,10 @@ import { render } from 'react-dom';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import LinkItem from './components/LinkItem';
 import TokenPage from './FullPageRoutes/TokenPage';
+import ProfilePage from './FullPageRoutes/Profile';
+import { AppContext } from './utils/context';
 import RecordPage from './FullPageRoutes/RecordPage';
 import VideoListPage from './FullPageRoutes/VideoListPage';
-import { AppContext } from './utils/context';
-import ProfilePage from './FullPageRoutes/Profile';
 
 export type User = {
     username: string;

@@ -2,45 +2,108 @@ import random
 
 from django.contrib.auth.models import User
 from django.db.models import Q
-from rest_framework import generics, permissions, status
-from rest_framework.decorators import api_view
+from rest_framework import generics, status
+from rest_framework.generics import CreateAPIView, RetrieveAPIView
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.views import APIView
+from rest_framework_jwt.authentication import JSONWebTokenAuthentication
+from rest_framework_jwt.settings import api_settings
 
-from .models import Video
-from .serializers import UserSerializer, UserSerializerWithToken, VideoSerializer
+from .models import UserProfile, Video
+from .serializers import (
+    UserLoginSerializer,
+    UserRegistrationSerializer,
+    UserSerializer,
+    VideoSerializer,
+)
+
+JWT_PAYLOAD_HANDLER = api_settings.JWT_PAYLOAD_HANDLER
+JWT_ENCODE_HANDLER = api_settings.JWT_ENCODE_HANDLER
 
 
-@api_view(["GET"])
-def current_user(request):
-    """
-    Determine the current user via token and return data
-    """
+class UserRegistrationView(CreateAPIView):
 
-    serializer = UserSerializer(request.user)
-    return Response(serializer.data)
+    serializer_class = UserRegistrationSerializer
+    permission_classes = (AllowAny,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        status_code = status.HTTP_201_CREATED
+        user_profile = User.objects.get(username=request.data["username"])
+
+        payload = JWT_PAYLOAD_HANDLER(user_profile)
+        jwt_token = JWT_ENCODE_HANDLER(payload)
+        response = {
+            "success": "True",
+            "status code": status_code,
+            "message": "User registered  successfully",
+            "token": jwt_token,
+            "username": request.data["username"],
+        }
+
+        return Response(response, status=status_code)
 
 
-class UserList(APIView):
-    """
-    Create a new user
-    """
+class UserLoginView(RetrieveAPIView):
 
-    permission_classes = (permissions.AllowAny,)
+    permission_classes = (AllowAny,)
+    serializer_class = UserLoginSerializer
 
-    def post(self, request, format=None):
-        serializer = UserSerializerWithToken(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        response = {
+            "success": "True",
+            "status code": status.HTTP_200_OK,
+            "message": "User logged in  successfully",
+            "token": serializer.data["token"],
+            "username": request.data["username"],
+        }
+        status_code = status.HTTP_200_OK
+
+        return Response(response, status=status_code)
+
+
+class UserProfileView(RetrieveAPIView):
+
+    permission_classes = (IsAuthenticated,)
+    authentication_class = JSONWebTokenAuthentication
+
+    def get(self, request):
+        try:
+            user_profile = UserProfile.objects.get(user=request.user)
+            status_code = status.HTTP_200_OK
+            response = {
+                "success": "true",
+                "status code": status_code,
+                "message": "User profile fetched successfully",
+                "username": user_profile.user.username,
+                "data": [
+                    {
+                        "first_name": user_profile.first_name,
+                        "last_name": user_profile.last_name,
+                        "phone_number": user_profile.phone_number,
+                        "age": user_profile.age,
+                        "gender": user_profile.gender,
+                    }
+                ],
+            }
+
+        except Exception as e:
+            status_code = status.HTTP_400_BAD_REQUEST
+            response = {
+                "success": "false",
+                "status code": status.HTTP_400_BAD_REQUEST,
+                "message": "User does not exists",
+                "error": str(e),
+            }
+        return Response(response, status=status_code)
 
 
 class VideoListCreate(generics.ListCreateAPIView):
-    queryset = Video.objects.all()
-    serializer_class = VideoSerializer
-
     def post(self, request, format=None):
         data = request.data.pop("data")
         serializer = self.serializer_class(
