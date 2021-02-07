@@ -6,7 +6,6 @@ import { red } from '@material-ui/core/colors';
 
 export type UserHandlerArgs = {
     e: React.FormEvent<HTMLFormElement>;
-    errorMessage: string | null
     username: string | null;
     password: string | null;
 };
@@ -60,7 +59,7 @@ export default function LoginForm({ handle_login, errorMessage }: LoginFormProps
                 <Avatar className={classes.avatarStyle}><LockOutlinedIcon/></Avatar>
                 <h2>Log In </h2>
             </Grid>
-            <form onSubmit={(e) => handle_login({ e, errorMessage, username, password })}>
+            <form onSubmit={(e) => handle_login({ e, username, password })}>
                 <TextField 
                 label="Email"
                 placeholder="Enter email"

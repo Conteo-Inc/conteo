@@ -6,18 +6,9 @@ import { request } from '../utils/fetch';
 import { Grid, Paper } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
-
-import type { User } from '../App';
-
 type TokenResponse = {
     username: string;
     token: string;
-};
-
-type NavProps = {
-    logged_in: boolean;
-    display_form: (form: string) => void;
-    handle_logout: () => void;
 };
 
 function handleErrors(response) {
@@ -54,45 +45,37 @@ export default function TokenPage() {
         seterrMessage(null)   
     }, [displayedForm, logged_in]);
 
-    const handle_login = ({ e, errorMessage, ...data }: UserHandlerArgs) => {
+    const handle_login = ({ e, ...data }: UserHandlerArgs) => {
         e.preventDefault();
         request<TokenResponse>(
             '/api/login/',
             'post',
-            false,
             true,
             data
-        ).then(handleErrors)
-        .then((json) => {
-            localStorage.setItem('token', json.parsedBody.token);
+        ).then((json) => {
             setLoggedIn(true);
             setEmail(json.parsedBody.username);
             setDisplayedForm(null);
             seterrMessage(null)
-        }).catch(error =>{
-            seterrMessage("Incorrect email or password")   // Set error message based on error type
         });
     };
 
-    const handle_signup = ({ e, errorMessage, ...data }: UserHandlerArgs) => {
+    const handle_signup = ({ e, ...data }: UserHandlerArgs) => {
         e.preventDefault();
-        request<TokenResponse>('/api/register/', 'post', false, true, data)
-        .then(handleErrors)
+        request<TokenResponse>('/api/register/', 'post', true, data)
         .then((resp)=>{
-            localStorage.setItem('token', resp.parsedBody.token);
             setLoggedIn(true);
             setDisplayedForm(null);
             setEmail(resp.parsedBody.username);
         })
-        .catch(error =>{
-            seterrMessage("Incorrect email or password")   // Set error message based on error type later
-        });
     }
 
     const handle_logout = () => {
-        localStorage.removeItem('token');
-        setLoggedIn(false);
-        setEmail(null);
+        request('/api/logout/', 'post', true).then((resp) => {
+            setLoggedIn(false);
+            setEmail(null);
+            setDisplayedForm("login");
+        })
     };
 
     const display_form = (form) => {
