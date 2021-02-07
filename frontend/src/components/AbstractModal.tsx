@@ -46,7 +46,7 @@ export default function AbstractModal(props: ModalType) {
 
     const handleConfirm = () => { 
         if(props.handleConfirm != null){
-            props.handleCancel()
+            props.handleConfirm()
         }
     }
 
