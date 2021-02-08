@@ -10,8 +10,8 @@ type ModalType =  {
     cancelText?: string;
     isOpen: boolean;
     setisOpen: React.Dispatch<React.SetStateAction<boolean>>;
-    handleConfirm?: any;
-    handleCancel?: any;
+    handleConfirm: any;
+    handleCancel: any;
 };
 
 const useStyles = makeStyles(theme =>({
@@ -37,23 +37,13 @@ const useStyles = makeStyles(theme =>({
 export default function AbstractModal(props: ModalType) {
     const classes = useStyles()
 
-    const handleCancel = () => { 
-        props.setisOpen(false)
-        if(props.handleCancel != null){
-            props.handleCancel()
-        }
-    }
-
-    const handleConfirm = () => { 
-        if(props.handleConfirm != null){
-            props.handleConfirm()
-        }
-    }
+    React.useEffect(() => { 
+    }, [props]);
 
     return (
         <Dialog open={props.isOpen}  classes={{paper: classes.modal}}>
             <DialogTitle>
-                <IconButton className={classes.modalTitle} onClick={handleCancel}>
+                <IconButton className={classes.modalTitle} onClick={props.handleCancel}>
                     <CloseIcon />
                 </IconButton>
             </DialogTitle>
@@ -66,8 +56,8 @@ export default function AbstractModal(props: ModalType) {
                 </Typography>  
             </DialogContent>
             <DialogActions className={classes.modalAction}>
-                <Button variant="contained" onClick={handleCancel} color="secondary">{props.cancelText || "NO"}</Button>
-                <Button variant="contained" onClick={handleConfirm} color="default">{props.confirmText || "YES"}</Button>
+                <Button variant="contained" onClick={props.handleCancel} color="secondary">{props.cancelText || "NO"}</Button>
+                <Button variant="contained" onClick={props.handleConfirm} color="default">{props.confirmText || "YES"}</Button>
             </DialogActions>
         </Dialog>
     )

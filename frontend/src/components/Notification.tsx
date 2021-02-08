@@ -8,7 +8,7 @@ type NotificationType =  {
     type: 'error' | 'info' | 'success' | 'warning'; 
     message: string;
     setisOpen: React.Dispatch<React.SetStateAction<boolean>>;
-    handleClose?: any
+    handleClose: any
 };
 
 const useStyles = makeStyles(theme => ({
@@ -19,13 +19,9 @@ const useStyles = makeStyles(theme => ({
 
 export default function Notification(props: NotificationType) {
     const classes = useStyles()
-
-    const handleClose = (e) => { 
-        props.setisOpen(false)
-        if(props.handleClose != null){
-            props.handleClose()
-        }
-    }
+    
+    React.useEffect(() => { 
+    }, [props]);
 
     return (
         <Snackbar
@@ -33,11 +29,11 @@ export default function Notification(props: NotificationType) {
         open={props.isOpen}
         autoHideDuration={2000}
         anchorOrigin={{vertical: 'top', horizontal:'right' }}
-        onClose={handleClose}
+        onClose={props.handleClose}
         >
             <Alert 
             severity={props.type}
-            onClose={handleClose}
+            onClose={props.handleClose}
             >
                 {props.message}
             </Alert>
