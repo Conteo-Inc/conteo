@@ -4,37 +4,37 @@ import { Grid, Avatar, Typography, TextField, Button } from '@material-ui/core';
 
 // This is what the ProfileContent component expects to receive from storage.
 export type ProfileContentProps = {
-    username: string;
-    name: string;
-    profileImg: string;
-    gender: string;
-    religion: string;
-    location: string;
-    occupations: string[];
-    age: number | string,
-    interests: string[];
-};
+    name: string
+    username: string
+    age: number
+    gender: string
+    occupations: string[]
+    location: string
+    interests: string[]
+    religion: string
+    profileImg: string
+}
 
 // A field listed in the content.
 type ProfileField = {
-    title: string;
-    value: string;
-};
+    title: string
+    value: string
+}
 
 type ProfileFieldList = {
-    name: ProfileField,
-    username: ProfileField,
-    age: ProfileField,
-    gender: ProfileField,
-    occupations: ProfileField,
-    location: ProfileField,
-    interests: ProfileField,
-    religion: ProfileField,
-};
+    name: ProfileField
+    username: ProfileField
+    age: ProfileField
+    gender: ProfileField
+    occupations: ProfileField
+    location: ProfileField
+    interests: ProfileField
+    religion: ProfileField
+}
 
 const useStyles = makeStyles({
     profileHeader: {
-        padding: '0 50',
+        padding: '0px 50px',
     },
     profileAvatar: {
         height: 200,
@@ -73,139 +73,187 @@ const useStyles = makeStyles({
         right: '0',
         transform: 'translate(-100%, -10%)',
     },
-});
+})
 
 export default function ProfileContent(props: ProfileContentProps) {
-    const classes = useStyles();
+    const classes = useStyles()
     const [isEditMode, toggleEditMode] = React.useState(false)
 
-    // Is used to compare fields that have been edited with their
-    // original values.
-    const [name, setName] = React.useState<string>()
-    const [username, setUsername] = React.useState<string>()
-    const [age, setAge] = React.useState<number | string>()
-    const [gender, setGender] = React.useState<string>()
-    const [occupations, setOccupations] = React.useState<string[]>()
-    const [location, setLocation] = React.useState<string>()
-    const [interests, setInterests] = React.useState<string[]>()
-    const [religion, setReligion] = React.useState<string>()
-    const [editedProfileFields, setEditableProfileFields] = React.useState<ProfileFieldList | null>(null)
+    // Custom profile hook. This separates saved profile content from edited, unsaved profile content.
+    function useProfile(initialProfile: ProfileContentProps) {
+        const [name, setName] = React.useState<typeof initialProfile.name>(initialProfile.name)
+        const [username, setUsername] = React.useState<typeof initialProfile.username>(initialProfile.username)
+        const [age, setAge] = React.useState<typeof initialProfile.age>(initialProfile.age)
+        const [gender, setGender] = React.useState<typeof initialProfile.gender>(initialProfile.gender)
+        const [occupations, setOccupations] = React.useState<typeof initialProfile.occupations>(initialProfile.occupations)
+        const [location, setLocation] = React.useState<typeof initialProfile.location>(initialProfile.location)
+        const [interests, setInterests] = React.useState<typeof initialProfile.interests>(initialProfile.interests)
+        const [religion, setReligion] = React.useState<typeof initialProfile.religion>(initialProfile.religion)
+        const [profileImg, setProfileImg] = React.useState<typeof initialProfile.profileImg>(initialProfile.profileImg)
 
-    const readOnlyContent = 'readonly';
-    const editableContent = 'editable';
+        const editableContent: ProfileContentProps = {
+            name: name,
+            username: username,
+            age: age,
+            gender: gender,
+            occupations: occupations,
+            location: location,
+            interests: interests,
+            religion: religion,
+            profileImg: profileImg,
+        }
 
-    // Add user profile values to list.
-    var profileFields: ProfileFieldList = {
+        const setters = {
+            setName,
+            setUsername,
+            setAge,
+            setGender,
+            setOccupations,
+            setLocation,
+            setInterests,
+            setReligion,
+            setProfileImg,
+        }
+
+        return { editableContent, setters }
+    }
+
+    // Pass props to to useProfile hook.
+    const { editableContent, setters } = useProfile(props)
+
+    // Initialize readonly profile content and acquire hook to update it when edits are saved.
+    const [readonlyContent, setProfile] = React.useState<ProfileContentProps>(editableContent);
+
+    // User profile field list. Field values are assigned to readonly content.
+    const fields: ProfileFieldList = {
         name: {
             title: 'Full Name',
-            value: props.name,
+            value: readonlyContent.name,
         },
         username: {
             title: 'Username',
-            value: props.username,
+            value: readonlyContent.username,
         },
         age: {
             title: 'Age',
-            value: props.age.toString(),
+            value: readonlyContent.age.toString(),
         },
         gender: {
             title: 'Gender',
-            value: props.gender,
+            value: readonlyContent.gender,
         },
         occupations: {
             title: 'Occupations',
-            value: props.occupations.join(', '),
+            value: readonlyContent.occupations.join(', '),
         },
         location: {
             title: 'Location',
-            value: props.location,
+            value: readonlyContent.location,
         },
         interests: {
             title: 'Interests',
-            value: props.interests.join(', '),
+            value: readonlyContent.interests.join(', '),
         },
         religion: {
             title: 'Religion',
-            value: props.religion,
+            value: readonlyContent.religion,
         },
-    };
+    }
 
     const handleEditBtnClick = (e) => {
         e.preventDefault()
-        setEditableProfileFields(profileFields)
         toggleEditMode(true)
     }
 
     const handleCancelBtnClick = (e) => {
         e.preventDefault()
-        setEditableProfileFields(profileFields)
         toggleEditMode(false)
     }
 
     const saveFields = (e) => {
-        console.log('saving fields:')
-        console.log(e.target)
+        e.preventDefault()
+        setProfile(editableContent)
         toggleEditMode(false)
-
-        Object.keys(profileFields).forEach(key => {
-            let originalField: ProfileField = profileFields[key]
-            let editedField: ProfileField = editedProfileFields[key]
-            const { title, value } = editedField
-
-            // Test if field was changed.
-            if (originalField.value != value) {
-                console.log(`${title} was changed to: ${value}`)
-                originalField.value = value
-            }
-            else {
-                console.log(`${title} was not changed`)
-            }
-        });
     }
 
     return (
         <>
             <Grid container item className={classes.profileHeader} xs={12}>
-                <Grid container item alignItems="center" justify="center" xs={6}>
+                <Grid container item alignItems='center' justify='center' xs={6}>
                     <Avatar alt={props.name} src={props.profileImg} className={classes.profileAvatar} />
                 </Grid>
-                <Grid container item alignItems="center" justify="center" xs={6}>
+                <Grid container item alignItems='center' justify='center' xs={6}>
                     <div className={classes.introVideo}>Intro Video</div>
                 </Grid>
             </Grid>
-            { isEditMode ? null :
-                <Grid id={readOnlyContent} container item alignItems="center" className={classes.fieldsContainer} xs={12}>
-                    <Button variant="contained" color="secondary" className={classes.bottomRight} onClick={handleEditBtnClick}>Edit</Button>
-                    <Grid id={readOnlyContent} container item alignItems="center" xs={12}>
-                        {Object.keys(profileFields).map(function (key) {
-                            let field: ProfileField = profileFields[key];
-                            const { title, value } = field;
+            { !isEditMode &&
+                <Grid container item alignItems='center' className={classes.fieldsContainer} xs={12}>
+                    <Grid id={'readonlyContent'} container item alignItems='center' xs={12}>
+                        {Object.keys(fields).map(function (key) {
+                            const field: ProfileField = fields[key]
+                            const { title, value } = field
+
                             return (
                                 <Grid key={`${key}-readonlyFieldGrid`} item className={classes.field} sm={12} md={6}>
                                     <Typography id={`${key}-readonlyFieldText`}>{title}: {value}</Typography>
                                 </Grid>
-                            );
+                            )
                         })}
                     </Grid>
+                    <Button variant='contained' color='secondary' className={classes.bottomRight}
+                        onClick={handleEditBtnClick}>Edit</Button>
                 </Grid>
             }
-            { isEditMode ?
-                <Grid id={editableContent} container item alignItems="center" className={classes.fieldsContainer} xs={12}>
-                    <Grid id={editableContent} container item alignItems="center" xs={12}>
-                        <Grid item className={classes.field} sm={3} md={6}>
-                            <form onSubmit={saveFields}>
-                                <TextField required label={editedProfileFields.name.title} defaultValue={editedProfileFields.name.value} onChange={(e) => { setName(e.target.value) }} />
-                                <TextField disabled label={editedProfileFields.username.title} defaultValue={editedProfileFields.username.value} onChange={(e) => { setUsername(e.target.value) }} />
-                                <TextField required label={editedProfileFields.age.title} defaultValue={editedProfileFields.age.value} onChange={(e) => { setAge(e.target.value) }} />
-                                <TextField label={editedProfileFields.gender.title} defaultValue={editedProfileFields.gender.value} onChange={(e) => { setGender(e.target.value) }} />
-                                <Button variant="contained" color="primary" type='submit' className={classes.bottomRight}>Save</Button>
-                                <Button variant="contained" className={classes.bottomRight2} onClick={handleCancelBtnClick}>Cancel</Button>
-                            </form>
+            { isEditMode &&
+                <Grid container item alignItems='center' className={classes.fieldsContainer} xs={12}>
+                    <Grid id={'editableContent'} container item alignItems='center' xs={12}>
+                        <Grid key={`name-editableFieldGrid`} item className={classes.field} sm={12} md={6}>
+                            <TextField required label={fields.name.title}
+                                defaultValue={fields.name.value}
+                                onChange={e => { setters.setName(e.target.value) }} />
                         </Grid>
+                        <Grid key={`username-editableFieldGrid`} item className={classes.field} sm={12} md={6}>
+                            <TextField disabled label={fields.username.title}
+                                defaultValue={fields.username.value}
+                                onChange={e => { setters.setUsername(e.target.value) }} />
+                        </Grid>
+                        <Grid key={`age-editableFieldGrid`} item className={classes.field} sm={12} md={6}>
+                            <TextField required label={fields.age.title}
+                                defaultValue={fields.age.value}
+                                onChange={e => { setters.setAge(Number(e.target.value)) }} />
+                        </Grid>
+                        <Grid key={`gender-editableFieldGrid`} item className={classes.field} sm={12} md={6}>
+                            <TextField label={fields.gender.title}
+                                defaultValue={fields.gender.value}
+                                onChange={e => { setters.setGender(e.target.value) }} />
+                        </Grid>
+                        <Grid key={`occupations-editableFieldGrid`} item className={classes.field} sm={12} md={6}>
+                            <TextField label={fields.occupations.title}
+                                defaultValue={fields.occupations.value}
+                                onChange={e => { setters.setOccupations(e.target.value.split(',')) }} />
+                        </Grid>
+                        <Grid key={`location-editableFieldGrid`} item className={classes.field} sm={12} md={6}>
+                            <TextField label={fields.location.title}
+                                defaultValue={fields.location.value}
+                                onChange={e => { setters.setLocation(e.target.value) }} />
+                        </Grid>
+                        <Grid key={`interests-editableFieldGrid`} item className={classes.field} sm={12} md={6}>
+                            <TextField label={fields.interests.title}
+                                defaultValue={fields.interests.value}
+                                onChange={e => { setters.setInterests(e.target.value.split(',')) }} />
+                        </Grid>
+                        <Grid key={`religion-editableFieldGrid`} item className={classes.field} sm={12} md={6}>
+                            <TextField label={fields.religion.title}
+                                defaultValue={fields.religion.value}
+                                onChange={e => { setters.setReligion(e.target.value) }} />
+                        </Grid>
+                        <Button variant='contained' type='submit' color='primary' className={classes.bottomRight}
+                            onClick={saveFields}>Save</Button>
+                        <Button variant='contained' className={classes.bottomRight2}
+                            onClick={handleCancelBtnClick}>Cancel</Button>
                     </Grid>
                 </Grid>
-                : null
             }
         </>
-    );
+    )
 }

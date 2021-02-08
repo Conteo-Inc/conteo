@@ -42,7 +42,7 @@ export default function Profile() {
         religion: 'Scientology',
         location: 'Hollywood',
         occupations: ['All the above'],
-        age: '58',
+        age: 58,
         interests: ['Acting', 'Film Producing'],
     };
 
@@ -58,7 +58,8 @@ export default function Profile() {
                     occupations={content.occupations} age={content.age}
                     interests={content.interests} />
                 {/* Other components (e.g. Notifications, Settings, and Privacy)
-                will be added here with attribute hidden */}
+                will be added here to be rendered when the respective component
+                is selected from sidebar. */}
             </Grid>
         </Grid>
     );
