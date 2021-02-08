@@ -3,8 +3,8 @@ import { render } from 'react-dom';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import LinkItem from './components/LinkItem';
 import TokenPage from './FullPageRoutes/TokenPage';
-import DashboardPage from './FullPageRoutes/DashboardPage'
-import DashboardSideBar from './FullPageRoutes/DashboardSideBar';
+import DashboardPage from './FullPageRoutes/DashboardPage';
+
 
 
 function MainPage() {
@@ -22,7 +22,7 @@ export default function App() {
             <Switch>
                 <Route exact path='/Dashboard'>
                    
-                    <DashboardPage />
+                    < DashboardPage />
                 </Route>
                 <Route exact path='/Tokens'>
                     <TokenPage />

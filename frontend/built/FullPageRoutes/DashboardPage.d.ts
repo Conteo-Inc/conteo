@@ -1,6 +1,6 @@
 /// <reference types="react" />
 export declare type MailProps = {
     profilePic: string;
-    name: string;
+    username: string;
 };
-export default function DashboardPage(): JSX.Element;
+export default function DashboardPage(props: MailProps): JSX.Element;
