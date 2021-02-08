@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from rest_framework import generics, permissions, request, response, status, views
 
-from .models import Profile, Video
+from .models import Video
 from .serializers import (
     ProfileSerializer,
     UserRegistrationSerializer,
