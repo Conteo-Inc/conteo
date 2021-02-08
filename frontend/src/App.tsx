@@ -3,6 +3,7 @@ import { render } from 'react-dom';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import LinkItem from './components/LinkItem';
 import TokenPage from './FullPageRoutes/TokenPage';
+import ProfilePage from './FullPageRoutes/Profile';
 import { Box, Grid, makeStyles, Typography } from '@material-ui/core';
 
 const useStyles = makeStyles({
@@ -20,7 +21,7 @@ const useStyles = makeStyles({
         color: 'white',
     },
     app: {
-        height: '50rem',
+        height: '40rem',
         display: 'flex',
         flexDirection: 'column',
     },
@@ -31,6 +32,7 @@ function MainPage() {
     return (
         <ul>
             <LinkItem to='/Tokens' text='Tokens' />
+            <LinkItem to='/Profile' text='Profile' />
         </ul>
     );
 }
@@ -72,6 +74,9 @@ export default function App() {
                 <Switch>
                     <Route path='/Tokens'>
                         <TokenPage />
+                    </Route>
+                    <Route path='/Profile'>
+                        <ProfilePage />
                     </Route>
                     <Route path='/'>
                         <MainPage />
