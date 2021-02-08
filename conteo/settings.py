@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "api.apps.APIConfig",
     "rest_framework",
-    #This seems silly
+    # This seems silly
     "corsheaders",
     "frontend",
 ]
@@ -93,9 +93,7 @@ DATABASES = {
 
 REST_FRAMEWORK = {
     # "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
-    "DEFAULT_PERMISSION_CLASSES": (
-        "rest_framework.permissions.IsAuthenticated",
-    ),
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.BasicAuthentication",
@@ -108,7 +106,7 @@ CORS_ORIGIN_WHITELIST = ("http://localhost:8000",)
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
 
-#@TODO: Update this for passphrase
+# @TODO: Update this for passphrase
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",

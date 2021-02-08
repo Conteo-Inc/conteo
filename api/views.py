@@ -1,35 +1,39 @@
 import random
 
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.db.models import Q
-from rest_framework import generics, status, permissions, request, response, views
-from django.contrib.auth import authenticate, login, logout
+from rest_framework import generics, permissions, request, response, status, views
 
 from .models import UserProfile, Video
 from .serializers import (
-    UserProfileSerializer, UserRegistrationSerializer, UserSerializer,
+    UserProfileSerializer,
+    UserRegistrationSerializer,
+    UserSerializer,
     VideoSerializer,
 )
+
 
 class UserRegistrationView(generics.CreateAPIView):
     permission_classes = (permissions.AllowAny,)
     serializer_class = UserRegistrationSerializer
 
-    def post(self, request:request.Request):
+    def post(self, request: request.Request):
         response = self.create(request=request)
-        userId = response.data['id']
+        userId = response.data["id"]
         user = User.objects.get(id=userId)
         login(request=request, user=user)
 
         return response
 
+
 class UserLoginView(views.APIView):
     permission_classes = (permissions.AllowAny,)
 
-    def post(self, request:request.Request):
-        username = request.data['username']
-        password = request.data['password']
-        
+    def post(self, request: request.Request):
+        username = request.data["username"]
+        password = request.data["password"]
+
         user = authenticate(request=request, username=username, password=password)
         if user is not None:
             login(request=request, user=user)
@@ -37,11 +41,13 @@ class UserLoginView(views.APIView):
 
         return response.Response(status=status.HTTP_400_BAD_REQUEST)
 
+
 class UserLogoutView(generics.GenericAPIView):
     def post(self, request):
         logout(request=request)
 
         return response.Response(status=status.HTTP_200_OK)
+
 
 class UserProfileView(generics.RetrieveAPIView):
     serializer_class = UserProfileSerializer
@@ -49,7 +55,10 @@ class UserProfileView(generics.RetrieveAPIView):
 
     def get(self, request):
         user = request.user
-        return response.Response(data=UserProfileSerializer(user.profile).data, status=status.HTTP_200_OK)
+        return response.Response(
+            data=UserProfileSerializer(user.profile).data, status=status.HTTP_200_OK
+        )
+
 
 class VideoListCreate(generics.ListCreateAPIView):
     queryset = Video.objects.all()
