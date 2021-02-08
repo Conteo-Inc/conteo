@@ -5,9 +5,9 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from rest_framework import generics, permissions, request, response, status, views
 
-from .models import UserProfile, Video
+from .models import Profile, Video
 from .serializers import (
-    UserProfileSerializer,
+    ProfileSerializer,
     UserRegistrationSerializer,
     UserSerializer,
     VideoSerializer,
@@ -49,14 +49,14 @@ class UserLogoutView(generics.GenericAPIView):
         return response.Response(status=status.HTTP_200_OK)
 
 
-class UserProfileView(generics.RetrieveAPIView):
-    serializer_class = UserProfileSerializer
-    queryset = UserProfile.objects.all()
+class ProfileView(generics.RetrieveAPIView):
+    serializer_class = ProfileSerializer
+    queryset = Profile.objects.all()
 
     def get(self, request):
         user = request.user
         return response.Response(
-            data=UserProfileSerializer(user.profile).data, status=status.HTTP_200_OK
+            data=ProfileSerializer(user.profile).data, status=status.HTTP_200_OK
         )
 
 

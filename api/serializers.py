@@ -1,12 +1,12 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from .models import UserProfile, Video
+from .models import Profile, Video
 
 
-class UserProfileSerializer(serializers.ModelSerializer):
+class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
-        model = UserProfile
+        model = Profile
         fields = "__all__"
 
 
@@ -21,11 +21,11 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         user = User.objects.create_user(**validated_data)
         user.email = user.username
         user.save()
+
         # A profile with default data is created here. We can add more as needed
         # in the profile model.
-        UserProfile.objects.create(
-            user=user,
-        )
+        user.profile = Profile(user.id)
+        user.profile.save()
         return user
 
     class Meta:

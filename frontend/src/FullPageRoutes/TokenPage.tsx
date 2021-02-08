@@ -14,13 +14,6 @@ type TokenResponse = {
     token: string;
 };
 
-function handleErrors(response) {
-    if (!response.ok) {
-        throw Error(response.statusText);
-    }
-    return response;
-}
-
 const useStyles = makeStyles({
     paperStyle: {
         padding: 20,
@@ -37,9 +30,7 @@ const useStyles = makeStyles({
 
 export default function TokenPage() {
     const [displayedForm, setDisplayedForm] = React.useState<string>(null);
-    const [logged_in, setLoggedIn] = React.useState<boolean>(
-        localStorage.getItem('token') ? true : false
-    );
+    const [logged_in, setLoggedIn] = React.useState<boolean>(false);
     const [email, setEmail] = React.useState<string>(null);
     const [errMessage, seterrMessage] = React.useState<string>(null);
     const classes = useStyles();
