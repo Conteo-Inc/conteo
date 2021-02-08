@@ -65,7 +65,8 @@ class VideoSerializer(serializers.ModelSerializer):
         sender = self.context.get("user")
 
         # receiver = User.objects.get(id=validated_data.pop('receiver'))
-        # Data is prepended by "data:video/mp4;base64,", need to remove those 22 characters
+        # Data is prepended by "data:video/mp4;base64,",
+        # need to remove those 22 characters
         # Encode converts from string to bytes
         data_bytes = data[22:].encode("ascii")
         instance = self.Meta.model(**validated_data)
@@ -78,8 +79,10 @@ class VideoSerializer(serializers.ModelSerializer):
         # ok we need to construct a filename
         fname = "%d_%d_%s" % (sender.id, instance.receiver.id, instance.created_at)
 
-        # ContentFile takes the data and creates a pseudo-file.
-        # See https://docs.djangoproject.com/en/3.1/ref/files/file/#the-contentfile-class
+        # ContentFile takes the data and
+        # creates a pseudo-file.
+        # See
+        # https://docs.djangoproject.com/en/3.1/ref/files/file/#the-contentfile-class
         cf = ContentFile(data_bytes, name=fname)
         instance.video_file.save(fname, cf)
 
