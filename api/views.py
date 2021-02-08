@@ -49,10 +49,7 @@ class UserLogoutView(generics.GenericAPIView):
         return response.Response(status=status.HTTP_200_OK)
 
 
-class ProfileView(generics.RetrieveAPIView):
-    serializer_class = ProfileSerializer
-    queryset = Profile.objects.all()
-
+class ProfileView(views.APIView):
     def get(self, request):
         user = request.user
         return response.Response(
