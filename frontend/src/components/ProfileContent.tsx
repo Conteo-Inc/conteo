@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
+import { useProfile } from '../utils/profile'
 import { Grid, Avatar, Typography, TextField, Button } from '@material-ui/core';
 
 // This is what the ProfileContent component expects to receive from storage.
@@ -78,45 +79,6 @@ const useStyles = makeStyles({
 export default function ProfileContent(props: ProfileContentProps) {
     const classes = useStyles()
     const [isEditMode, toggleEditMode] = React.useState(false)
-
-    // Custom profile hook. This separates saved profile content from edited, unsaved profile content.
-    function useProfile(initialProfile: ProfileContentProps) {
-        const [name, setName] = React.useState<typeof initialProfile.name>(initialProfile.name)
-        const [username, setUsername] = React.useState<typeof initialProfile.username>(initialProfile.username)
-        const [age, setAge] = React.useState<typeof initialProfile.age>(initialProfile.age)
-        const [gender, setGender] = React.useState<typeof initialProfile.gender>(initialProfile.gender)
-        const [occupations, setOccupations] = React.useState<typeof initialProfile.occupations>(initialProfile.occupations)
-        const [location, setLocation] = React.useState<typeof initialProfile.location>(initialProfile.location)
-        const [interests, setInterests] = React.useState<typeof initialProfile.interests>(initialProfile.interests)
-        const [religion, setReligion] = React.useState<typeof initialProfile.religion>(initialProfile.religion)
-        const [profileImg, setProfileImg] = React.useState<typeof initialProfile.profileImg>(initialProfile.profileImg)
-
-        const editableContent: ProfileContentProps = {
-            name: name,
-            username: username,
-            age: age,
-            gender: gender,
-            occupations: occupations,
-            location: location,
-            interests: interests,
-            religion: religion,
-            profileImg: profileImg,
-        }
-
-        const setters = {
-            setName,
-            setUsername,
-            setAge,
-            setGender,
-            setOccupations,
-            setLocation,
-            setInterests,
-            setReligion,
-            setProfileImg,
-        }
-
-        return { editableContent, setters }
-    }
 
     // Pass props to to useProfile hook.
     const { editableContent, setters } = useProfile(props)
