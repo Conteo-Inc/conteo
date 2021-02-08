@@ -1,5 +1,7 @@
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User, update_last_login
+from django.core.files.base import ContentFile
+from django.utils.timezone import now
 from rest_framework import serializers
 from rest_framework_jwt.settings import api_settings
 

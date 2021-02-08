@@ -32,7 +32,7 @@ class Video(models.Model):
     created_at = models.DateTimeField()
     viewed_at = models.DateTimeField(null=True)
 
-    video_file = models.FileField(upload_to="media/", null=True, verbose_name="")
+    video_file = models.FileField(upload_to="videos/", null=True, verbose_name="")
 
 
 class MatchStatus(models.Model):
