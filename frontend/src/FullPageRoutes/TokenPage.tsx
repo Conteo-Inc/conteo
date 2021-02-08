@@ -1,5 +1,8 @@
 import * as React from 'react';
-import LoginForm, { UserHandlerArgs, ColorButton } from '../components/LoginForm';
+import LoginForm, {
+    UserHandlerArgs,
+    ColorButton,
+} from '../components/LoginForm';
 import SignupForm from '../components/SignupForm';
 import Dashboard from '../components/Dashboard';
 import { request } from '../utils/fetch';
@@ -19,17 +22,17 @@ function handleErrors(response) {
 }
 
 const useStyles = makeStyles({
-    paperStyle : {
+    paperStyle: {
         padding: 20,
         width: 280,
-        margin: "20px auto"
+        margin: '20px auto',
     },
-    btnStyle : {
+    btnStyle: {
         margin: '8px 0',
     },
     pageStyle: {
-        margin: "100px auto"
-    }
+        margin: '100px auto',
+    },
 });
 
 export default function TokenPage() {
@@ -42,40 +45,38 @@ export default function TokenPage() {
     const classes = useStyles();
 
     React.useEffect(() => {
-        seterrMessage(null)   
+        seterrMessage(null);
     }, [displayedForm, logged_in]);
 
     const handle_login = ({ e, ...data }: UserHandlerArgs) => {
         e.preventDefault();
-        request<TokenResponse>(
-            '/api/login/',
-            'post',
-            true,
-            data
-        ).then((json) => {
-            setLoggedIn(true);
-            setEmail(json.parsedBody.username);
-            setDisplayedForm(null);
-            seterrMessage(null)
-        });
+        request<TokenResponse>('/api/login/', 'post', true, data).then(
+            (json) => {
+                setLoggedIn(true);
+                setEmail(json.parsedBody.username);
+                setDisplayedForm(null);
+                seterrMessage(null);
+            }
+        );
     };
 
     const handle_signup = ({ e, ...data }: UserHandlerArgs) => {
         e.preventDefault();
-        request<TokenResponse>('/api/register/', 'post', true, data)
-        .then((resp)=>{
-            setLoggedIn(true);
-            setDisplayedForm(null);
-            setEmail(resp.parsedBody.username);
-        })
-    }
+        request<TokenResponse>('/api/register/', 'post', true, data).then(
+            (resp) => {
+                setLoggedIn(true);
+                setDisplayedForm(null);
+                setEmail(resp.parsedBody.username);
+            }
+        );
+    };
 
     const handle_logout = () => {
         request('/api/logout/', 'post', true).then((resp) => {
             setLoggedIn(false);
             setEmail(null);
-            setDisplayedForm("login");
-        })
+            setDisplayedForm('login');
+        });
     };
 
     const display_form = (form) => {
@@ -84,45 +85,54 @@ export default function TokenPage() {
 
     return (
         <>
-        {
-          logged_in === true? (
-            <Dashboard handle_logout={handle_logout} email={email} />
-        ):
-         displayedForm === 'signup' ? (
-            <SignupForm handle_signup={handle_signup} errorMessage={errMessage}/>
-        ) : 
-        (
-            <Grid 
-            container
-            className={classes.pageStyle}
-            >
-                <Grid 
-                container
-                spacing={0}
-                direction="column"
-                alignItems="center"
-                justify="center"
-                item 
-                sm
-                >
-                    <Paper className={classes.paperStyle} >
-                        <ColorButton type='submit' variant='contained' fullWidth className={classes.btnStyle} onClick={() => {display_form('signup')}}>Sign Up</ColorButton>
-                    </Paper>
+            {logged_in === true ? (
+                <Dashboard handle_logout={handle_logout} email={email} />
+            ) : displayedForm === 'signup' ? (
+                <SignupForm
+                    handle_signup={handle_signup}
+                    errorMessage={errMessage}
+                />
+            ) : (
+                <Grid container className={classes.pageStyle}>
+                    <Grid
+                        container
+                        spacing={0}
+                        direction='column'
+                        alignItems='center'
+                        justify='center'
+                        item
+                        sm
+                    >
+                        <Paper className={classes.paperStyle}>
+                            <ColorButton
+                                type='submit'
+                                variant='contained'
+                                fullWidth
+                                className={classes.btnStyle}
+                                onClick={() => {
+                                    display_form('signup');
+                                }}
+                            >
+                                Sign Up
+                            </ColorButton>
+                        </Paper>
+                    </Grid>
+                    <Grid
+                        container
+                        spacing={0}
+                        direction='column'
+                        alignItems='center'
+                        justify='center'
+                        item
+                        sm
+                    >
+                        <LoginForm
+                            handle_login={handle_login}
+                            errorMessage={errMessage}
+                        />
+                    </Grid>
                 </Grid>
-                <Grid 
-                container
-                spacing={0}
-                direction="column"
-                alignItems="center"
-                justify="center"
-                item 
-                sm
-                >
-                    <LoginForm handle_login={handle_login} errorMessage={errMessage}/>
-                </Grid>
-            </Grid>
-        )
-        }
+            )}
         </>
     );
 }
