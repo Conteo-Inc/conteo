@@ -19,9 +19,6 @@ const useStyles = makeStyles(theme => ({
 
 export default function Notification(props: NotificationType) {
     const classes = useStyles()
-    
-    React.useEffect(() => { 
-    }, [props]);
 
     return (
         <Snackbar

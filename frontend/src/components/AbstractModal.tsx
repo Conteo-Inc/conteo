@@ -36,10 +36,7 @@ const useStyles = makeStyles(theme =>({
 
 export default function AbstractModal(props: ModalType) {
     const classes = useStyles()
-
-    React.useEffect(() => { 
-    }, [props]);
-
+    
     return (
         <Dialog open={props.isOpen}  classes={{paper: classes.modal}}>
             <DialogTitle>
