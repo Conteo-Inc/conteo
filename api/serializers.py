@@ -6,7 +6,12 @@ from .models import UserProfile, Video
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
-        fields = ("first_name", "last_name", "phone_number", "age", "gender")
+        fields = "__all__"
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = "__all__"
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):

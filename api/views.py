@@ -5,9 +5,9 @@ from django.db.models import Q
 from rest_framework import generics, status, permissions, request, response, views
 from django.contrib.auth import authenticate, login, logout
 
-from .models import Video
+from .models import UserProfile, Video
 from .serializers import (
-    UserProfileSerializer, UserRegistrationSerializer,
+    UserProfileSerializer, UserRegistrationSerializer, UserSerializer,
     VideoSerializer,
 )
 
@@ -44,40 +44,12 @@ class UserLogoutView(generics.GenericAPIView):
         return response.Response(status=status.HTTP_200_OK)
 
 class UserProfileView(generics.RetrieveAPIView):
-    pass
-    # permission_classes = (IsAuthenticated,)
-    # authentication_class = JSONWebTokenAuthentication
+    serializer_class = UserProfileSerializer
+    queryset = UserProfile.objects.all()
 
-    # def get(self, request):
-    #     try:
-    #         user_profile = UserProfile.objects.get(user=request.user)
-    #         status_code = status.HTTP_200_OK
-    #         response = {
-    #             "success": "true",
-    #             "status code": status_code,
-    #             "message": "User profile fetched successfully",
-    #             "username": user_profile.user.username,
-    #             "data": [
-    #                 {
-    #                     "first_name": user_profile.first_name,
-    #                     "last_name": user_profile.last_name,
-    #                     "phone_number": user_profile.phone_number,
-    #                     "age": user_profile.age,
-    #                     "gender": user_profile.gender,
-    #                 }
-    #             ],
-    #         }
-
-    #     except Exception as e:
-    #         status_code = status.HTTP_400_BAD_REQUEST
-    #         response = {
-    #             "success": "false",
-    #             "status code": status.HTTP_400_BAD_REQUEST,
-    #             "message": "User does not exists",
-    #             "error": str(e),
-    #         }
-    #     return Response(response, status=status_code)
-
+    def get(self, request):
+        user = request.user
+        return response.Response(data=UserProfileSerializer(user.profile).data, status=status.HTTP_200_OK)
 
 class VideoListCreate(generics.ListCreateAPIView):
     queryset = Video.objects.all()
@@ -89,8 +61,7 @@ class Matches(generics.GenericAPIView):
     View for requesting new matches for a user.
     """
 
-    # TODO Need a more appropriate serializer
-    serializer_class = UserProfileSerializer
+    serializer_class = UserSerializer
 
     def get_queryset(self):
         """
