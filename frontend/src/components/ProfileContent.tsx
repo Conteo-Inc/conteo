@@ -3,7 +3,7 @@ import { makeStyles } from "@material-ui/core/styles"
 import { Grid, Avatar, Typography } from "@material-ui/core"
 
 // This is what the ProfileContent component expects to receive from storage.
-export type ProfileContentProps = {
+type ProfileContentProps = {
   username: string
   name: string
   profileImg: string
@@ -57,7 +57,7 @@ export default function ProfileContent(props: ProfileContentProps) {
   const classes = useStyles()
 
   // Add user profile values to list.
-  var profileFields: ProfileField[] = [
+  const profileFields: ProfileField[] = [
     {
       title: "Full Name",
       value: props.name,

@@ -41,11 +41,7 @@ export default function SignupForm({
           </Avatar>
           <h2>Sign Up </h2>
         </Grid>
-        <form
-          onSubmit={(e) =>
-            handle_signup({ e, errorMessage, username, password })
-          }
-        >
+        <form onSubmit={(e) => handle_signup({ e, username, password })}>
           <TextField
             label="Email"
             placeholder="Enter email"

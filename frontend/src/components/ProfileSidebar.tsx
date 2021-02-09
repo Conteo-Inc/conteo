@@ -47,7 +47,7 @@ export default function ProfileSidebar(props: ProfileSidebarProps) {
   const classes = useStyles()
 
   // Add sidebar items to list.
-  var items: SidebarItem[] = [
+  const items: SidebarItem[] = [
     {
       icon: <PersonIcon />,
       title: "Bio",
