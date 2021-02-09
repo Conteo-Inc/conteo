@@ -2,11 +2,8 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import F, Q
 
-GENDER_CHOICES = (
-        ("M", "Male"),
-        ("F", "Female"),
-        ("O", "Other")
-)
+GENDER_CHOICES = (("M", "Male"), ("F", "Female"), ("O", "Other"))
+
 
 # Note that enforcement on these fields should be done on the frontend --- Very easy!
 class Profile(models.Model):

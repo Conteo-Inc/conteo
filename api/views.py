@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from rest_framework import generics, permissions, request, response, status, views
 
-from .models import Video
+from .models import Profile, Video
 from .serializers import (
     ProfileSerializer,
     UserRegistrationSerializer,
@@ -106,8 +106,9 @@ class Matches(generics.GenericAPIView):
         matches = random.sample(serializer.data, min(max_amount, len(serializer.data)))
         return response.Response(matches)
 
-class ProfileListView(ListAPIView):
-    #@TODO: Change UserProfile to Profile
-    queryset = UserProfile.objects.all()
-    #@TODO: Change UserSerialzer to ProfileSerializer
-    serializer_class = UserSerializer
+
+class ProfileListView(generics.ListAPIView):
+    # @TODO: Change UserProfile to Profile
+    queryset = Profile.objects.all()
+    # @TODO: Change UserSerialzer to ProfileSerializer
+    serializer_class = ProfileSerializer
