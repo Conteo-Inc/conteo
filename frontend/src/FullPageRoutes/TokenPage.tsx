@@ -4,10 +4,10 @@ import LoginForm, {
     ColorButton,
 } from '../components/LoginForm';
 import SignupForm from '../components/SignupForm';
-import Dashboard from '../components/Dashboard';
 import { request } from '../utils/fetch';
 import { Grid, Paper } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import Dashboard from "../FullPageRoutes/Dashboard"
 
 type TokenResponse = {
     username: string;
@@ -77,7 +77,9 @@ export default function TokenPage() {
     return (
         <>
             {logged_in === true ? (
-                <Dashboard handle_logout={handle_logout} email={email} />
+                // <Dashboard handle_logout={handle_logout} email={email} />
+            //@TODO: Time to do some heavy restructuring
+            <Dashboard />
             ) : displayedForm === 'signup' ? (
                 <SignupForm
                     handle_signup={handle_signup}

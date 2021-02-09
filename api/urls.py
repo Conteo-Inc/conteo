@@ -9,4 +9,7 @@ urlpatterns = [
     path("video/", views.VideoListCreate.as_view()),
     path("match/", views.Matches.as_view()),
     path("profile/", views.ProfileView.as_view()),
+    # When we get into matching with real data, let's discuss if this needs to be broken into
+    # multiple endpoints - Michael
+    path("profiles/", views.ProfileListView.as_view()),
 ]

@@ -17,6 +17,7 @@ import ListAlt from '@material-ui/icons/ListAlt';
 import Mail from '@material-ui/icons/Mail';
 import Info from '@material-ui/icons/Info';
 import Help from '@material-ui/icons/Help';
+import MailList from '../components/MailList';
 
 //Not sure how to put these in, we should look into it:
 // @media (prefers-reduced-motion: no-preference) {
@@ -141,6 +142,7 @@ export default function Dashboard() {
                                 <Typography variant='h3' gutterBottom>
                                     Penpal Mail
                                 </Typography>
+                                <MailList />
                             </Container>
                         </Route>
                         <Route exact path='/faqs'>
