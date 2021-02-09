@@ -2,7 +2,6 @@ import * as React from "react"
 import { request } from "../utils/fetch"
 import ProfileSidebar from "../components/ProfileSidebar"
 import ProfileContent from "../components/ProfileContent"
-import type { ProfileContentProps } from "../components/ProfileContent"
 import { makeStyles } from "@material-ui/core/styles"
 import { Grid } from "@material-ui/core"
 
@@ -47,7 +46,7 @@ export default function Profile() {
   })
 
   // Dummy data.
-  const content: ProfileContentProps = {
+  const content = {
     username: username,
     name: "Tom Cruise",
     profileImg: "",
