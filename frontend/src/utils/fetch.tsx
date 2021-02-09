@@ -28,7 +28,7 @@ export async function request<T>(
   method: "get" | "put" | "post",
   specifyJson = true,
   body?: any
-) {
+): Promise<HttpResponse<T>> {
   const csrfToken = Cookies.get("csrftoken")
   const args: RequestInit = {
     method: method,

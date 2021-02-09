@@ -7,9 +7,6 @@ import {
   TextField,
   FormControlLabel,
   Checkbox,
-  Button,
-  Typography,
-  Link,
 } from "@material-ui/core"
 import AccountCircleIcon from "@material-ui/icons/AccountCircle"
 
@@ -20,7 +17,7 @@ type SignupFormProps = {
 export default function SignupForm({
   handle_signup,
   errorMessage,
-}: SignupFormProps) {
+}: SignupFormProps): JSX.Element {
   const [username, setUsername] = React.useState<string | null>(null)
   const [password, setPassword] = React.useState<string | null>(null)
 

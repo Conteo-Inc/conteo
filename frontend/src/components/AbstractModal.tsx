@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-export default function AbstractModal(props: ModalType) {
+export default function AbstractModal(props: ModalType): JSX.Element {
   const classes = useStyles()
 
   return (

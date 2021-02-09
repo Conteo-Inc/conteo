@@ -52,7 +52,7 @@ export const ColorButton = withStyles((theme) => ({
 export default function LoginForm({
   handle_login,
   errorMessage,
-}: LoginFormProps) {
+}: LoginFormProps): JSX.Element {
   const [username, setUsername] = React.useState<string | null>(null)
   const [password, setPassword] = React.useState<string | null>(null)
 

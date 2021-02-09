@@ -53,7 +53,9 @@ const useStyles = makeStyles({
   },
 })
 
-export default function ProfileContent(props: ProfileContentProps) {
+export default function ProfileContent(
+  props: ProfileContentProps
+): JSX.Element {
   const classes = useStyles()
 
   // Add user profile values to list.

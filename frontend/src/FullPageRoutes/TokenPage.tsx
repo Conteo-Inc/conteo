@@ -28,7 +28,7 @@ const useStyles = makeStyles({
   },
 })
 
-export default function TokenPage() {
+export default function TokenPage(): JSX.Element {
   const [displayedForm, setDisplayedForm] = React.useState<string | null>(null)
   const [logged_in, setLoggedIn] = React.useState<boolean>(false)
   const [email, setEmail] = React.useState<string | null>(null)
@@ -77,7 +77,7 @@ export default function TokenPage() {
   }
 
   const handle_logout = () => {
-    request("/api/logout/", "post", true).then((resp) => {
+    request("/api/logout/", "post", true).then(() => {
       setLoggedIn(false)
       setEmail(null)
       setDisplayedForm("login")

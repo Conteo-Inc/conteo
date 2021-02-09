@@ -27,7 +27,7 @@ type UserProfile = {
   gender: string
 }
 
-export default function Profile() {
+export default function Profile(): JSX.Element {
   const classes = useStyles()
 
   const [username, setUsername] = React.useState<string>("")

@@ -5,7 +5,10 @@ export type DashboardProps = {
   handle_logout: (event: React.MouseEvent<HTMLLIElement, MouseEvent>) => void
 }
 
-export default function Dashboard({ email, handle_logout }: DashboardProps) {
+export default function Dashboard({
+  email,
+  handle_logout,
+}: DashboardProps): JSX.Element {
   return (
     <>
       <h1>Hello {email}</h1>

@@ -43,7 +43,9 @@ const useStyles = makeStyles({
   },
 })
 
-export default function ProfileSidebar(props: ProfileSidebarProps) {
+export default function ProfileSidebar(
+  props: ProfileSidebarProps
+): JSX.Element {
   const classes = useStyles()
 
   // Add sidebar items to list.

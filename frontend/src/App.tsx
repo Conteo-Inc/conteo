@@ -37,7 +37,7 @@ function MainPage() {
   )
 }
 
-export default function App() {
+export default function App(): JSX.Element {
   const classes = useStyles()
   return (
     <Router>

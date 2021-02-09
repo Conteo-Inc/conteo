@@ -7,7 +7,7 @@ type NotificationType = {
   type: "error" | "info" | "success" | "warning"
   message: string
   setisOpen: React.Dispatch<React.SetStateAction<boolean>>
-  handleClose: any
+  handleClose: (event: React.SyntheticEvent<Element, Event>) => void
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -16,10 +16,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-export default function Notification(props: NotificationType) {
+export default function Notification(props: NotificationType): JSX.Element {
   const classes = useStyles()
 
   return (
+    // FIXME props.handleClose is set on both Snackbar.onClose and
+    // Alert.onClose. This is probably a bug
     <Snackbar
       className={classes.root}
       open={props.isOpen}
