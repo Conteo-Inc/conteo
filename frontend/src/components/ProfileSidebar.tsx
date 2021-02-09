@@ -11,13 +11,13 @@ import LockIcon from '@material-ui/icons/Lock';
 type ProfileSidebarProps = {
     name: string;
     profileImg: string;
-}
+};
 
 // Aitem listed in the sidebar.
 type SidebarItem = {
     icon: JSX.Element;
     title: string;
-}
+};
 
 const useStyles = makeStyles({
     tab: {
@@ -72,24 +72,52 @@ export default function ProfileSidebar(props: ProfileSidebarProps) {
 
     return (
         <>
-        <Grid container item className={classes.tab} xs={12}>
-            <Grid container item alignItems="center" justify="center" xs={3}>
-                <Avatar alt={props.name} src={props.profileImg} className={classes.headerAvatar} />
-            </Grid>
-            <Grid container item alignItems="center" xs={9}>
-                <Typography className={`${classes.headerName} ${classes.tabTitle}`}>{props.name}</Typography>
-            </Grid>
-        </Grid>
-        {items.map(({ icon, title }: SidebarItem) => (
-            <Grid key={title} container item className={classes.tab} xs={12}>
-                <Grid container item alignItems="center" justify="center" xs={3}>
-                    {icon}
+            <Grid container item className={classes.tab} xs={12}>
+                <Grid
+                    container
+                    item
+                    alignItems='center'
+                    justify='center'
+                    xs={3}
+                >
+                    <Avatar
+                        alt={props.name}
+                        src={props.profileImg}
+                        className={classes.headerAvatar}
+                    />
                 </Grid>
-                <Grid container item alignItems="center" xs={9}>
-                    <Typography className={classes.tabTitle}>{title}</Typography>
+                <Grid container item alignItems='center' xs={9}>
+                    <Typography
+                        className={`${classes.headerName} ${classes.tabTitle}`}
+                    >
+                        {props.name}
+                    </Typography>
                 </Grid>
             </Grid>
-        ))}
+            {items.map(({ icon, title }: SidebarItem) => (
+                <Grid
+                    key={title}
+                    container
+                    item
+                    className={classes.tab}
+                    xs={12}
+                >
+                    <Grid
+                        container
+                        item
+                        alignItems='center'
+                        justify='center'
+                        xs={3}
+                    >
+                        {icon}
+                    </Grid>
+                    <Grid container item alignItems='center' xs={9}>
+                        <Typography className={classes.tabTitle}>
+                            {title}
+                        </Typography>
+                    </Grid>
+                </Grid>
+            ))}
         </>
     );
 }

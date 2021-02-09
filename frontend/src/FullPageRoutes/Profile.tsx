@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { request } from '../utils/fetch';
-import type { User } from '../App';
 import ProfileSidebar from '../components/ProfileSidebar';
 import ProfileContent from '../components/ProfileContent';
 import type { ProfileContentProps } from '../components/ProfileContent';
@@ -21,14 +20,23 @@ const useStyles = makeStyles({
     },
 });
 
+type UserProfile = {
+    first_name: string;
+    last_name: string;
+    phone_number?: string;
+    age?: number;
+    gender: string;
+
+}
+
 export default function Profile() {
     const classes = useStyles();
 
     const [username, setUsername] = React.useState<string>(null);
     React.useEffect(() => {
-        request<User>('/api/current_user/', 'get', true, false).then(
-            (user) => {
-                setUsername(user.parsedBody.username);
+        request<UserProfile>('/api/profile/', 'get', true).then(
+            (profile) => {
+                setUsername(profile.parsedBody.first_name);
             }
         );
     });
