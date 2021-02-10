@@ -3,11 +3,7 @@ from django.db import models
 from django.db.models import F, Q
 
 
-# Note that enforcement on these fields should be done on the frontend --- Very easy!
-class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
-    first_name = models.CharField(max_length=50, blank=True)
-    last_name = models.CharField(max_length=50, blank=True)
+class Profile(User):
     phone_number = models.CharField(max_length=10, unique=True, null=True)
     age = models.PositiveIntegerField(null=True)
     GENDER_CHOICES = (
