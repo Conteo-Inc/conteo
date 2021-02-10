@@ -6,17 +6,12 @@ from django.db.models import Q
 from rest_framework import generics, permissions, request, response, status, views
 
 from .models import Video
-from .serializers import (
-    ProfileSerializer,
-    UserRegistrationSerializer,
-    UserSerializer,
-    VideoSerializer,
-)
+from .serializers import ProfileSerializer, VideoSerializer
 
 
 class UserRegistrationView(generics.CreateAPIView):
     permission_classes = (permissions.AllowAny,)
-    serializer_class = UserRegistrationSerializer
+    serializer_class = ProfileSerializer
 
     def post(self, request: request.Request):
         response = self.create(request=request)
