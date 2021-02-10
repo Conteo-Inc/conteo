@@ -57,12 +57,12 @@ class VideoListCreate(generics.ListCreateAPIView):
     serializer_class = VideoSerializer
 
 
-class Matches(generics.GenericAPIView):
+class Matches(generics.ListAPIView):
     """
     View for requesting new matches for a user.
     """
 
-    serializer_class = UserSerializer
+    serializer_class = ProfileSerializer
 
     def get_queryset(self):
         """
@@ -96,7 +96,8 @@ class Matches(generics.GenericAPIView):
 
     def get(self, request: request.Request):
         max_amount = request.query_params.get("amount", 20)
-        queryset = self.filter_queryset(self.get_queryset())
-        serializer = self.get_serializer(queryset, many=True)
-        matches = random.sample(serializer.data, min(max_amount, len(serializer.data)))
-        return response.Response(matches)
+        response = self.list(request)
+        response.data = random.sample(
+            response.data, min(max_amount, len(response.data))
+        )
+        return response
