@@ -54,6 +54,7 @@ class MatchStatus(models.Model):
                 check=Q(user_lo_id__lt=F("user_hi_id")), name="user_lo_lt_user_hi"
             )
         ]
+        verbose_name_plural = "MatchStatuses"
 
     def __str__(self):
         return f"{self.user_lo} [{self.user_lo_response}] - {self.user_hi} [{self.user_hi_response}]"  # noqa: E501
