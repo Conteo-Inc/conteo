@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from rest_framework import generics, permissions, request, response, status, views
 
-from .models import Video
+from .models import Video, Profile
 from .serializers import (
     ProfileSerializer,
     UserRegistrationSerializer,
@@ -25,6 +25,20 @@ class UserRegistrationView(generics.CreateAPIView):
         login(request=request, user=user)
 
         return response
+
+class UserAccountDeleteView(views.APIView):
+    permission_classes = (permissions.AllowAny,)
+    def delete(self, request):
+        try:
+            request_id = request.data["id"] 
+            user = User.objects.get(pk=request_id)
+            profile = Profile.objects.filter(user=user)
+            profile.delete()
+            user.delete()
+            return response.Response(status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return response.Response(status=status.HTTP_400_BAD_REQUEST)
+        return response.Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class UserLoginView(views.APIView):
