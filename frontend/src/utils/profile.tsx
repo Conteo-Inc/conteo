@@ -10,22 +10,45 @@ export type ProfileContentSetters = {
   setOccupations: React.Dispatch<React.SetStateAction<string[]>>
   setLocation: React.Dispatch<React.SetStateAction<string>>
   setInterests: React.Dispatch<React.SetStateAction<string[]>>
-  setReligion: React.Dispatch<React.SetStateAction<string>>
+  setReligions: React.Dispatch<React.SetStateAction<string[]>>
   setProfileImg: React.Dispatch<React.SetStateAction<string>>
 }
 
 // Custom profile hook. This separates saved profile content from edited, unsaved profile content.
-export function useProfile(initialProfile: ProfileContentType) {
-  const [firstName, setFirstName] = useState<typeof initialProfile.firstName>(initialProfile.firstName)
-  const [lastName, setLastName] = useState<typeof initialProfile.lastName>(initialProfile.lastName)
-  const [username, setUsername] = useState<typeof initialProfile.username>(initialProfile.username)
+export function useProfile(
+  initialProfile: ProfileContentType
+): {
+  editableContent: ProfileContentType
+  setters: ProfileContentSetters
+} {
+  const [firstName, setFirstName] = useState<typeof initialProfile.firstName>(
+    initialProfile.firstName
+  )
+  const [lastName, setLastName] = useState<typeof initialProfile.lastName>(
+    initialProfile.lastName
+  )
+  const [username, setUsername] = useState<typeof initialProfile.username>(
+    initialProfile.username
+  )
   const [age, setAge] = useState<typeof initialProfile.age>(initialProfile.age)
-  const [gender, setGender] = useState<typeof initialProfile.gender>(initialProfile.gender)
-  const [occupations, setOccupations] = useState<typeof initialProfile.occupations>(initialProfile.occupations)
-  const [location, setLocation] = useState<typeof initialProfile.location>(initialProfile.location)
-  const [interests, setInterests] = useState<typeof initialProfile.interests>(initialProfile.interests)
-  const [religion, setReligion] = useState<typeof initialProfile.religion>(initialProfile.religion)
-  const [profileImg, setProfileImg] = useState<typeof initialProfile.profileImg>(initialProfile.profileImg)
+  const [gender, setGender] = useState<typeof initialProfile.gender>(
+    initialProfile.gender
+  )
+  const [occupations, setOccupations] = useState<
+    typeof initialProfile.occupations
+  >(initialProfile.occupations)
+  const [location, setLocation] = useState<typeof initialProfile.location>(
+    initialProfile.location
+  )
+  const [interests, setInterests] = useState<typeof initialProfile.interests>(
+    initialProfile.interests
+  )
+  const [religions, setReligions] = useState<typeof initialProfile.religions>(
+    initialProfile.religions
+  )
+  const [profileImg, setProfileImg] = useState<
+    typeof initialProfile.profileImg
+  >(initialProfile.profileImg)
 
   const editableContent: ProfileContentType = {
     firstName: firstName,
@@ -36,7 +59,7 @@ export function useProfile(initialProfile: ProfileContentType) {
     occupations: occupations,
     location: location,
     interests: interests,
-    religion: religion,
+    religions: religions,
     profileImg: profileImg,
   }
 
@@ -49,7 +72,7 @@ export function useProfile(initialProfile: ProfileContentType) {
     setOccupations,
     setLocation,
     setInterests,
-    setReligion,
+    setReligions,
     setProfileImg,
   }
 

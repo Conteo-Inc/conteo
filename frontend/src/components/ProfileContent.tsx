@@ -2,7 +2,15 @@ import * as React from "react"
 import { request } from "../utils/fetch"
 import { makeStyles } from "@material-ui/core/styles"
 import type { ProfileContentSetters } from "../utils/profile"
-import { Grid, Avatar, Typography, TextField, Button, Paper, TextFieldProps } from "@material-ui/core"
+import {
+  Grid,
+  Avatar,
+  Typography,
+  TextField,
+  Button,
+  Paper,
+  TextFieldProps,
+} from "@material-ui/core"
 
 type SaveProfileResponse = {
   token: string
@@ -25,7 +33,7 @@ export type ProfileContentType = {
   occupations: string[]
   location: string
   interests: string[]
-  religion: string
+  religions: string[]
   profileImg: string
 }
 
@@ -97,11 +105,13 @@ export default function ProfileContent(
       textFieldProps: {
         required: true,
         disabled: false,
-        onChange: e => { setters.setFirstName(e.target.value) },
+        onChange: (e) => {
+          setters.setFirstName(e.currentTarget.value)
+        },
         inputProps: {
           maxLength: 50,
         },
-      }
+      },
     },
     {
       title: "Last Name",
@@ -109,11 +119,13 @@ export default function ProfileContent(
       textFieldProps: {
         required: true,
         disabled: false,
-        onChange: e => { setters.setLastName(e.target.value) },
+        onChange: (e) => {
+          setters.setLastName(e.currentTarget.value)
+        },
         inputProps: {
           maxLength: 50,
         },
-      }
+      },
     },
     {
       title: "Username",
@@ -121,8 +133,10 @@ export default function ProfileContent(
       textFieldProps: {
         required: true,
         disabled: true,
-        onChange: e => { setters.setUsername(e.target.value) },
-      }
+        onChange: (e) => {
+          setters.setUsername(e.currentTarget.value)
+        },
+      },
     },
     {
       title: "Age",
@@ -130,8 +144,10 @@ export default function ProfileContent(
       textFieldProps: {
         required: true,
         disabled: true,
-        onChange: e => { setters.setAge(Number(e.target.value)) },
-      }
+        onChange: (e) => {
+          setters.setAge(Number(e.currentTarget.value))
+        },
+      },
     },
     {
       title: "Gender",
@@ -139,8 +155,10 @@ export default function ProfileContent(
       textFieldProps: {
         required: false,
         disabled: false,
-        onChange: e => { setters.setGender(e.target.value) },
-      }
+        onChange: (e) => {
+          setters.setGender(e.currentTarget.value)
+        },
+      },
     },
     {
       title: "Occupations",
@@ -148,8 +166,10 @@ export default function ProfileContent(
       textFieldProps: {
         required: false,
         disabled: false,
-        onChange: e => { setters.setOccupations(e.target.value.split(",")) },
-      }
+        onChange: (e) => {
+          setters.setOccupations(e.currentTarget.value.split(","))
+        },
+      },
     },
     {
       title: "Location",
@@ -157,8 +177,10 @@ export default function ProfileContent(
       textFieldProps: {
         required: false,
         disabled: false,
-        onChange: e => { setters.setLocation(e.target.value) },
-      }
+        onChange: (e) => {
+          setters.setLocation(e.currentTarget.value)
+        },
+      },
     },
     {
       title: "Interests",
@@ -166,17 +188,21 @@ export default function ProfileContent(
       textFieldProps: {
         required: false,
         disabled: false,
-        onChange: e => { setters.setInterests(e.target.value.split(",")) },
-      }
+        onChange: (e) => {
+          setters.setInterests(e.currentTarget.value.split(","))
+        },
+      },
     },
     {
-      title: "Religion",
-      value: readonlyContent.religion,
+      title: "Religions",
+      value: readonlyContent.religions.join(", "),
       textFieldProps: {
         required: false,
         disabled: false,
-        onChange: e => { setters.setReligion(e.target.value) }
-      }
+        onChange: (e) => {
+          setters.setReligions(e.currentTarget.value.split(","))
+        },
+      },
     },
   ]
 
@@ -196,7 +222,8 @@ export default function ProfileContent(
           setProfile(editableContent)
           toggleEditMode(false)
           seterrMessage("")
-        }).catch(err => {
+        })
+        .catch((err) => {
           seterrMessage(err)
         })
     })
@@ -207,57 +234,100 @@ export default function ProfileContent(
       <Grid item className={classes.profileHeader} xs={12}>
         <Grid container justify="center" spacing={2}>
           <Grid item xs={12} sm={6}>
-            <Avatar src={readonlyContent.profileImg} className={classes.profileAvatar} />
+            <Avatar
+              src={readonlyContent.profileImg}
+              className={classes.profileAvatar}
+            />
           </Grid>
           <Grid item xs={12} sm={6}>
             <div className={classes.introVideo}>Intro Video</div>
           </Grid>
         </Grid>
       </Grid>
-      {!isEditMode &&
+      {!isEditMode && (
         <Grid item xs={12}>
           <Paper>
             <Grid container spacing={2}>
               {fields.map(({ title, value }: ProfileField) => (
-                <Grid key={`readonlyField-${title}`} container item justify="flex-end" className={classes.field} sm={12} md={6}>
+                <Grid
+                  key={`readonlyField-${title}`}
+                  container
+                  item
+                  justify="flex-end"
+                  className={classes.field}
+                  sm={12}
+                  md={6}
+                >
                   <Grid item xs={9}>
-                    <Typography>{title}: {value}</Typography>
+                    <Typography>
+                      {title}: {value}
+                    </Typography>
                   </Grid>
                 </Grid>
               ))}
               <Grid container item justify="center" xs={12}>
                 <Grid item>
-                  <Button variant="contained" color="secondary" style={{ margin: 5 }} onClick={handleEditBtnClick}>Edit</Button>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    style={{ margin: 5 }}
+                    onClick={handleEditBtnClick}
+                  >
+                    Edit
+                  </Button>
                 </Grid>
               </Grid>
             </Grid>
           </Paper>
         </Grid>
-      }
-      {isEditMode &&
+      )}
+      {isEditMode && (
         <Grid item xs={12}>
           <Paper>
             <Grid container spacing={2}>
               {fields.map(({ title, value, textFieldProps }: ProfileField) => (
-                <Grid container item justify="flex-end" className={classes.field} sm={12} md={6}>
+                <Grid
+                  key={`editableField-${title}`}
+                  container
+                  item
+                  justify="flex-end"
+                  className={classes.field}
+                  sm={12}
+                  md={6}
+                >
                   <Grid item xs={9}>
                     <TextField
                       label={title}
                       defaultValue={value}
-                      {...textFieldProps} />
+                      {...textFieldProps}
+                    />
                   </Grid>
                 </Grid>
               ))}
               <Grid container item justify="center" xs={12}>
                 <Grid item>
-                  <Button variant="contained" type="submit" color="primary" style={{ margin: 5 }} onClick={saveFields}>Save</Button>
-                  <Button variant="contained" style={{ margin: 5 }} onClick={handleCancelBtnClick}>Cancel</Button>
+                  <Button
+                    variant="contained"
+                    type="submit"
+                    color="primary"
+                    style={{ margin: 5 }}
+                    onClick={saveFields}
+                  >
+                    Save
+                  </Button>
+                  <Button
+                    variant="contained"
+                    style={{ margin: 5 }}
+                    onClick={handleCancelBtnClick}
+                  >
+                    Cancel
+                  </Button>
                 </Grid>
               </Grid>
             </Grid>
           </Paper>
         </Grid>
-      }
-    </Grid >
+      )}
+    </Grid>
   )
 }

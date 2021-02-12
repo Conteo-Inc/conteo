@@ -32,7 +32,7 @@ const useStyles = makeStyles({
   },
 })
 
-export default function Profile() {
+export default function Profile(): JSX.Element {
   const classes = useStyles()
 
   const dummyUserProfile: UserProfile = {
@@ -43,17 +43,26 @@ export default function Profile() {
       phone_number: "nope",
       age: -1,
       gender: "nope",
-    }
+    },
   }
 
   const [userData, setUserData] = React.useState<UserProfile>(dummyUserProfile)
   React.useEffect(() => {
     request<UserProfile>("/api/current_user/", "get", true, false)
-      .then((profile) => {
-        console.log(`user.parsedBody: `)
-        console.log(profile.parsedBody)
-        setUserData(profile.parsedBody)
-      }).catch(err => {
+      .then((resp) => {
+        if (resp.parsedBody) {
+          console.log(`resp.parsedBody: `)
+          console.log(resp.parsedBody)
+          setUserData(resp.parsedBody)
+        } else {
+          console.error(
+            "FIXME: resp.parsedBody was undefined and so lodaing the user \
+                  profile failed. This is a problem with the code that needs \
+                  to be addressed"
+          )
+        }
+      })
+      .catch((err) => {
         console.log(err)
       })
   })
@@ -65,7 +74,7 @@ export default function Profile() {
     lastName: userData.data.last_name,
     profileImg: "",
     gender: userData.data.gender,
-    religion: "Scientology",
+    religions: ["Scientology"],
     location: "Hollywood",
     occupations: ["All the above"],
     age: Number(userData.data.age),
@@ -76,8 +85,9 @@ export default function Profile() {
   const { editableContent, setters } = useProfile(content)
 
   // Initialize readonly profile content and acquire hook to update it when edits are saved.
-  const [readonlyContent, setProfile] = React.useState<ProfileContentType>(editableContent)
-
+  const [readonlyContent, setProfile] = React.useState<ProfileContentType>(
+    editableContent
+  )
   return (
     <Grid container className={classes.root}>
       <Grid container item className={classes.sideBar} xs={3}>
