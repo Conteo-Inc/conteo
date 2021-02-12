@@ -11,7 +11,7 @@ class Profile(models.Model):
     first_name = models.CharField(max_length=50, blank=True)
     last_name = models.CharField(max_length=50, blank=True)
     phone_number = models.CharField(max_length=10, unique=True, null=True)
-    age = models.PositiveIntegerField(null=True, blank=False)
+    birth_date = models.DateField(null=True)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True)
 
 

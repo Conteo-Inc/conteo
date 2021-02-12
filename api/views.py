@@ -3,6 +3,7 @@ import random
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.db.models import Q
+from django.http.response import HttpResponseRedirect
 from rest_framework import generics, permissions, request, response, status, views
 
 from .models import Profile, Video
@@ -30,14 +31,17 @@ class UserRegistrationView(generics.CreateAPIView):
 class UserLoginView(views.APIView):
     permission_classes = (permissions.AllowAny,)
 
-    def post(self, request: request.Request):
+    def post(
+        self,
+        request: request.Request,
+    ):
         username = request.data["username"]
         password = request.data["password"]
 
         user = authenticate(request=request, username=username, password=password)
         if user is not None:
             login(request=request, user=user)
-            return response.Response(status=status.HTTP_200_OK)
+            return HttpResponseRedirect(redirect_to="/dashboard/")
 
         return response.Response(status=status.HTTP_400_BAD_REQUEST)
 

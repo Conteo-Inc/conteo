@@ -4,10 +4,13 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom"
 import LinkItem from "./components/LinkItem"
 import TokenPage from "./FullPageRoutes/TokenPage"
 import ProfilePage from "./FullPageRoutes/Profile"
-import { Box, Grid, makeStyles, Typography } from "@material-ui/core"
+import { Grid, makeStyles, Typography } from "@material-ui/core"
 import Dashboard from "./FullPageRoutes/Dashboard"
 
 const useStyles = makeStyles({
+  appRoot: {
+    minHeight: "55rem",
+  },
   header: {
     backgroundColor: "#cd0b2d",
     height: "3rem",
@@ -21,15 +24,13 @@ const useStyles = makeStyles({
   bannerText: {
     color: "white",
   },
-  app: {
-    height: "40rem",
-    display: "flex",
-    flexDirection: "column",
+  appBody: {
+    minHeight: "49rem",
   },
 })
 
 //@TODO: Move links to common file
-function MainPage(): JSX.Element {
+function MainPage() {
   return (
     <ul>
       <LinkItem to="/Tokens" text="Tokens" />
@@ -43,19 +44,22 @@ export default function App(): JSX.Element {
   const classes = useStyles()
   return (
     <Router>
-      <Grid
-        container
-        direction="row"
-        justify="space-between"
-        alignItems="center"
-        className={classes.header}
-      >
-        <Typography variant="h5" className={classes.bannerText}>
-          {"Hi, Jane"}
-        </Typography>
-        {/* Figure out sizes */}
-        <Grid item lg={2} sm={2} xs={2}>
-          <Grid container direction="row" justify="space-between">
+      <Grid container direction="column" className={classes.appRoot}>
+        <Grid
+          container
+          item
+          direction="row"
+          justify="space-between"
+          alignItems="center"
+          className={classes.header}
+          wrap="nowrap"
+        >
+          <Grid item xs={2}>
+            <Typography variant="h5" className={classes.bannerText}>
+              {"Hi, Jane"}
+            </Typography>
+          </Grid>
+          <Grid item container direction="row" justify="space-between" xs={3}>
             <Typography className={classes.bannerText}>{"About"}</Typography>
             <Typography className={classes.bannerText}>
               {"Contact Us"}
@@ -64,33 +68,32 @@ export default function App(): JSX.Element {
             <Typography className={classes.bannerText}>{"Log Out"}</Typography>
           </Grid>
         </Grid>
-      </Grid>
-      {/* Here's where the body of the App will live */}
-      <Box className={classes.app}>
-        <Switch>
-          <Route path="/Tokens">
-            <TokenPage />
-          </Route>
-          <Route path="/Profile">
-            <ProfilePage />
-          </Route>
-          <Route path="/Dashboard">
-            <Dashboard />
-          </Route>
-          <Route path="/">
-            <MainPage />
-          </Route>
-        </Switch>
-      </Box>
-      <Grid
-        container
-        direction="row"
-        justify="space-between"
-        alignItems="flex-end"
-        className={classes.footer}
-      >
-        <Grid item lg={2}>
-          <Grid container direction="row" justify="space-between">
+        {/* Here's where the body of the App will live */}
+        <Grid item container direction="row" className={classes.appBody}>
+          <Switch>
+            <Route path="/Tokens">
+              <TokenPage />
+            </Route>
+            <Route path="/Profile">
+              <ProfilePage />
+            </Route>
+            <Route path="/Dashboard">
+              <Dashboard />
+            </Route>
+            <Route path="/">
+              <MainPage />
+            </Route>
+          </Switch>
+        </Grid>
+        <Grid
+          container
+          item
+          direction="row"
+          justify="space-between"
+          alignItems="flex-end"
+          className={classes.footer}
+        >
+          <Grid container item xs={2} direction="row" justify="space-between">
             <Typography className={classes.bannerText}>
               {"Privacy Policy"}
             </Typography>
@@ -98,10 +101,12 @@ export default function App(): JSX.Element {
               {"Terms of Service"}
             </Typography>
           </Grid>
+          <Grid item xs={1} alignItems="flex-end">
+            <Typography className={classes.bannerText}>
+              {"Copyright 2020"}
+            </Typography>
+          </Grid>
         </Grid>
-        <Typography className={classes.bannerText}>
-          {"Copyright 2020"}
-        </Typography>
       </Grid>
     </Router>
   )
