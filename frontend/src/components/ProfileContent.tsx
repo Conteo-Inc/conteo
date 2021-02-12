@@ -2,7 +2,7 @@ import * as React from "react"
 import { request } from "../utils/fetch"
 import { makeStyles } from "@material-ui/core/styles"
 import type { ProfileContentSetters } from "../utils/profile"
-import { Grid, Avatar, Typography, TextField, Button, Paper } from "@material-ui/core"
+import { Grid, Avatar, Typography, TextField, Button, Paper, TextFieldProps } from "@material-ui/core"
 
 type SaveProfileResponse = {
   token: string
@@ -33,18 +33,7 @@ export type ProfileContentType = {
 type ProfileField = {
   title: string
   value: string
-}
-
-type ProfileFieldList = {
-  firstName: ProfileField
-  lastName: ProfileField
-  username: ProfileField
-  age: ProfileField
-  gender: ProfileField
-  occupations: ProfileField
-  location: ProfileField
-  interests: ProfileField
-  religion: ProfileField
+  textFieldProps: TextFieldProps
 }
 
 const useStyles = makeStyles({
@@ -101,64 +90,109 @@ export default function ProfileContent(
   const classes = useStyles()
 
   // User profile field list. Field values are assigned to readonly content.
-  // TODO: consider removing type ProfileFieldList and making fields an
-  //  array of ProfileField. This requires each field to provide custom
-  //  TextField jsx.
-  const fields: ProfileFieldList = {
-    firstName: {
+  const fields: ProfileField[] = [
+    {
       title: "First Name",
       value: readonlyContent.firstName,
+      textFieldProps: {
+        required: true,
+        disabled: false,
+        onChange: e => { setters.setFirstName(e.target.value) },
+        inputProps: {
+          maxLength: 50,
+        },
+      }
     },
-    lastName: {
+    {
       title: "Last Name",
       value: readonlyContent.lastName,
+      textFieldProps: {
+        required: true,
+        disabled: false,
+        onChange: e => { setters.setLastName(e.target.value) },
+        inputProps: {
+          maxLength: 50,
+        },
+      }
     },
-    username: {
+    {
       title: "Username",
       value: readonlyContent.username,
+      textFieldProps: {
+        required: true,
+        disabled: true,
+        onChange: e => { setters.setUsername(e.target.value) },
+      }
     },
-    age: {
+    {
       title: "Age",
       value: readonlyContent.age.toString(),
+      textFieldProps: {
+        required: true,
+        disabled: true,
+        onChange: e => { setters.setAge(Number(e.target.value)) },
+      }
     },
-    gender: {
+    {
       title: "Gender",
       value: readonlyContent.gender,
+      textFieldProps: {
+        required: false,
+        disabled: false,
+        onChange: e => { setters.setGender(e.target.value) },
+      }
     },
-    occupations: {
+    {
       title: "Occupations",
       value: readonlyContent.occupations.join(", "),
+      textFieldProps: {
+        required: false,
+        disabled: false,
+        onChange: e => { setters.setOccupations(e.target.value.split(",")) },
+      }
     },
-    location: {
+    {
       title: "Location",
       value: readonlyContent.location,
+      textFieldProps: {
+        required: false,
+        disabled: false,
+        onChange: e => { setters.setLocation(e.target.value) },
+      }
     },
-    interests: {
+    {
       title: "Interests",
       value: readonlyContent.interests.join(", "),
+      textFieldProps: {
+        required: false,
+        disabled: false,
+        onChange: e => { setters.setInterests(e.target.value.split(",")) },
+      }
     },
-    religion: {
+    {
       title: "Religion",
       value: readonlyContent.religion,
+      textFieldProps: {
+        required: false,
+        disabled: false,
+        onChange: e => { setters.setReligion(e.target.value) }
+      }
     },
-  }
+  ]
 
-  const handleEditBtnClick = (e) => {
-    e.preventDefault()
+  const handleEditBtnClick = () => {
     toggleEditMode(true)
   }
 
-  const handleCancelBtnClick = (e) => {
-    e.preventDefault()
+  const handleCancelBtnClick = () => {
     seterrMessage("")
     toggleEditMode(false)
   }
 
-  const saveFields = (e) => {
-    e.preventDefault()
+  const saveFields = () => {
     React.useEffect(() => {
       request<SaveProfileResponse>("/api/current_user/", "post", true, true)
-        .then((json) => {
+        .then(() => {
           setProfile(editableContent)
           toggleEditMode(false)
           seterrMessage("")
@@ -184,18 +218,13 @@ export default function ProfileContent(
         <Grid item xs={12}>
           <Paper>
             <Grid container spacing={2}>
-              {Object.keys(fields).map(function (key) {
-                const field: ProfileField = fields[key]
-                const { title, value } = field
-
-                return (
-                  <Grid key={key} container item justify="flex-end" className={classes.field} sm={12} md={6}>
-                    <Grid item xs={9}>
-                      <Typography>{title}: {value}</Typography>
-                    </Grid>
+              {fields.map(({ title, value }: ProfileField) => (
+                <Grid key={`readonlyField-${title}`} container item justify="flex-end" className={classes.field} sm={12} md={6}>
+                  <Grid item xs={9}>
+                    <Typography>{title}: {value}</Typography>
                   </Grid>
-                )
-              })}
+                </Grid>
+              ))}
               <Grid container item justify="center" xs={12}>
                 <Grid item>
                   <Button variant="contained" color="secondary" style={{ margin: 5 }} onClick={handleEditBtnClick}>Edit</Button>
@@ -209,71 +238,16 @@ export default function ProfileContent(
         <Grid item xs={12}>
           <Paper>
             <Grid container spacing={2}>
-              <Grid container item justify="flex-end" className={classes.field} sm={12} md={6}>
-                <Grid item xs={9}>
-                  <TextField required label={fields.firstName.title}
-                    defaultValue={fields.firstName.value}
-                    onChange={e => { setters.setFirstName(e.target.value) }}
-                    inputProps={{ maxLength: 50 }} />
+              {fields.map(({ title, value, textFieldProps }: ProfileField) => (
+                <Grid container item justify="flex-end" className={classes.field} sm={12} md={6}>
+                  <Grid item xs={9}>
+                    <TextField
+                      label={title}
+                      defaultValue={value}
+                      {...textFieldProps} />
+                  </Grid>
                 </Grid>
-              </Grid>
-              <Grid container item justify="flex-end" className={classes.field} sm={12} md={6}>
-                <Grid item xs={9}>
-                  <TextField required label={fields.lastName.title}
-                    defaultValue={fields.lastName.value}
-                    onChange={e => { setters.setLastName(e.target.value) }}
-                    inputProps={{ maxLength: 50 }} />
-                </Grid>
-              </Grid>
-              <Grid container item justify="flex-end" className={classes.field} sm={12} md={6}>
-                <Grid item xs={9}>
-                  <TextField disabled label={fields.username.title}
-                    defaultValue={fields.username.value}
-                    onChange={e => { setters.setUsername(e.target.value) }} />
-                </Grid>
-              </Grid>
-              <Grid container item justify="flex-end" className={classes.field} sm={12} md={6}>
-                <Grid item xs={9}>
-                  <TextField disabled label={fields.age.title}
-                    defaultValue={fields.age.value}
-                    onChange={e => { setters.setAge(Number(e.target.value)) }} />
-                </Grid>
-              </Grid>
-              <Grid container item justify="flex-end" className={classes.field} sm={12} md={6}>
-                <Grid item xs={9}>
-                  <TextField label={fields.gender.title}
-                    defaultValue={fields.gender.value}
-                    onChange={e => { setters.setGender(e.target.value) }} />
-                </Grid>
-              </Grid>
-              <Grid container item justify="flex-end" className={classes.field} sm={12} md={6}>
-                <Grid item xs={9}>
-                  <TextField label={fields.occupations.title}
-                    defaultValue={fields.occupations.value}
-                    onChange={e => { setters.setOccupations(e.target.value.split(",")) }} />
-                </Grid>
-              </Grid>
-              <Grid container item justify="flex-end" className={classes.field} sm={12} md={6}>
-                <Grid item xs={9}>
-                  <TextField label={fields.location.title}
-                    defaultValue={fields.location.value}
-                    onChange={e => { setters.setLocation(e.target.value) }} />
-                </Grid>
-              </Grid>
-              <Grid container item justify="flex-end" className={classes.field} sm={12} md={6}>
-                <Grid item xs={9}>
-                  <TextField label={fields.interests.title}
-                    defaultValue={fields.interests.value}
-                    onChange={e => { setters.setInterests(e.target.value.split(",")) }} />
-                </Grid>
-              </Grid>
-              <Grid container item justify="flex-end" className={classes.field} sm={12} md={6}>
-                <Grid item xs={9}>
-                  <TextField label={fields.religion.title}
-                    defaultValue={fields.religion.value}
-                    onChange={e => { setters.setReligion(e.target.value) }} />
-                </Grid>
-              </Grid>
+              ))}
               <Grid container item justify="center" xs={12}>
                 <Grid item>
                   <Button variant="contained" type="submit" color="primary" style={{ margin: 5 }} onClick={saveFields}>Save</Button>
