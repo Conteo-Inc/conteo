@@ -1,9 +1,14 @@
 {
     "compilerOptions": {
+        "target": "es6",
+        "lib": ["es6", "DOM"],
         "jsx": "react",
+        "strict": true,
+        "noImplicitAny": true,
+        "noImplicitThis": true,
         "isolatedModules": true,
         "allowJs": true,
-        "target": "es5"
+        "moduleResolution": "node"
     },
-    "include": ["./src/**/*"]
+    "include": ["src/"]
 }
