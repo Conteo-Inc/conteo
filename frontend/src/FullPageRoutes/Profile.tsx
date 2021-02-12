@@ -79,36 +79,23 @@ export default function Profile() {
   const [readonlyContent, setProfile] = React.useState<ProfileContentType>(editableContent)
 
   return (
-    <Grid
-      container
-      className={classes.root}
-    >
-      <Grid
-        container
-        item
-        className={classes.sideBar}
-        xs={3}
-      >
+    <Grid container className={classes.root}>
+      <Grid container item className={classes.sideBar} xs={3}>
         <ProfileSidebar
           name={`${readonlyContent.firstName} ${readonlyContent.lastName}`}
           profileImg={readonlyContent.profileImg}
         />
       </Grid>
-      <Grid
-        container
-        item
-        className={classes.section}
-        xs={9}
-      >
+      <Grid container item className={classes.section} xs={9}>
         <ProfileContent
           editableContent={editableContent}
           setters={setters}
           readonlyContent={readonlyContent}
           setProfile={setProfile}
         />
-        {/* Other components (e.g. Notifications, Settings, and Privacy)
-                will be added here to be rendered when the respective component
-                is selected from sidebar. */}
+        {/* Other components (e.g. Notifications, Settings, and Privacy) will be
+        added here to be rendered when the respective component is selected from
+        sidebar. */}
       </Grid>
     </Grid>
   )

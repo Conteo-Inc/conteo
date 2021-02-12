@@ -43,11 +43,13 @@ const useStyles = makeStyles({
   },
 })
 
-export default function ProfileSidebar(props: ProfileSidebarProps) {
+export default function ProfileSidebar(
+  props: ProfileSidebarProps
+): JSX.Element {
   const classes = useStyles()
 
   // Add sidebar items to list.
-  var items: SidebarItem[] = [
+  const items: SidebarItem[] = [
     {
       icon: <PersonIcon />,
       title: "Bio",
@@ -74,7 +76,11 @@ export default function ProfileSidebar(props: ProfileSidebarProps) {
     <>
       <Grid container item className={classes.tab} xs={12}>
         <Grid container item alignItems="center" justify="center" xs={3}>
-          <Avatar alt={props.name} src={props.profileImg} className={classes.headerAvatar} />
+          <Avatar
+            alt={props.name}
+            src={props.profileImg}
+            className={classes.headerAvatar}
+          />
         </Grid>
         <Grid container item alignItems="center" xs={9}>
           <Typography className={`${classes.headerName} ${classes.tabTitle}`}>

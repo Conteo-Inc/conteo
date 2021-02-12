@@ -14,7 +14,7 @@ fi
 err=0
 
 # Check python source code style
-staged_files="$(git diff --staged --name-only --diff-filter=ACMR | grep .py$)"
+staged_files="$(git diff --staged --name-only --diff-filter=ACMR | egrep '\.pyi?$')"
 if [ -n "$staged_files" ]; then
     echo Running isort
     "$venvdir/bin/isort" --profile black --check-only $staged_files
@@ -27,6 +27,17 @@ if [ -n "$staged_files" ]; then
     err=$((err|$?))
 fi
 
-# TODO Add typescript style checking
+# Check typescript source code style
+staged_files="$(git diff --staged --name-only --diff-filter=ACMR | egrep '\.tsx?$' | sed s,frontend/,,)"
+if [ -n "$staged_files" ]; then
+    cd frontend
+    echo Running prettier
+    npm run --silent format-check -- $staged_files
+    err=$((err|$?))
+    echo Running eslint
+    npm run --silent lint-check -- $staged_files
+    err=$((err|$?))
+    cd -
+fi
 
 exit $err
