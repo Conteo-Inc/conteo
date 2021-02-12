@@ -1,20 +1,20 @@
-import * as React from 'react';
-import { request } from '../utils/fetch';
-import { useProfile } from '../utils/profile';
-import ProfileSidebar from '../components/ProfileSidebar';
-import ProfileContent from '../components/ProfileContent';
-import type { ProfileContentType } from '../components/ProfileContent';
-import { makeStyles } from '@material-ui/core/styles';
-import { Grid } from '@material-ui/core';
+import * as React from "react"
+import { request } from "../utils/fetch"
+import { useProfile } from "../utils/profile"
+import ProfileSidebar from "../components/ProfileSidebar"
+import ProfileContent from "../components/ProfileContent"
+import type { ProfileContentType } from "../components/ProfileContent"
+import { makeStyles } from "@material-ui/core/styles"
+import { Grid } from "@material-ui/core"
 
 type UserProfile = {
-  username: string;
+  username: string
   data: {
-    first_name: string;
-    last_name: string;
-    phone_number: string;
-    age: string | number;
-    gender: string;
+    first_name: string
+    last_name: string
+    phone_number: string
+    age: string | number
+    gender: string
   }
 }
 
@@ -24,59 +24,59 @@ const useStyles = makeStyles({
   },
   sideBar: {
     padding: 10,
-    backgroundColor: 'rgb(238, 235, 228)',
+    backgroundColor: "rgb(238, 235, 228)",
   },
   section: {
     padding: 50,
-    backgroundColor: 'rgb(234, 232, 224)',
+    backgroundColor: "rgb(234, 232, 224)",
   },
-});
+})
 
 export default function Profile() {
-  const classes = useStyles();
+  const classes = useStyles()
 
   const dummyUserProfile: UserProfile = {
-    username: 'nope',
+    username: "nope",
     data: {
-      first_name: 'nope',
-      last_name: 'nope',
-      phone_number: 'nope',
+      first_name: "nope",
+      last_name: "nope",
+      phone_number: "nope",
       age: -1,
-      gender: 'nope',
+      gender: "nope",
     }
   }
 
-  const [userData, setUserData] = React.useState<UserProfile>(dummyUserProfile);
+  const [userData, setUserData] = React.useState<UserProfile>(dummyUserProfile)
   React.useEffect(() => {
-    request<UserProfile>('/api/current_user/', 'get', true, false)
+    request<UserProfile>("/api/current_user/", "get", true, false)
       .then((profile) => {
         console.log(`user.parsedBody: `)
         console.log(profile.parsedBody)
         setUserData(profile.parsedBody)
       }).catch(err => {
         console.log(err)
-      });
-  });
+      })
+  })
 
   // Dummy data.
   const content: ProfileContentType = {
     username: userData.username,
     firstName: userData.data.first_name,
     lastName: userData.data.last_name,
-    profileImg: '',
+    profileImg: "",
     gender: userData.data.gender,
-    religion: 'Scientology',
-    location: 'Hollywood',
-    occupations: ['All the above'],
+    religion: "Scientology",
+    location: "Hollywood",
+    occupations: ["All the above"],
     age: Number(userData.data.age),
-    interests: ['Acting', 'Film Producing'],
-  };
+    interests: ["Acting", "Film Producing"],
+  }
 
   // Pass props to to useProfile hook.
   const { editableContent, setters } = useProfile(content)
 
   // Initialize readonly profile content and acquire hook to update it when edits are saved.
-  const [readonlyContent, setProfile] = React.useState<ProfileContentType>(editableContent);
+  const [readonlyContent, setProfile] = React.useState<ProfileContentType>(editableContent)
 
   return (
     <Grid
@@ -111,5 +111,5 @@ export default function Profile() {
                 is selected from sidebar. */}
       </Grid>
     </Grid>
-  );
+  )
 }
