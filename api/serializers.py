@@ -41,11 +41,9 @@ class VideoSerializer(serializers.ModelSerializer):
         data = self.context.get("data")
         sender = self.context.get("user")
 
-        # receiver = User.objects.get(id=validated_data.pop('receiver'))
-        # Data is prepended by "data:video/mp4;base64,",
-        # need to remove those 22 characters
+        # Data is prepended by "data:video/mp4;base64,"
         # Encode converts from string to bytes
-        data_bytes = data[22:].encode("ascii")
+        data_bytes = data.encode("ascii")
         instance = self.Meta.model(**validated_data)
 
         instance.sender = sender
@@ -73,8 +71,7 @@ class VideoSerializer(serializers.ModelSerializer):
         video_file.open()
 
         # Raw base64 bytes need to be decoded to a string
-        # and the data needs the header
-        rep["video_file"] = "data:video/mp4;base64," + video_file.read().decode("UTF-8")
+        rep["video_file"] = video_file.read().decode("UTF-8")
         video_file.close()
 
         return rep

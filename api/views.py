@@ -5,7 +5,13 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from rest_framework import generics, permissions, request, response, status, views
 
-from .serializers import ProfileSerializer, UserRegistrationSerializer, UserSerializer
+from .models import Video
+from .serializers import (
+    ProfileSerializer,
+    UserRegistrationSerializer,
+    UserSerializer,
+    VideoSerializer,
+)
 
 
 class UserRegistrationView(generics.CreateAPIView):
@@ -52,6 +58,9 @@ class ProfileView(views.APIView):
 
 
 class VideoListCreate(generics.ListCreateAPIView):
+    queryset = Video.objects.all()
+    serializer_class = VideoSerializer
+
     def post(self, request, format=None):
         data = request.data.pop("data")
         serializer = self.serializer_class(
