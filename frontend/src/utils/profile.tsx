@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ProfileContent } from '../components/ProfileContentComponent'
+import { ProfileContentType } from '../components/ProfileContent'
 
 export type ProfileContentSetters = {
     setFirstName: React.Dispatch<React.SetStateAction<string>>;
@@ -15,7 +15,7 @@ export type ProfileContentSetters = {
 }
 
 // Custom profile hook. This separates saved profile content from edited, unsaved profile content.
-export function useProfile(initialProfile: ProfileContent) {
+export function useProfile(initialProfile: ProfileContentType) {
     const [firstName, setFirstName] = useState<typeof initialProfile.firstName>(initialProfile.firstName)
     const [lastName, setLastName] = useState<typeof initialProfile.lastName>(initialProfile.lastName)
     const [username, setUsername] = useState<typeof initialProfile.username>(initialProfile.username)
@@ -27,7 +27,7 @@ export function useProfile(initialProfile: ProfileContent) {
     const [religion, setReligion] = useState<typeof initialProfile.religion>(initialProfile.religion)
     const [profileImg, setProfileImg] = useState<typeof initialProfile.profileImg>(initialProfile.profileImg)
 
-    const editableContent: ProfileContent = {
+    const editableContent: ProfileContentType = {
         firstName: firstName,
         lastName: lastName,
         username: username,

@@ -3,21 +3,20 @@ import { request } from '../utils/fetch';
 import { makeStyles } from '@material-ui/core/styles';
 import type { ProfileContentSetters } from '../utils/profile';
 import { Grid, Avatar, Typography, TextField, Button, Paper } from '@material-ui/core';
-import { keys } from '@material-ui/core/styles/createBreakpoints';
 
 type SaveProfileResponse = {
     token: string;
 }
 
-type ProfileContentComponentProps = {
-    editableContent: ProfileContent;
+type ProfileContentProps = {
+    editableContent: ProfileContentType;
     setters: ProfileContentSetters;
-    readonlyContent: ProfileContent;
-    setProfile: React.Dispatch<React.SetStateAction<ProfileContent>>;
+    readonlyContent: ProfileContentType;
+    setProfile: React.Dispatch<React.SetStateAction<ProfileContentType>>;
 }
 
 // This is what the ProfileContent component expects to receive from storage.
-export type ProfileContent = {
+export type ProfileContentType = {
     firstName: string;
     lastName: string;
     username: string;
@@ -92,7 +91,7 @@ const useStyles = makeStyles({
     },
 })
 
-export default function ProfileContentComponent(props: ProfileContentComponentProps) {
+export default function ProfileContentComponent(props: ProfileContentProps) {
     const { editableContent, setters, readonlyContent, setProfile } = props
     const [isEditMode, toggleEditMode] = React.useState(false)
     const [errMessage, seterrMessage] = React.useState<string>(null);
