@@ -1,13 +1,20 @@
-import * as React from 'react';
+import * as React from "react"
 
-export default function Dashboard({ email, handle_logout}) {
+export type DashboardProps = {
+  email: string | null
+  handle_logout: (event: React.MouseEvent<HTMLLIElement, MouseEvent>) => void
+}
 
-    return (
-        <>
-        <h1>Hello {email}</h1>
-        <ul>
-            <li onClick={handle_logout}>Logout</li>
-        </ul>
-        </>
-    );
+export default function Dashboard({
+  email,
+  handle_logout,
+}: DashboardProps): JSX.Element {
+  return (
+    <>
+      <h1>Hello {email}</h1>
+      <ul>
+        <li onClick={handle_logout}>Logout</li>
+      </ul>
+    </>
+  )
 }
