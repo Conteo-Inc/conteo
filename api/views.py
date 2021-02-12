@@ -5,13 +5,7 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from rest_framework import generics, permissions, request, response, status, views
 
-from .models import Video
-from .serializers import (
-    ProfileSerializer,
-    UserRegistrationSerializer,
-    UserSerializer,
-    VideoSerializer,
-)
+from .serializers import ProfileSerializer, UserRegistrationSerializer, UserSerializer
 
 
 class UserRegistrationView(generics.CreateAPIView):
@@ -65,8 +59,8 @@ class VideoListCreate(generics.ListCreateAPIView):
         )
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return response.Response(serializer.data, status=status.HTTP_201_CREATED)
+        return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class Matches(generics.GenericAPIView):
