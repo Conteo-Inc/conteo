@@ -1,11 +1,22 @@
 import * as React from 'react';
 import { request } from '../utils/fetch';
-import type { User } from '../App';
+import { useProfile } from '../utils/profile';
 import ProfileSidebar from '../components/ProfileSidebar';
-import ProfileContent from '../components/ProfileContent';
-import type { ProfileContentProps } from '../components/ProfileContent';
+import ProfileContentComponent from '../components/ProfileContentComponent';
+import type { ProfileContent } from '../components/ProfileContentComponent';
 import { makeStyles } from '@material-ui/core/styles';
 import { Grid } from '@material-ui/core';
+
+type UserProfile = {
+    username: string;
+    data: {
+        first_name: string;
+        last_name: string;
+        phone_number: string;
+        age: string | number;
+        gender: string;
+    }
+}
 
 const useStyles = makeStyles({
     root: {
@@ -24,39 +35,77 @@ const useStyles = makeStyles({
 export default function Profile() {
     const classes = useStyles();
 
-    const [username, setUsername] = React.useState<string>(null);
+    const dummyUserProfile: UserProfile = {
+        username: 'nope',
+        data: {
+            first_name: 'nope',
+            last_name: 'nope',
+            phone_number: 'nope',
+            age: -1,
+            gender: 'nope',
+        }
+    }
+
+    const [userData, setUserData] = React.useState<UserProfile>(dummyUserProfile);
     React.useEffect(() => {
-        request<User>('/api/current_user/', 'get', true, false).then(
-            (user) => {
-                setUsername(user.parsedBody.username);
-            }
-        );
+        request<UserProfile>('/api/current_user/', 'get', true, false)
+            .then((profile) => {
+                console.log(`user.parsedBody: `)
+                console.log(profile.parsedBody)
+                setUserData(profile.parsedBody)
+            }).catch(err => {
+                console.log(err)
+            });
     });
 
     // Dummy data.
-    const content: ProfileContentProps = {
-        username: username,
-        name: 'Tom Cruise',
+    const content: ProfileContent = {
+        username: userData.username,
+        firstName: userData.data.first_name,
+        lastName: userData.data.last_name,
         profileImg: '',
-        gender: 'Male',
+        gender: userData.data.gender,
         religion: 'Scientology',
         location: 'Hollywood',
         occupations: ['All the above'],
-        age: 58,
+        age: Number(userData.data.age),
         interests: ['Acting', 'Film Producing'],
     };
 
+    // Pass props to to useProfile hook.
+    const { editableContent, setters } = useProfile(content)
+
+    // Initialize readonly profile content and acquire hook to update it when edits are saved.
+    const [readonlyContent, setProfile] = React.useState<ProfileContent>(editableContent);
+
     return (
-        <Grid container className={classes.root}>
-        <Grid container item className={classes.sideBar} xs={3}>
-            <ProfileSidebar name={content.name} profileImg={content.profileImg} />
+        <Grid
+            container
+            className={classes.root}
+        >
+            <Grid
+                container
+                item
+                className={classes.sideBar}
+                xs={3}
+            >
+                <ProfileSidebar
+                    name={`${readonlyContent.firstName} ${readonlyContent.lastName}`}
+                    profileImg={readonlyContent.profileImg}
+                />
             </Grid>
-            <Grid container item className={classes.section} xs={9}>
-                <ProfileContent username={content.username} name={content.name}
-                    profileImg={content.profileImg} gender={content.gender}
-                    religion={content.religion} location={content.location}
-                    occupations={content.occupations} age={content.age}
-                    interests={content.interests} />
+            <Grid
+                container
+                item
+                className={classes.section}
+                xs={9}
+            >
+                <ProfileContentComponent
+                    editableContent={editableContent}
+                    setters={setters}
+                    readonlyContent={readonlyContent}
+                    setProfile={setProfile}
+                />
                 {/* Other components (e.g. Notifications, Settings, and Privacy)
                 will be added here to be rendered when the respective component
                 is selected from sidebar. */}
