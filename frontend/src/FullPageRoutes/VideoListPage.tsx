@@ -7,7 +7,7 @@ type Video = {
     video_file: string;
 };
 
-export default function VideoListPage() {
+export default function VideoListPage(): JSX.Element {
     const [videos, setVideos] = React.useState<Video[]>([]);
 
     React.useEffect(() => {
