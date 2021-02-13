@@ -1,6 +1,7 @@
 import random
 
 import factory
+from django.contrib.auth.hashers import make_password
 from django.db.models.signals import post_save
 from factory.helpers import lazy_attribute
 
@@ -37,6 +38,7 @@ class UserFactory(factory.django.DjangoModelFactory):
     username = factory.Sequence(lambda n: "user%d@example.com" % n)
     email = factory.SelfAttribute("username")
     profile = factory.RelatedFactory(ProfileFactory, factory_related_name="user")
+    password = make_password("ls")
 
     class Meta:
         model = User
