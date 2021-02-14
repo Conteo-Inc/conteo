@@ -29,16 +29,9 @@ class UserRegistrationView(generics.CreateAPIView):
 class UserAccountDeleteView(views.APIView):
     permission_classes = (permissions.AllowAny,)
     def delete(self, request):
-        try:
-            request_id = request.data["id"] 
-            user = User.objects.get(pk=request_id)
-            profile = Profile.objects.filter(user=user)
-            profile.delete()
-            user.delete()
-            return response.Response(status=status.HTTP_200_OK)
-        except User.DoesNotExist:
-            return response.Response(status=status.HTTP_400_BAD_REQUEST)
-        return response.Response(status=status.HTTP_204_NO_CONTENT)
+        req_user = request.user
+        req_user.delete()
+        return response.Response(status=status.HTTP_200_OK)
 
 
 class UserLoginView(views.APIView):
