@@ -57,3 +57,29 @@ class MatchStatus(models.Model):
 
     def __str__(self):
         return f"{self.user_lo} [{self.user_lo_response}] - {self.user_hi} [{self.user_hi_response}]"  # noqa: E501
+
+
+class Report(models.Model):
+    class Status(models.TextChoices):
+        UNASSIGNED = "U"
+        ASSIGNED = "A"
+        RESOLVED = "R"
+
+    class ReportType(models.TextChoices):
+        VIDEO = "V"
+        PROFILE = "P"
+
+    status = models.CharField(choices=Status.choices, default=Status.UNASSIGNED)
+    type = models.CharField(choices=ReportType.choices)
+    description = models.TextField(blank=True)
+    reporter = models.ForeignKey(User, help_text="The user who submitted the report")
+    reportee = models.ForeignKey(User, help_text="The user being reported")
+    reviewer = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        limit_choices_to={"is_staff": True},
+        null=True,
+        help_text="The admin handling the report",
+    )
+    video = models.ForeignKey(Video, null=True, help_text="The offending video")
+    submitted_on = models.DateTimeField(auto_now_add=True, editable=False)
