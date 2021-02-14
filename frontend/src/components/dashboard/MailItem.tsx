@@ -1,10 +1,11 @@
-import { Grid, makeStyles } from "@material-ui/core"
+import { Grid, makeStyles, Typography } from "@material-ui/core"
+import { AccountCircle, ArrowDropDown } from "@material-ui/icons"
 import * as React from "react"
 
 const useStyles = makeStyles({
   mailItem: {
-    border: "1px solid black",
-    margin: "2rem",
+    minHeight: "4rem",
+    padding: "0 1rem",
   },
 })
 
@@ -14,16 +15,15 @@ export type MailListItem = {
   profileImage?: string
   first_name: string
   last_name: string
-  age: number
+  birth_date: number
   gender: Gender
 }
 
 export default function MailItem({
   first_name,
   last_name,
-  age,
+  birth_date,
   gender,
-  profileImage = "profile",
 }: MailListItem): JSX.Element {
   const { mailItem } = useStyles()
   return (
@@ -33,11 +33,13 @@ export default function MailItem({
       justify="space-between"
       className={mailItem}
     >
-      <div>{profileImage}</div>
-      <div>{first_name + last_name}</div>
-      <div>{age}</div>
-      <div>{gender}</div>
-      <div>...</div>
+      <Grid item container direction="row" xs={3} wrap="nowrap">
+        <AccountCircle fontSize="large" style={{ color: "#4b5e82" }} />
+        <Typography variant="h6">{`${first_name} ${last_name}`}</Typography>
+      </Grid>
+      <Typography variant="h6">{birth_date}</Typography>
+      <Typography variant="h6">{gender}</Typography>
+      <ArrowDropDown fontSize="large" style={{ color: "#4b5e82" }} />
     </Grid>
   )
 }

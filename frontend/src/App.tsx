@@ -26,6 +26,7 @@ const useStyles = makeStyles({
   },
   appBody: {
     minHeight: "49rem",
+    width: "100%",
   },
 })
 
@@ -33,9 +34,9 @@ const useStyles = makeStyles({
 function MainPage() {
   return (
     <ul>
-      <LinkItem to="/Tokens" text="Tokens" />
-      <LinkItem to="/Profile" text="Profile" />
-      <LinkItem to="/Dashboard" text="Dashboard" />
+      <LinkItem to="/tokens" text="Tokens" />
+      <LinkItem to="/profile" text="Profile" />
+      <LinkItem to="/dashboard" text="Dashboard" />
     </ul>
   )
 }
@@ -70,20 +71,23 @@ export default function App(): JSX.Element {
         </Grid>
         {/* Here's where the body of the App will live */}
         <Grid item container direction="row" className={classes.appBody}>
-          <Switch>
-            <Route path="/Tokens">
-              <TokenPage />
-            </Route>
-            <Route path="/Profile">
-              <ProfilePage />
-            </Route>
-            <Route path="/Dashboard">
-              <Dashboard />
-            </Route>
-            <Route path="/">
-              <MainPage />
-            </Route>
-          </Switch>
+          {/* Switch needs to be wrapped in a div to inherit the css */}
+          <div className={classes.appBody} id="foo">
+            <Switch>
+              <Route path="/tokens">
+                <TokenPage />
+              </Route>
+              <Route path="/profile">
+                <ProfilePage />
+              </Route>
+              <Route path="/dashboard">
+                <Dashboard />
+              </Route>
+              <Route path="/">
+                <MainPage />
+              </Route>
+            </Switch>
+          </div>
         </Grid>
         <Grid
           container

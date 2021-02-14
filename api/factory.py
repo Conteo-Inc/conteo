@@ -35,13 +35,20 @@ class ProfileFactory(factory.django.DjangoModelFactory):
 
 @factory.django.mute_signals(post_save)
 class UserFactory(factory.django.DjangoModelFactory):
+    # @TODO: Prevent collisions here
     username = factory.Sequence(lambda n: "user%d@example.com" % n)
     email = factory.SelfAttribute("username")
     profile = factory.RelatedFactory(ProfileFactory, factory_related_name="user")
-    password = make_password("ls")
+
+    @factory.lazy_attribute
+    def password(self):
+        return make_password(self.pw)
 
     class Meta:
         model = User
+
+    class Params:
+        pw = "ls"
 
 
 class MatchStatusFactory(factory.django.DjangoModelFactory):

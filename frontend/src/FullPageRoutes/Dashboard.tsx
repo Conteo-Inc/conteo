@@ -93,7 +93,7 @@ export default function Dashboard(): JSX.Element {
       <Grid id="drawer" className={drawer} item md={2}>
         <Drawer />
       </Grid>
-      <Grid id="mail" item md={10} className={mail}>
+      <Grid id="mail" item sm={10} className={mail}>
         <MailList />
       </Grid>
     </Grid>

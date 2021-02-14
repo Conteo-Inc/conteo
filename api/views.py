@@ -3,6 +3,7 @@ import random
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.db.models import Q
+from django.db.models.query import QuerySet
 from django.http.response import HttpResponseRedirect
 from rest_framework import generics, permissions, request, response, status, views
 
@@ -112,7 +113,20 @@ class Matches(generics.GenericAPIView):
 
 
 class ProfileListView(generics.ListAPIView):
-    # @TODO: Change UserProfile to Profile
-    queryset = Profile.objects.all()
-    # @TODO: Change UserSerialzer to ProfileSerializer
     serializer_class = ProfileSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        # Case 1: User is user_lo
+        case1 = Profile.objects.filter(
+            Q(user__matchstatus_hi__user_lo=user)
+            & Q(user__matchstatus_hi__user_lo_response=True)
+            & Q(user__matchstatus_hi__user_hi_response=True)
+        )
+        # Case 2: User is user_hi
+        case2 = Profile.objects.filter(
+            Q(user__matchstatus_lo__user_hi=user)
+            & Q(user__matchstatus_lo__user_lo_response=True)
+            & Q(user__matchstatus_lo__user_hi_response=True)
+        )
+        return QuerySet.union(case1, case2)
