@@ -69,17 +69,30 @@ class Report(models.Model):
         VIDEO = "V"
         PROFILE = "P"
 
-    status = models.CharField(choices=Status.choices, default=Status.UNASSIGNED)
-    type = models.CharField(choices=ReportType.choices)
+    status = models.CharField(
+        max_length=1, choices=Status.choices, default=Status.UNASSIGNED
+    )
+    report_type = models.CharField(max_length=1, choices=ReportType.choices)
     description = models.TextField(blank=True)
-    reporter = models.ForeignKey(User, help_text="The user who submitted the report")
-    reportee = models.ForeignKey(User, help_text="The user being reported")
+    reporter = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        help_text="The user who submitted the report",
+        related_name="submitted_reports",
+    )
+    reportee = models.ForeignKey(
+        User, on_delete=models.CASCADE, help_text="The user being reported"
+    )
     reviewer = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
         limit_choices_to={"is_staff": True},
         null=True,
         help_text="The admin handling the report",
+        related_name="assigned_reports",
     )
-    video = models.ForeignKey(Video, null=True, help_text="The offending video")
+    video = models.ForeignKey(
+        Video, on_delete=models.SET_NULL, null=True, help_text="The offending video"
+    )
     submitted_on = models.DateTimeField(auto_now_add=True, editable=False)
