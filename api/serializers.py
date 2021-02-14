@@ -43,3 +43,4 @@ class VideoSerializer(serializers.ModelSerializer):
 class ReportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Report
+        fields = ("report_type", "reporter", "reportee", "description")

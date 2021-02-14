@@ -110,3 +110,7 @@ class Matches(generics.GenericAPIView):
 
 class Reports(generics.CreateAPIView):
     serializer_class = ReportSerializer
+
+    def post(self, request: request.Request, *args, **kwargs):
+        request.data["reporter"] = request.user.id
+        return self.create(request, *args, **kwargs)
