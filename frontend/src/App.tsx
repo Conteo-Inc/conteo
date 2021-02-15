@@ -34,7 +34,7 @@ function MainPage() {
     <ul>
       <LinkItem to="/Tokens" text="Tokens" />
       <LinkItem to="/Profile" text="Profile" />
-      <LinkItem to='/matches' text='matches' />
+      <LinkItem to='/Matches' text='Matches' />
     </ul>
   )
 }
@@ -74,7 +74,7 @@ export default function App(): JSX.Element {
           <Route path="/Profile">
             <ProfilePage />
           </Route>
-          <Route path="/matches">
+          <Route path="/Matches">
             <MatchingPage />
           </Route>
           <Route path="/">
