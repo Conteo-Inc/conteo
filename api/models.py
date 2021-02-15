@@ -12,6 +12,10 @@ class Profile(User):
     )
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True)
 
+    class Meta:
+        verbose_name = "Profile"
+        verbose_name_plural = "Profiles"
+
 
 class Video(models.Model):
     title = models.CharField(max_length=100)

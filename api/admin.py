@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import MatchStatus
+from .models import MatchStatus, Profile
 
-# Register your models here.
 admin.site.register(MatchStatus)
+admin.site.register(Profile)
