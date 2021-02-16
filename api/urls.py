@@ -9,4 +9,5 @@ urlpatterns = [
     path("video/", views.VideoListCreate.as_view()),
     path("match/", views.Matches.as_view()),
     path("profile/", views.ProfileView.as_view()),
+    path("report/", views.Reports.as_view()),
 ]
