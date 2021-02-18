@@ -8,6 +8,7 @@ from rest_framework import generics, permissions, request, response, status, vie
 from .models import Video
 from .serializers import (
     ProfileSerializer,
+    ReportSerializer,
     UserRegistrationSerializer,
     UserSerializer,
     VideoSerializer,
@@ -105,3 +106,11 @@ class Matches(generics.GenericAPIView):
         serializer = self.get_serializer(queryset, many=True)
         matches = random.sample(serializer.data, min(max_amount, len(serializer.data)))
         return response.Response(matches)
+
+
+class Reports(generics.CreateAPIView):
+    serializer_class = ReportSerializer
+
+    def post(self, request: request.Request, *args, **kwargs):
+        request.data["reporter"] = request.user.id
+        return self.create(request, *args, **kwargs)
