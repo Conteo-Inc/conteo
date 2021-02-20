@@ -151,3 +151,41 @@ class MatchesViewTestCase(APITestCase):
                 {"username": "fog"},
             ],
         )
+
+
+class VideoViewTestCase(APITestCase):
+    def setUp(self):
+        # create a sender and a receiver
+        self.sender = User.objects.create_user(username="sender", password="sender")
+        self.receiver = User.objects.create_user(
+            username="receiver", password="receiver"
+        )
+
+        # match them together
+        MatchStatus.objects.create(
+            user_lo=self.sender,
+            user_hi=self.receiver,
+            user_lo_response=True,
+            user_hi_response=True,
+        )
+        self.video = "video"
+
+    def test_send_video(self):
+        self.client.login(username="sender", password="sender")
+        self.client.post(
+            "/api/video/",
+            {"data": self.video, "receiver": self.receiver.id},
+            format="json",
+        )
+
+        # Test that video was successfully received
+        video = self.receiver.received_videos.filter(sender=self.sender)
+        self.assertIsNotNone(video)
+
+        # Test video retrieval
+        self.client.login(username="receiver", password="receiver")
+        res = self.client.get("/api/video/")
+        results = res.json()
+
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["video_file"], self.video)
