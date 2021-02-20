@@ -2,11 +2,11 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import F, Q
 
-GENDER_CHOICES = (("M", "Male"), ("F", "Female"), ("O", "Other"))
-
 
 # Note that enforcement on these fields should be done on the frontend --- Very easy!
 class Profile(models.Model):
+    GENDER_CHOICES = (("M", "Male"), ("F", "Female"), ("O", "Other"))
+
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     first_name = models.CharField(max_length=50, blank=True)
     last_name = models.CharField(max_length=50, blank=True)

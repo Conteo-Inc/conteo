@@ -39,7 +39,7 @@ export default function Profile(): JSX.Element {
 
   // Dummy data.
   const content = {
-    username: username ? username : "",
+    username: username ?? "",
     name: "Tom Cruise",
     profileImg: "",
     gender: "Male",

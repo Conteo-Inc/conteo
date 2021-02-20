@@ -75,7 +75,6 @@ export default function TokenPage(): JSX.Element {
   return (
     <>
       {logged_in === true ? (
-        // <Dashboard handle_logout={handle_logout} email={email} />
         //@TODO: Time to do some heavy restructuring
         <Dashboard />
       ) : displayedForm === "signup" ? (
