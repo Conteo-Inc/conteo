@@ -6,22 +6,26 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0004_report'),
+        ("api", "0004_report"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='profile',
-            name='age',
+            model_name="profile",
+            name="age",
         ),
         migrations.AddField(
-            model_name='profile',
-            name='birth_date',
+            model_name="profile",
+            name="birth_date",
             field=models.DateField(null=True),
         ),
         migrations.AlterField(
-            model_name='profile',
-            name='gender',
-            field=models.CharField(choices=[('M', 'Male'), ('F', 'Female'), ('O', 'Other')], max_length=1, null=True),
+            model_name="profile",
+            name="gender",
+            field=models.CharField(
+                choices=[("M", "Male"), ("F", "Female"), ("O", "Other")],
+                max_length=1,
+                null=True,
+            ),
         ),
     ]
