@@ -13,4 +13,5 @@ urlpatterns = [
     # let's discuss if this needs to be broken into
     # multiple endpoints - Michael
     path("profiles/", views.ProfileListView.as_view()),
+    path("report/", views.Reports.as_view()),
 ]
