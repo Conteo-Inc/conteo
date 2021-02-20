@@ -43,7 +43,7 @@ class VideoSerializer(serializers.ModelSerializer):
 
         # Data is prepended by "data:video/mp4;base64,"
         # Encode converts from string to bytes
-        data_bytes = data.encode("ascii")
+        data_bytes = data.encode()
         instance = self.Meta.model(**validated_data)
 
         instance.sender = sender
@@ -71,7 +71,7 @@ class VideoSerializer(serializers.ModelSerializer):
         video_file.open()
 
         # Raw base64 bytes need to be decoded to a string
-        rep["video_file"] = video_file.read().decode("UTF-8")
+        rep["video_file"] = video_file.read().decode()
         video_file.close()
 
         return rep

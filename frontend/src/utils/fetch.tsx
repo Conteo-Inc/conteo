@@ -7,9 +7,7 @@ type HttpResponse<T> = Response & {
 export async function http<T>(request: RequestInfo): Promise<HttpResponse<T>> {
   const res: HttpResponse<T> = await fetch(request)
 
-  try {
-    res.parsedBody = await res.json()
-  } catch (ex) {} //eslint-disable-line
+  res.parsedBody = await res.json()
 
   if (!res.ok) {
     throw new Error(res.statusText)

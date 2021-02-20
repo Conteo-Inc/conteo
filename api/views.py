@@ -58,8 +58,11 @@ class ProfileView(views.APIView):
 
 
 class VideoListCreate(generics.ListCreateAPIView):
-    queryset = Video.objects.all()
     serializer_class = VideoSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        return Video.objects.filter(receiver=user)
 
     def post(self, request, format=None):
         data = request.data.pop("data")

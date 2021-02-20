@@ -8,8 +8,6 @@ import useFocusedUser, { Nullable, NullableId } from "../utils/context"
 const useStyles = makeStyles({
   video_root: {
     backgroundColor: "black",
-    width: 1066,
-    height: 700,
   },
 })
 
@@ -36,7 +34,7 @@ function sendVideo(blob: Nullable<Blob>, receiver: NullableId) {
   if (blob) {
     const reader = new FileReader()
     reader.readAsDataURL(blob)
-    reader.onloadend = () => {
+    reader.onload = () => {
       request("/api/video/", "post", true, {
         receiver: receiver,
         data: reader.result,
@@ -62,12 +60,14 @@ export default function RecordPage(): JSX.Element {
 
   const classes = useStyles()
   return (
-    <Grid container justify="center">
-      {mediaBlobUrl ? (
-        <video src={mediaBlobUrl} controls className={classes.video_root} />
-      ) : (
-        <Preview stream={previewStream} />
-      )}
+    <Grid container direction="column" wrap="nowrap" alignItems="center">
+      <Grid item xs={6}>
+        {mediaBlobUrl ? (
+          <video src={mediaBlobUrl} controls className={classes.video_root} />
+        ) : (
+          <Preview stream={previewStream} />
+        )}
+      </Grid>
       <Controls
         status={status}
         startRecording={startRecording}
