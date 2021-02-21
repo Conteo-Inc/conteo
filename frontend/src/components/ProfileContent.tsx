@@ -1,5 +1,4 @@
 import * as React from "react"
-import { request } from "../utils/fetch"
 import { makeStyles } from "@material-ui/core/styles"
 import type { ProfileContentSetters } from "../utils/profile"
 import {
@@ -12,23 +11,19 @@ import {
   TextFieldProps,
 } from "@material-ui/core"
 
-type SaveProfileResponse = {
-  token: string
-}
-
 type ProfileContentProps = {
   editableContent: ProfileContentType
   setters: ProfileContentSetters
   readonlyContent: ProfileContentType
-  setProfile: React.Dispatch<React.SetStateAction<ProfileContentType>>
+  saveProfileFields: (unsavedContent: ProfileContentType) => void
 }
 
 // This is what the ProfileContent component expects to receive from storage.
 export type ProfileContentType = {
+  username: string
   firstName: string
   lastName: string
-  username: string
-  age: number
+  birthday: Date
   gender: string
   occupations: string[]
   location: string
@@ -89,12 +84,14 @@ const useStyles = makeStyles({
   },
 })
 
-export default function ProfileContent(
-  props: ProfileContentProps
-): JSX.Element {
-  const { editableContent, setters, readonlyContent, setProfile } = props
-  const [isEditMode, toggleEditMode] = React.useState(false)
-  const [errMessage, seterrMessage] = React.useState<string>("")
+export default function ProfileContent({
+  editableContent,
+  setters,
+  readonlyContent,
+  saveProfileFields,
+}: ProfileContentProps): JSX.Element {
+  const [isEditMode, toggleEditMode] = React.useState<boolean>(false)
+  const [errMessage, seterrMessage] = React.useState<string | null>(null)
   const classes = useStyles()
 
   // User profile field list. Field values are assigned to readonly content.
@@ -139,13 +136,13 @@ export default function ProfileContent(
       },
     },
     {
-      title: "Age",
-      value: readonlyContent.age.toString(),
+      title: "Birthday",
+      value: readonlyContent.birthday.toLocaleDateString(),
       textFieldProps: {
         required: true,
         disabled: true,
         onChange: (e) => {
-          setters.setAge(Number(e.currentTarget.value))
+          setters.setBirthday(new Date(e.currentTarget.value))
         },
       },
     },
@@ -215,20 +212,6 @@ export default function ProfileContent(
     toggleEditMode(false)
   }
 
-  const saveFields = () => {
-    React.useEffect(() => {
-      request<SaveProfileResponse>("/api/current_user/", "post", true, true)
-        .then(() => {
-          setProfile(editableContent)
-          toggleEditMode(false)
-          seterrMessage("")
-        })
-        .catch((err) => {
-          seterrMessage(err)
-        })
-    })
-  }
-
   return (
     <Grid container spacing={2}>
       <Grid item className={classes.profileHeader} xs={12}>
@@ -284,47 +267,53 @@ export default function ProfileContent(
       {isEditMode && (
         <Grid item xs={12}>
           <Paper>
-            <Grid container spacing={2}>
-              {fields.map(({ title, value, textFieldProps }: ProfileField) => (
-                <Grid
-                  key={`editableField-${title}`}
-                  container
-                  item
-                  justify="flex-end"
-                  className={classes.field}
-                  sm={12}
-                  md={6}
-                >
-                  <Grid item xs={9}>
-                    <TextField
-                      label={title}
-                      defaultValue={value}
-                      {...textFieldProps}
-                    />
+            <form onSubmit={() => saveProfileFields(editableContent)}>
+              <Grid container spacing={2}>
+                {fields.map(
+                  ({ title, value, textFieldProps }: ProfileField) => (
+                    <Grid
+                      key={`editableField-${title}`}
+                      container
+                      item
+                      justify="flex-end"
+                      className={classes.field}
+                      sm={12}
+                      md={6}
+                    >
+                      <Grid item xs={9}>
+                        <TextField
+                          label={title}
+                          defaultValue={value}
+                          {...textFieldProps}
+                        />
+                      </Grid>
+                    </Grid>
+                  )
+                )}
+                <Grid container item justify="center" xs={12}>
+                  <Grid item>
+                    <Button
+                      variant="contained"
+                      type="submit"
+                      color="primary"
+                      style={{ margin: 5 }}
+                    >
+                      Save
+                    </Button>
+                    <Button
+                      variant="contained"
+                      style={{ margin: 5 }}
+                      onClick={handleCancelBtnClick}
+                    >
+                      Cancel
+                    </Button>
                   </Grid>
                 </Grid>
-              ))}
-              <Grid container item justify="center" xs={12}>
-                <Grid item>
-                  <Button
-                    variant="contained"
-                    type="submit"
-                    color="primary"
-                    style={{ margin: 5 }}
-                    onClick={saveFields}
-                  >
-                    Save
-                  </Button>
-                  <Button
-                    variant="contained"
-                    style={{ margin: 5 }}
-                    onClick={handleCancelBtnClick}
-                  >
-                    Cancel
-                  </Button>
-                </Grid>
               </Grid>
-            </Grid>
+              <br />
+              <span>{errMessage}</span>
+              <br />
+            </form>
           </Paper>
         </Grid>
       )}

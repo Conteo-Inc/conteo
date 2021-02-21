@@ -9,13 +9,16 @@ import { Grid } from "@material-ui/core"
 
 type UserProfile = {
   username: string
-  data: {
-    first_name: string
-    last_name: string
-    phone_number: string
-    age: string | number
-    gender: string
-  }
+  email: string
+  first_name: string
+  last_name: string
+  phone_number: string
+  birth_date: Date | string
+  gender: string
+}
+
+type SaveProfileResponse = {
+  token: string
 }
 
 const useStyles = makeStyles({
@@ -35,20 +38,22 @@ const useStyles = makeStyles({
 export default function Profile(): JSX.Element {
   const classes = useStyles()
 
+  // Dummy user profile data used to test which data is successfully retrieved
+  // from DB.
   const dummyUserProfile: UserProfile = {
     username: "nope",
-    data: {
-      first_name: "nope",
-      last_name: "nope",
-      phone_number: "nope",
-      age: -1,
-      gender: "nope",
-    },
+    email: "nope",
+    first_name: "nope",
+    last_name: "nope",
+    phone_number: "nope",
+    birth_date: new Date(Date.now()),
+    gender: "nope",
   }
 
+  // Initialize user data with dummy data.
   const [userData, setUserData] = React.useState<UserProfile>(dummyUserProfile)
   React.useEffect(() => {
-    request<UserProfile>("/api/current_user/", "get", true, false)
+    request<UserProfile>("/api/profile/", "get", true)
       .then((resp) => {
         if (resp.parsedBody) {
           console.log(`resp.parsedBody: `)
@@ -60,6 +65,8 @@ export default function Profile(): JSX.Element {
                   profile failed. This is a problem with the code that needs \
                   to be addressed"
           )
+          console.log("resp: ")
+          console.log(resp)
         }
       })
       .catch((err) => {
@@ -67,27 +74,39 @@ export default function Profile(): JSX.Element {
       })
   })
 
-  // Dummy data.
+  // Dummy profile content data.
   const content: ProfileContentType = {
     username: userData.username,
-    firstName: userData.data.first_name,
-    lastName: userData.data.last_name,
-    profileImg: "",
-    gender: userData.data.gender,
-    religions: ["Scientology"],
-    location: "Hollywood",
+    firstName: userData.first_name,
+    lastName: userData.last_name,
+    birthday: new Date(userData.birth_date),
+    gender: userData.gender,
     occupations: ["All the above"],
-    age: Number(userData.data.age),
+    location: "Hollywood",
+    religions: ["Scientology"],
     interests: ["Acting", "Film Producing"],
+    profileImg: "",
   }
 
-  // Pass props to to useProfile hook.
+  // Pass props to useProfile hook.
   const { editableContent, setters } = useProfile(content)
 
   // Initialize readonly profile content and acquire hook to update it when edits are saved.
   const [readonlyContent, setProfile] = React.useState<ProfileContentType>(
     editableContent
   )
+
+  const saveProfileFields = (unsavedContent: ProfileContentType) => {
+    request<SaveProfileResponse>("/api/profile/", "post", true, unsavedContent)
+      .then(() => {
+        setProfile(unsavedContent)
+        toggleEditMode(false)
+      })
+      .catch((err) => {
+        seterrMessage(err)
+      })
+  }
+
   return (
     <Grid container className={classes.root}>
       <Grid container item className={classes.sideBar} xs={3}>
@@ -101,7 +120,7 @@ export default function Profile(): JSX.Element {
           editableContent={editableContent}
           setters={setters}
           readonlyContent={readonlyContent}
-          setProfile={setProfile}
+          saveProfileFields={saveProfileFields}
         />
         {/* Other components (e.g. Notifications, Settings, and Privacy) will be
         added here to be rendered when the respective component is selected from

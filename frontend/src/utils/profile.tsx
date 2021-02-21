@@ -5,7 +5,7 @@ export type ProfileContentSetters = {
   setFirstName: React.Dispatch<React.SetStateAction<string>>
   setLastName: React.Dispatch<React.SetStateAction<string>>
   setUsername: React.Dispatch<React.SetStateAction<string>>
-  setAge: React.Dispatch<React.SetStateAction<number>>
+  setBirthday: React.Dispatch<React.SetStateAction<Date>>
   setGender: React.Dispatch<React.SetStateAction<string>>
   setOccupations: React.Dispatch<React.SetStateAction<string[]>>
   setLocation: React.Dispatch<React.SetStateAction<string>>
@@ -30,7 +30,9 @@ export function useProfile(
   const [username, setUsername] = useState<typeof initialProfile.username>(
     initialProfile.username
   )
-  const [age, setAge] = useState<typeof initialProfile.age>(initialProfile.age)
+  const [birthday, setBirthday] = useState<typeof initialProfile.birthday>(
+    initialProfile.birthday
+  )
   const [gender, setGender] = useState<typeof initialProfile.gender>(
     initialProfile.gender
   )
@@ -54,7 +56,7 @@ export function useProfile(
     firstName: firstName,
     lastName: lastName,
     username: username,
-    age: age,
+    birthday: birthday,
     gender: gender,
     occupations: occupations,
     location: location,
@@ -67,7 +69,7 @@ export function useProfile(
     setFirstName,
     setLastName,
     setUsername,
-    setAge,
+    setBirthday,
     setGender,
     setOccupations,
     setLocation,
