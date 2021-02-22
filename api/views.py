@@ -30,6 +30,15 @@ class UserRegistrationView(generics.CreateAPIView):
         return response
 
 
+class UserAccountDeleteView(views.APIView):
+    permission_classes = (permissions.AllowAny,)
+
+    def delete(self, request):
+        req_user = request.user
+        req_user.delete()
+        return response.Response(status=status.HTTP_200_OK)
+
+
 class UserLoginView(views.APIView):
     permission_classes = (permissions.AllowAny,)
 
