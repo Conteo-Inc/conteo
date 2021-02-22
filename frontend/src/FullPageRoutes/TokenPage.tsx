@@ -41,43 +41,33 @@ export default function TokenPage(): JSX.Element {
 
   const handle_login = ({ e, ...data }: UserHandlerArgs) => {
     e.preventDefault()
-    request<TokenResponse>("/api/login/", "post", true, data).then((json) => {
-      // FIXME: json.parsedBody can be undefined; this needs to be handled gracefully!
-      if (json.parsedBody) {
-        setLoggedIn(true)
-        setEmail(json.parsedBody.username)
-        setDisplayedForm(null)
-        seterrMessage(null)
-      } else {
-        console.error(
-          "FIXME: json.parsedBody was undefined and so the login failed. \
-                  This is a problem with the code that needs to be addressed"
-        )
-      }
+    request<TokenResponse>({
+      path: "/api/login/",
+      method: "post",
+      body: data,
+    }).then((json) => {
+      setLoggedIn(true)
+      setEmail(json.parsedBody.username)
+      setDisplayedForm(null)
+      seterrMessage(null)
     })
   }
 
   const handle_signup = ({ e, ...data }: UserHandlerArgs) => {
     e.preventDefault()
-    request<TokenResponse>("/api/register/", "post", true, data).then(
-      (resp) => {
-        // FIXME: resp.parsedBody can be undefined; this needs to be handled gracefully!
-        if (resp.parsedBody) {
-          setLoggedIn(true)
-          setDisplayedForm(null)
-          setEmail(resp.parsedBody.username)
-        } else {
-          console.error(
-            "FIXME: resp.parsedBody was undefined and so the login failed. \
-                  This is a problem with the code that needs to be addressed"
-          )
-        }
-      }
-    )
+    request<TokenResponse>({
+      path: "/api/register/",
+      method: "post",
+      body: data,
+    }).then((resp) => {
+      setLoggedIn(true)
+      setDisplayedForm(null)
+      setEmail(resp.parsedBody.username)
+    })
   }
 
   const handle_logout = () => {
-    request("/api/logout/", "post", true).then(() => {
+    request({ path: "/api/logout/", method: "post" }).then(() => {
       setLoggedIn(false)
       setEmail(null)
       setDisplayedForm("login")
