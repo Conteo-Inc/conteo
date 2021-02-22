@@ -77,11 +77,7 @@ export default function ProfileSidebar({
     <>
       <Grid container item className={classes.tab} xs={12}>
         <Grid container item alignItems="center" justify="center" xs={3}>
-          <Avatar
-            alt={firstName}
-            src={""}
-            className={classes.headerAvatar}
-          />
+          <Avatar alt={firstName} src={""} className={classes.headerAvatar} />
         </Grid>
         <Grid container item alignItems="center" xs={9}>
           <Typography className={`${classes.headerName} ${classes.tabTitle}`}>

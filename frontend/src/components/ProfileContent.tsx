@@ -163,10 +163,7 @@ export default function ProfileContent({
       <Grid item className={classes.profileHeader} xs={12}>
         <Grid container justify="center" spacing={2}>
           <Grid item xs={12} sm={6}>
-            <Avatar
-              src={""}
-              className={classes.profileAvatar}
-            />
+            <Avatar src={""} className={classes.profileAvatar} />
           </Grid>
           <Grid item xs={12} sm={6}>
             <div className={classes.introVideo}>Intro Video</div>
