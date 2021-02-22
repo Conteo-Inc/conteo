@@ -18,9 +18,17 @@ class Profile(models.Model):
 
 
 class Video(models.Model):
-    title = models.CharField(max_length=100)
-    created_at = models.DateTimeField(auto_now_add=True)
+    sender = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="sent_videos"
+    )
+    receiver = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="received_videos"
+    )
+
+    created_at = models.DateTimeField()
     viewed_at = models.DateTimeField(null=True)
+
+    video_file = models.FileField(upload_to="videos/", null=True, verbose_name="")
 
 
 class MatchStatus(models.Model):

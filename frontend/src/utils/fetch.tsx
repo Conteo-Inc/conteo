@@ -7,9 +7,7 @@ type HttpResponse<T> = Response & {
 export async function http<T>(request: RequestInfo): Promise<HttpResponse<T>> {
   const res: HttpResponse<T> = await fetch(request)
 
-  try {
-    res.parsedBody = await res.json()
-  } catch (ex) {}
+  res.parsedBody = await res.json()
 
   if (!res.ok) {
     throw new Error(res.statusText)
@@ -27,7 +25,7 @@ export async function request<T>(
   path: string,
   method: "get" | "put" | "post",
   specifyJson = true,
-  body?: any
+  body?: any // eslint-disable-line
 ): Promise<HttpResponse<T>> {
   const csrfToken = Cookies.get("csrftoken")
   const args: RequestInit = {

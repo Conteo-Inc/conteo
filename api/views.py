@@ -59,8 +59,21 @@ class ProfileView(views.APIView):
 
 
 class VideoListCreate(generics.ListCreateAPIView):
-    queryset = Video.objects.all()
     serializer_class = VideoSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        return Video.objects.filter(receiver=user)
+
+    def post(self, request, format=None):
+        data = request.data.pop("data")
+        serializer = self.serializer_class(
+            data=request.data, context={"data": data, "user": request.user}
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return response.Response(serializer.data, status=status.HTTP_201_CREATED)
+        return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class Matches(generics.GenericAPIView):
