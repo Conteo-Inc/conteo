@@ -41,9 +41,13 @@ export default function TokenPage(): JSX.Element {
 
   const handle_login = ({ e, ...data }: UserHandlerArgs) => {
     e.preventDefault()
-    request<TokenResponse>("/api/login/", "post", true, data).then((json) => {
+    request<TokenResponse>({
+      path: "/api/login/",
+      method: "post",
+      body: data,
+    }).then((json) => {
       setLoggedIn(true)
-      setEmail(json.parsedBody ? json.parsedBody.username : "")
+      setEmail(json.parsedBody.username)
       setDisplayedForm(null)
       seterrMessage(null)
     })
@@ -51,17 +55,19 @@ export default function TokenPage(): JSX.Element {
 
   const handle_signup = ({ e, ...data }: UserHandlerArgs) => {
     e.preventDefault()
-    request<TokenResponse>("/api/register/", "post", true, data).then(
-      (resp) => {
-        setLoggedIn(true)
-        setDisplayedForm(null)
-        setEmail(resp.parsedBody ? resp.parsedBody.username : "")
-      }
-    )
+    request<TokenResponse>({
+      path: "/api/register/",
+      method: "post",
+      body: data,
+    }).then((resp) => {
+      setLoggedIn(true)
+      setDisplayedForm(null)
+      setEmail(resp.parsedBody.username)
+    })
   }
 
   // const handle_logout = () => {
-  //   request("/api/logout/", "post", true).then(() => {
+  //   request({ path: "/api/logout/", method: "post" }).then(() => {
   //     setLoggedIn(false)
   //     setEmail(null)
   //     setDisplayedForm("login")

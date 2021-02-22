@@ -32,9 +32,11 @@ export default function Profile(): JSX.Element {
 
   const [username, setUsername] = React.useState<string | null>(null)
   React.useEffect(() => {
-    request<UserProfile>("/api/profile/", "get", true).then((profile) => {
-      setUsername(profile.parsedBody ? profile.parsedBody.first_name : "")
-    })
+    request<UserProfile>({ path: "/api/profile/", method: "get" }).then(
+      (profile) => {
+        setUsername(profile.parsedBody.first_name)
+      }
+    )
   })
 
   // Dummy data.
