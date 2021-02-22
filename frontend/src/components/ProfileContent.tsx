@@ -12,10 +12,13 @@ import {
 } from "@material-ui/core"
 
 type ProfileContentProps = {
-  editableContent: ProfileContentType
-  setters: ProfileContentSetters
   readonlyContent: ProfileContentType
-  saveProfileFields: (unsavedContent: ProfileContentType) => void
+  setters: ProfileContentSetters
+  isEditMode: boolean
+  errMessage: string
+  handleEditFields: () => void
+  handleCancelEdit: () => void
+  handleSaveFields: (event: React.FormEvent<HTMLFormElement>) => void
 }
 
 // This is what the ProfileContent component expects to receive from storage.
@@ -25,11 +28,6 @@ export type ProfileContentType = {
   lastName: string
   birthday: Date
   gender: string
-  occupations: string[]
-  location: string
-  interests: string[]
-  religions: string[]
-  profileImg: string
 }
 
 // A field listed in the content.
@@ -85,13 +83,14 @@ const useStyles = makeStyles({
 })
 
 export default function ProfileContent({
-  editableContent,
-  setters,
   readonlyContent,
-  saveProfileFields,
+  setters,
+  isEditMode,
+  errMessage,
+  handleEditFields,
+  handleCancelEdit,
+  handleSaveFields,
 }: ProfileContentProps): JSX.Element {
-  const [isEditMode, toggleEditMode] = React.useState<boolean>(false)
-  const [errMessage, seterrMessage] = React.useState<string | null>(null)
   const classes = useStyles()
 
   // User profile field list. Field values are assigned to readonly content.
@@ -157,60 +156,7 @@ export default function ProfileContent({
         },
       },
     },
-    {
-      title: "Occupations",
-      value: readonlyContent.occupations.join(", "),
-      textFieldProps: {
-        required: false,
-        disabled: false,
-        onChange: (e) => {
-          setters.setOccupations(e.currentTarget.value.split(","))
-        },
-      },
-    },
-    {
-      title: "Location",
-      value: readonlyContent.location,
-      textFieldProps: {
-        required: false,
-        disabled: false,
-        onChange: (e) => {
-          setters.setLocation(e.currentTarget.value)
-        },
-      },
-    },
-    {
-      title: "Interests",
-      value: readonlyContent.interests.join(", "),
-      textFieldProps: {
-        required: false,
-        disabled: false,
-        onChange: (e) => {
-          setters.setInterests(e.currentTarget.value.split(","))
-        },
-      },
-    },
-    {
-      title: "Religions",
-      value: readonlyContent.religions.join(", "),
-      textFieldProps: {
-        required: false,
-        disabled: false,
-        onChange: (e) => {
-          setters.setReligions(e.currentTarget.value.split(","))
-        },
-      },
-    },
   ]
-
-  const handleEditBtnClick = () => {
-    toggleEditMode(true)
-  }
-
-  const handleCancelBtnClick = () => {
-    seterrMessage("")
-    toggleEditMode(false)
-  }
 
   return (
     <Grid container spacing={2}>
@@ -218,7 +164,7 @@ export default function ProfileContent({
         <Grid container justify="center" spacing={2}>
           <Grid item xs={12} sm={6}>
             <Avatar
-              src={readonlyContent.profileImg}
+              src={""}
               className={classes.profileAvatar}
             />
           </Grid>
@@ -254,7 +200,7 @@ export default function ProfileContent({
                     variant="contained"
                     color="secondary"
                     style={{ margin: 5 }}
-                    onClick={handleEditBtnClick}
+                    onClick={handleEditFields}
                   >
                     Edit
                   </Button>
@@ -267,7 +213,7 @@ export default function ProfileContent({
       {isEditMode && (
         <Grid item xs={12}>
           <Paper>
-            <form onSubmit={() => saveProfileFields(editableContent)}>
+            <form onSubmit={handleSaveFields}>
               <Grid container spacing={2}>
                 {fields.map(
                   ({ title, value, textFieldProps }: ProfileField) => (
@@ -303,7 +249,7 @@ export default function ProfileContent({
                     <Button
                       variant="contained"
                       style={{ margin: 5 }}
-                      onClick={handleCancelBtnClick}
+                      onClick={handleCancelEdit}
                     >
                       Cancel
                     </Button>

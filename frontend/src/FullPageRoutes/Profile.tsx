@@ -7,18 +7,14 @@ import type { ProfileContentType } from "../components/ProfileContent"
 import { makeStyles } from "@material-ui/core/styles"
 import { Grid } from "@material-ui/core"
 
-type UserProfile = {
+export type UserProfile = {
   username: string
   email: string
   first_name: string
   last_name: string
   phone_number: string
-  birth_date: Date | string
+  birth_date: string
   gender: string
-}
-
-type SaveProfileResponse = {
-  token: string
 }
 
 const useStyles = makeStyles({
@@ -36,70 +32,51 @@ const useStyles = makeStyles({
 })
 
 export default function Profile(): JSX.Element {
+  const [isEditMode, toggleEditMode] = React.useState<boolean>(false)
+  const [errMessage, seterrMessage] = React.useState<string>("")
   const classes = useStyles()
 
-  // Dummy user profile data used to test which data is successfully retrieved
-  // from DB.
-  const dummyUserProfile: UserProfile = {
-    username: "nope",
-    email: "nope",
-    first_name: "nope",
-    last_name: "nope",
-    phone_number: "nope",
-    birth_date: new Date(Date.now()),
-    gender: "nope",
-  }
+  const [readonlyContent, setProfile] = React.useState<ProfileContentType>({
+    username: "",
+    firstName: "",
+    lastName: "",
+    birthday: new Date(),
+    gender: "",
+  })
+  const { editableContent, setters } = useProfile(readonlyContent)
 
-  // Initialize user data with dummy data.
-  const [userData, setUserData] = React.useState<UserProfile>(dummyUserProfile)
   React.useEffect(() => {
-    request<UserProfile>("/api/profile/", "get", true)
-      .then((resp) => {
-        if (resp.parsedBody) {
-          console.log(`resp.parsedBody: `)
-          console.log(resp.parsedBody)
-          setUserData(resp.parsedBody)
-        } else {
-          console.error(
-            "FIXME: resp.parsedBody was undefined and so lodaing the user \
-                  profile failed. This is a problem with the code that needs \
-                  to be addressed"
-          )
-          console.log("resp: ")
-          console.log(resp)
+    request<UserProfile>({ path: "/api/profile/", method: "get" })
+      .then((res) => {
+        const profile: UserProfile = res.parsedBody
+        const content: ProfileContentType = {
+          username: profile.username,
+          firstName: profile.first_name,
+          lastName: profile.last_name,
+          birthday: new Date(profile.birth_date),
+          gender: profile.gender,
         }
+        setProfile(content)
       })
       .catch((err) => {
         console.log(err)
       })
-  })
+  }, [readonlyContent, editableContent])
 
-  // Dummy profile content data.
-  const content: ProfileContentType = {
-    username: userData.username,
-    firstName: userData.first_name,
-    lastName: userData.last_name,
-    birthday: new Date(userData.birth_date),
-    gender: userData.gender,
-    occupations: ["All the above"],
-    location: "Hollywood",
-    religions: ["Scientology"],
-    interests: ["Acting", "Film Producing"],
-    profileImg: "",
+  const handleEditFields = () => {
+    toggleEditMode(true)
   }
 
-  // Pass props to useProfile hook.
-  const { editableContent, setters } = useProfile(content)
+  const handleCancelEdit = () => {
+    seterrMessage("")
+    toggleEditMode(false)
+  }
 
-  // Initialize readonly profile content and acquire hook to update it when edits are saved.
-  const [readonlyContent, setProfile] = React.useState<ProfileContentType>(
-    editableContent
-  )
-
-  const saveProfileFields = (unsavedContent: ProfileContentType) => {
-    request<SaveProfileResponse>("/api/profile/", "post", true, unsavedContent)
+  const handleSaveFields = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    request({ path: "/api/profile/", method: "put", body: editableContent })
       .then(() => {
-        setProfile(unsavedContent)
+        setProfile(editableContent)
         toggleEditMode(false)
       })
       .catch((err) => {
@@ -111,16 +88,19 @@ export default function Profile(): JSX.Element {
     <Grid container className={classes.root}>
       <Grid container item className={classes.sideBar} xs={3}>
         <ProfileSidebar
-          name={`${readonlyContent.firstName} ${readonlyContent.lastName}`}
-          profileImg={readonlyContent.profileImg}
+          firstName={readonlyContent.firstName}
+          lastName={readonlyContent.lastName}
         />
       </Grid>
       <Grid container item className={classes.section} xs={9}>
         <ProfileContent
-          editableContent={editableContent}
+          isEditMode={isEditMode}
           setters={setters}
           readonlyContent={readonlyContent}
-          saveProfileFields={saveProfileFields}
+          handleEditFields={handleEditFields}
+          handleCancelEdit={handleCancelEdit}
+          handleSaveFields={handleSaveFields}
+          errMessage={errMessage}
         />
         {/* Other components (e.g. Notifications, Settings, and Privacy) will be
         added here to be rendered when the respective component is selected from
