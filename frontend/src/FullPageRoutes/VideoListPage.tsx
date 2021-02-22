@@ -11,9 +11,8 @@ export default function VideoListPage(): JSX.Element {
   const [videos, setVideos] = React.useState<Video[]>([])
 
   React.useEffect(() => {
-    request<Video[]>("/api/video/", "get", false).then((res) => {
-      //@TODO: Add proper checking
-      setVideos(res.parsedBody ? res.parsedBody : [])
+    request<Video[]>({ path: "/api/video/", method: "get" }).then((res) => {
+      setVideos(res.parsedBody)
     })
   })
 

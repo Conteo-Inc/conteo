@@ -1,13 +1,11 @@
 import * as Cookies from "js-cookie"
 
 type HttpResponse<T> = Response & {
-  parsedBody?: T
+  parsedBody: T
 }
 
-export async function http<T>(request: RequestInfo): Promise<HttpResponse<T>> {
-  const res: HttpResponse<T> = await fetch(request)
-
-  res.parsedBody = await res.json()
+export async function http(request: RequestInfo): Promise<Response> {
+  const res: Response = await fetch(request)
 
   if (!res.ok) {
     throw new Error(res.statusText)
@@ -15,32 +13,51 @@ export async function http<T>(request: RequestInfo): Promise<HttpResponse<T>> {
   return res
 }
 
-/*
-path: some api endpoint string, e.g. '/api/current-user/'
-method: fetch method
-includeAuth: if true, the request header will include the csrf authorization
-specifyJson: if true, the request header will include the Content-Type header with the value 'application/json'
-*/
-export async function request<T>(
-  path: string,
-  method: "get" | "put" | "post",
-  specifyJson = true,
+type requestArgs<T> = {
+  path: string
+  method: "get" | "put" | "post"
+  parser?: (res: Response) => Promise<T>
+  headers?: RequestInit["headers"] & { "Content-Type": string }
   body?: any // eslint-disable-line
-): Promise<HttpResponse<T>> {
+}
+
+async function parseAsJson<T>(res: Response): Promise<T> {
+  return (await res.json()) as T
+}
+
+const defaultRequestArgs = {
+  headers: {
+    "Content-Type": "application/json",
+  },
+  parser: parseAsJson,
+}
+/**
+ * A generic, strongly typed `fetch` wrapper.
+ * @param path: The path to the endpoint
+ * @param method The request method
+ * @param body: The data passed to the request. This is always stringifieds
+ * @param headers: By default, the headers includes a Content-Type of "application/json"
+ * @param parser: The method by which `res.parsedBody` is generated.
+ *    By default, the parser converts the response to json.
+ */
+export async function request<T>({
+  path,
+  method,
+  body,
+  headers = defaultRequestArgs.headers,
+  parser = defaultRequestArgs.parser,
+}: requestArgs<T>): Promise<HttpResponse<T>> {
   const csrfToken = Cookies.get("csrftoken")
   const args: RequestInit = {
     method: method,
     headers: {
-      //The ...(<boolean> && obj) syntax will spread the obj if the boolean is true,
-      //otherwise it will exclude
-
+      ...headers,
       //conditionally adds the X-CSRFToken property
       ...(csrfToken && { "X-CSRFToken": csrfToken }),
-      //conditionally adds the Content-Type property
-      ...(specifyJson && { "Content-Type": "application/json" }),
     },
     //conditionally adds the body
     ...(body && { body: JSON.stringify(body) }),
   }
-  return await http<T>(new Request(path, args))
+  const res = await http(new Request(path, args))
+  return { ...res, parsedBody: await parser(res) }
 }
