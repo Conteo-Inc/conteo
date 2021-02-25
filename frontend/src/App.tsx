@@ -19,6 +19,9 @@ const useStyles = makeStyles({
     backgroundColor: "#760000",
     height: "3rem",
     padding: "0 1rem",
+    position: "fixed",
+    left: 0,
+    bottom: 0,
   },
   bannerText: {
     color: "white",
