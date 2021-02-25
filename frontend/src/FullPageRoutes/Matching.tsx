@@ -54,7 +54,9 @@ export default function MatchingPage(): JSX.Element {
     <Container>
       {match ? (
         <>
-          <Typography>{match.first_name} {match.last_name}</Typography>
+          <Typography>
+            {match.first_name} {match.last_name}
+          </Typography>
           <Button onClick={() => onAccept(match.id)}>
             <Check />
             Accept

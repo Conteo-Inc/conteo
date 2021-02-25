@@ -1,7 +1,34 @@
 # from django.contrib.auth.models import User
 from rest_framework.test import APITestCase
 
-from api.models import MatchStatus, Profile
+from api.models import MatchStatus, Profile, Report, User
+
+
+class ReportViewTestCase(APITestCase):
+    def setUp(self):
+        self.ale = User.objects.create_user(username="ale", password="password")
+        self.boy = User.objects.create_user(username="boy", password="password")
+
+    def test_report(self):
+        """
+        Test reporting a user.
+
+        Checks if a user can report another user through the reporting
+        endpoint.
+        """
+        self.client.login(username="ale", password="password")
+        res = self.client.post(
+            "/api/report/",
+            {
+                "report_type": Report.ReportType.PROFILE,
+                "reportee": self.boy.id,
+            },
+            format="json",
+        )
+        self.assertEqual(res.status_code, 201)
+        report = Report.objects.filter(reporter=self.ale.id).first()
+        self.assertEqual(report.reporter, self.ale)
+        self.assertEqual(report.reportee, self.boy)
 
 
 class MatchesViewTestCase(APITestCase):
@@ -98,3 +125,55 @@ class MatchesViewTestCase(APITestCase):
             usernames(res.json()),
             ("ale", "boy", "cad", "dig", "eel", "fog"),
         )
+
+
+class VideoViewTestCase(APITestCase):
+    def setUp(self):
+        # create a sender and a receiver
+        self.lo = User.objects.create_user(username="lo", password="lo")
+        self.hi = User.objects.create_user(username="hi", password="hi")
+
+        # match them together
+        MatchStatus.objects.create(
+            user_lo=self.lo,
+            user_hi=self.hi,
+            user_lo_response=True,
+            user_hi_response=True,
+        )
+        self.video = "video"
+
+    def test_send_video(self):
+        # lo sends to hi
+        self.client.login(username="lo", password="lo")
+        self.client.post(
+            "/api/video/",
+            {"data": self.video, "receiver": self.hi.id},
+            format="json",
+        )
+
+        # hi receives the video
+        videos = self.hi.received_videos.filter(sender=self.lo)
+        self.assertEqual(len(videos), 1)
+
+        # hi retrieves the video
+        self.client.login(username="hi", password="hi")
+        res = self.client.get("/api/video/")
+        results = res.json()
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["video_file"], self.video)
+
+        # hi sends to lo
+        self.client.post(
+            "/api/video/", {"data": self.video, "receiver": self.lo.id}, format="json"
+        )
+
+        # lo receives the video
+        videos = self.lo.received_videos.filter(sender=self.hi)
+        self.assertEqual(len(videos), 1)
+
+        # lo retrieves the video
+        self.client.login(username="lo", password="lo")
+        res = self.client.get("/api/video/")
+        results = res.json()
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["video_file"], self.video)

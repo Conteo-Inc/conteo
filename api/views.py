@@ -6,7 +6,7 @@ from django.db.models import Q
 from rest_framework import generics, permissions, request, response, status, views
 
 from .models import Video
-from .serializers import ProfileSerializer, VideoSerializer
+from .serializers import ProfileSerializer, ReportSerializer, VideoSerializer
 
 
 class UserRegistrationView(generics.CreateAPIView):
@@ -20,6 +20,15 @@ class UserRegistrationView(generics.CreateAPIView):
         login(request=request, user=user)
 
         return response
+
+
+class UserAccountDeleteView(views.APIView):
+    permission_classes = (permissions.AllowAny,)
+
+    def delete(self, request):
+        req_user = request.user
+        req_user.delete()
+        return response.Response(status=status.HTTP_200_OK)
 
 
 class UserLoginView(views.APIView):
@@ -53,8 +62,21 @@ class ProfileView(views.APIView):
 
 
 class VideoListCreate(generics.ListCreateAPIView):
-    queryset = Video.objects.all()
     serializer_class = VideoSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        return Video.objects.filter(receiver=user)
+
+    def post(self, request, format=None):
+        data = request.data.pop("data")
+        serializer = self.serializer_class(
+            data=request.data, context={"data": data, "user": request.user}
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return response.Response(serializer.data, status=status.HTTP_201_CREATED)
+        return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class Matches(generics.ListAPIView):
@@ -101,3 +123,11 @@ class Matches(generics.ListAPIView):
             response.data, min(max_amount, len(response.data))
         )
         return response
+
+
+class Reports(generics.CreateAPIView):
+    serializer_class = ReportSerializer
+
+    def post(self, request: request.Request, *args, **kwargs):
+        request.data["reporter"] = request.user.id
+        return self.create(request, *args, **kwargs)

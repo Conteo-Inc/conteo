@@ -18,9 +18,17 @@ class Profile(User):
 
 
 class Video(models.Model):
-    title = models.CharField(max_length=100)
-    created_at = models.DateTimeField(auto_now_add=True)
+    sender = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="sent_videos"
+    )
+    receiver = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="received_videos"
+    )
+
+    created_at = models.DateTimeField()
     viewed_at = models.DateTimeField(null=True)
+
+    video_file = models.FileField(upload_to="videos/", null=True, verbose_name="")
 
 
 class MatchStatus(models.Model):
@@ -58,3 +66,42 @@ class MatchStatus(models.Model):
 
     def __str__(self):
         return f"{self.user_lo} [{self.user_lo_response}] - {self.user_hi} [{self.user_hi_response}]"  # noqa: E501
+
+
+class Report(models.Model):
+    class Status(models.TextChoices):
+        UNASSIGNED = "U"
+        ASSIGNED = "A"
+        RESOLVED = "R"
+
+    class ReportType(models.TextChoices):
+        VIDEO = "V"
+        PROFILE = "P"
+
+    status = models.CharField(
+        max_length=1, choices=Status.choices, default=Status.UNASSIGNED
+    )
+    report_type = models.CharField(max_length=1, choices=ReportType.choices)
+    description = models.TextField(blank=True)
+    reporter = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        help_text="The user who submitted the report",
+        related_name="submitted_reports",
+    )
+    reportee = models.ForeignKey(
+        User, on_delete=models.CASCADE, help_text="The user being reported"
+    )
+    reviewer = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        limit_choices_to={"is_staff": True},
+        null=True,
+        help_text="The admin handling the report",
+        related_name="assigned_reports",
+    )
+    video = models.ForeignKey(
+        Video, on_delete=models.SET_NULL, null=True, help_text="The offending video"
+    )
+    submitted_on = models.DateTimeField(auto_now_add=True, editable=False)

@@ -32,17 +32,11 @@ export default function Profile(): JSX.Element {
 
   const [username, setUsername] = React.useState<string>("")
   React.useEffect(() => {
-    request<UserProfile>("/api/profile/", "get", true).then((profile) => {
-      // FIXME: profile.parsedBody can be undefined; this needs to be handled gracefully!
-      if (profile.parsedBody) {
+    request<UserProfile>({ path: "/api/profile/", method: "get" }).then(
+      (profile) => {
         setUsername(profile.parsedBody.first_name)
-      } else {
-        console.error(
-          "FIXME: json.parsedBody was undefined and so the login failed. \
-                  This is a problem with the code that needs to be addressed"
-        )
       }
-    })
+    )
   })
 
   // Dummy data.
