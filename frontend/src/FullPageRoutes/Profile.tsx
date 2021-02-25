@@ -4,6 +4,7 @@ import ProfileSidebar from "../components/ProfileSidebar"
 import ProfileContent from "../components/ProfileContent"
 import { makeStyles } from "@material-ui/core/styles"
 import { Grid } from "@material-ui/core"
+import useFocusedUser, { Nullable } from "../utils/context"
 
 const useStyles = makeStyles({
   root: {
@@ -25,16 +26,22 @@ type UserProfile = {
   phone_number?: string
   age?: number
   gender: string
+  video: Nullable<string>
+  id: number
 }
 
 export default function Profile(): JSX.Element {
   const classes = useStyles()
+  const [, setFocusedUser] = useFocusedUser()
 
   const [username, setUsername] = React.useState<string>("")
+  const [video, setVideo] = React.useState<Nullable<string>>(null)
   React.useEffect(() => {
     request<UserProfile>({ path: "/api/profile/", method: "get" }).then(
       (profile) => {
         setUsername(profile.parsedBody.first_name)
+        setVideo(profile.parsedBody.video)
+        setFocusedUser(profile.parsedBody.id)
       }
     )
   })
@@ -50,6 +57,7 @@ export default function Profile(): JSX.Element {
     occupations: ["All the above"],
     age: "58",
     interests: ["Acting", "Film Producing"],
+    video: video,
   }
 
   return (
@@ -68,6 +76,7 @@ export default function Profile(): JSX.Element {
           occupations={content.occupations}
           age={content.age}
           interests={content.interests}
+          video={content.video}
         />
         {/* Other components (e.g. Notifications, Settings, and Privacy)
                 will be added here with attribute hidden */}

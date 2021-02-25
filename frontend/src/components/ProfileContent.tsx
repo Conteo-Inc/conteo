@@ -1,6 +1,9 @@
 import * as React from "react"
 import { makeStyles } from "@material-ui/core/styles"
-import { Grid, Avatar, Typography } from "@material-ui/core"
+import { Grid, Avatar, Typography, Button } from "@material-ui/core"
+import { Nullable } from "../utils/context"
+import { Link } from "react-router-dom"
+import { Colors } from "../utils/colors"
 
 // This is what the ProfileContent component expects to receive from storage.
 type ProfileContentProps = {
@@ -13,6 +16,7 @@ type ProfileContentProps = {
   occupations: string[]
   age: number | string
   interests: string[]
+  video: Nullable<string>
 }
 
 // A field listed in the content.
@@ -30,11 +34,9 @@ const useStyles = makeStyles({
     width: 200,
   },
   introVideo: {
-    height: 200,
-    width: 400,
-    backgroundColor: "#bdbdbd",
     color: "white",
     textAlign: "center",
+    marginBottom: "1rem",
   },
   fieldsContainer: {
     position: "relative",
@@ -50,6 +52,13 @@ const useStyles = makeStyles({
     fontSize: "2rem",
     padding: 5,
     paddingRight: 10,
+  },
+  recordButton: {
+    backgroundColor: Colors.DEEP_BLUE,
+    color: "white",
+    "&:hover": {
+      backgroundColor: Colors.DEEP_RED,
+    },
   },
 })
 
@@ -96,7 +105,14 @@ export default function ProfileContent(
 
   return (
     <>
-      <Grid container item className={classes.profileHeader} xs={12}>
+      <Grid
+        container
+        item
+        className={classes.profileHeader}
+        xs={12}
+        direction="row"
+        justify="space-between"
+      >
         <Grid container item alignItems="center" justify="center" xs={6}>
           <Avatar
             alt={props.name}
@@ -104,8 +120,26 @@ export default function ProfileContent(
             className={classes.profileAvatar}
           />
         </Grid>
-        <Grid container item alignItems="center" justify="center" xs={6}>
-          <div className={classes.introVideo}>Intro Video</div>
+        <Grid
+          container
+          item
+          alignItems="center"
+          justify="center"
+          xs={4}
+          className={classes.introVideo}
+        >
+          {props.video ? (
+            <video controls src={props.video} width={"100%"} height={"100%"} />
+          ) : (
+            <Button
+              className={classes.recordButton}
+              size="large"
+              component={Link}
+              to="/record"
+            >
+              <Typography variant="h6">Record Intro Video</Typography>
+            </Button>
+          )}
         </Grid>
       </Grid>
       <Grid

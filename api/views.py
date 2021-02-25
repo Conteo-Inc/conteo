@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from rest_framework import generics, permissions, request, response, status, views
 
-from .models import Video, Profile
+from .models import Video
 from .serializers import (
     ProfileSerializer,
     ReportSerializer,
@@ -27,8 +27,10 @@ class UserRegistrationView(generics.CreateAPIView):
 
         return response
 
+
 class UserAccountDeleteView(views.APIView):
     permission_classes = (permissions.AllowAny,)
+
     def delete(self, request):
         req_user = request.user
         req_user.delete()
@@ -58,6 +60,8 @@ class UserLogoutView(generics.GenericAPIView):
 
 
 class ProfileView(views.APIView):
+    serializer_class = ProfileSerializer
+
     def get(self, request):
         user = request.user
         return response.Response(

@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
+from django.db.models.query_utils import Q
 from django.utils.timezone import now
 from rest_framework import serializers
 
@@ -7,6 +8,14 @@ from .models import Profile, Report, Video
 
 
 class ProfileSerializer(serializers.ModelSerializer):
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        # get video
+        video = Video.objects.get(Q(sender=instance.user) & Q(receiver=instance.user))
+        rep["video"] = read_video(video.video_file)
+
+        return rep
+
     class Meta:
         model = Profile
         fields = "__all__"
@@ -34,6 +43,18 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         model = User
         fields = "__all__"
         extra_kwargs = {"password": {"write_only": True}}
+
+
+def read_video(video):
+    """
+    @param video: A FieldFile representing the video.
+    Commonly found on Video.video_file
+    """
+    video.open()
+    try:
+        return video.read().decode()
+    finally:
+        video.close()
 
 
 class VideoSerializer(serializers.ModelSerializer):
@@ -68,11 +89,7 @@ class VideoSerializer(serializers.ModelSerializer):
         rep = super().to_representation(instance)
 
         video_file = instance.video_file
-        video_file.open()
-
-        # Raw base64 bytes need to be decoded to a string
-        rep["video_file"] = video_file.read().decode()
-        video_file.close()
+        rep["video_file"] = read_video(video_file)
 
         return rep
 
