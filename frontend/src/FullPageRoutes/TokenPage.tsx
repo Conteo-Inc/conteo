@@ -5,7 +5,7 @@ import LoginForm, {
 } from "../components/LoginForm"
 import SignupForm from "../components/SignupForm"
 import Dashboard from "../components/Dashboard"
-import { request } from "../utils/fetch"
+import { request, parseIdentity } from "../utils/fetch"
 import { Grid, Paper } from "@material-ui/core"
 import { makeStyles } from "@material-ui/core/styles"
 
@@ -41,13 +41,13 @@ export default function TokenPage(): JSX.Element {
 
   const handle_login = ({ e, ...data }: UserHandlerArgs) => {
     e.preventDefault()
-    request<TokenResponse>({
+    request({
       path: "/api/login/",
       method: "post",
       body: data,
-    }).then((json) => {
+      parser: parseIdentity,
+    }).then(() => {
       setLoggedIn(true)
-      setEmail(json.parsedBody.username)
       setDisplayedForm(null)
       seterrMessage(null)
     })
