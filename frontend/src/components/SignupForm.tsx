@@ -1,5 +1,5 @@
 import * as React from "react"
-import { UserHandlerArgs, useStyles, ColorButton } from "./LoginForm"
+import { UserHandlerArgs, useStyles } from "./LoginForm"
 import {
   Avatar,
   Paper,
@@ -7,11 +7,13 @@ import {
   TextField,
   FormControlLabel,
   Checkbox,
+  Button,
 } from "@material-ui/core"
 import AccountCircleIcon from "@material-ui/icons/AccountCircle"
+import { Link } from "react-router-dom"
 
 type SignupFormProps = {
-  handle_signup: ({ e, username, password }: UserHandlerArgs) => void
+  handle_signup: ({ username, password }: UserHandlerArgs) => void
   errorMessage: string | null
 }
 export default function SignupForm({
@@ -38,7 +40,7 @@ export default function SignupForm({
           </Avatar>
           <h2>Sign Up </h2>
         </Grid>
-        <form onSubmit={(e) => handle_signup({ e, username, password })}>
+        <form>
           <TextField
             label="Email"
             placeholder="Enter email"
@@ -61,14 +63,17 @@ export default function SignupForm({
             control={<Checkbox name="checkedB" color="primary" />}
             label="Stay Signed in"
           />
-          <ColorButton
+          <Button
             type="submit"
             variant="contained"
             fullWidth
             className={classes.btnstyle}
+            component={Link}
+            to="/"
+            onClick={() => handle_signup({ username, password })}
           >
             Sign Up
-          </ColorButton>
+          </Button>
           <br />
           <span>{errorMessage}</span>
           <br />

@@ -25,6 +25,11 @@ async function parseAsJson<T>(res: Response): Promise<T> {
   return (await res.json()) as T
 }
 
+//This is mainly used when a request does not have a response with data
+export async function parseIdentity(res: Response): Promise<Response> {
+  return await res
+}
+
 const defaultRequestArgs = {
   headers: {
     "Content-Type": "application/json",

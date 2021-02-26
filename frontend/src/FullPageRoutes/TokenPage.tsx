@@ -4,15 +4,10 @@ import LoginForm, {
   ColorButton,
 } from "../components/LoginForm"
 import SignupForm from "../components/SignupForm"
-import Dashboard from "../components/Dashboard"
-import { request } from "../utils/fetch"
+import { parseIdentity, request } from "../utils/fetch"
 import { Grid, Paper } from "@material-ui/core"
 import { makeStyles } from "@material-ui/core/styles"
-
-type TokenResponse = {
-  username: string
-  token: string
-}
+import { useUser } from "../utils/context"
 
 const useStyles = makeStyles({
   paperStyle: {
@@ -30,47 +25,33 @@ const useStyles = makeStyles({
 
 export default function TokenPage(): JSX.Element {
   const [displayedForm, setDisplayedForm] = React.useState<string | null>(null)
-  const [logged_in, setLoggedIn] = React.useState<boolean>(false)
-  const [email, setEmail] = React.useState<string | null>(null)
   const [errMessage, seterrMessage] = React.useState<string | null>(null)
+  const [, setUser] = useUser()
   const classes = useStyles()
 
   React.useEffect(() => {
     seterrMessage(null)
-  }, [displayedForm, logged_in])
+  }, [displayedForm])
 
-  const handle_login = ({ e, ...data }: UserHandlerArgs) => {
-    e.preventDefault()
-    request<TokenResponse>({
+  const handle_login = ({ ...data }: UserHandlerArgs) => {
+    request({
       path: "/api/login/",
       method: "post",
       body: data,
-    }).then((json) => {
-      setLoggedIn(true)
-      setEmail(json.parsedBody.username)
-      setDisplayedForm(null)
-      seterrMessage(null)
+      parser: parseIdentity,
+    }).then(() => {
+      setUser({})
     })
   }
 
-  const handle_signup = ({ e, ...data }: UserHandlerArgs) => {
-    e.preventDefault()
-    request<TokenResponse>({
+  const handle_signup = ({ ...data }: UserHandlerArgs) => {
+    request({
       path: "/api/register/",
       method: "post",
       body: data,
-    }).then((resp) => {
-      setLoggedIn(true)
-      setDisplayedForm(null)
-      setEmail(resp.parsedBody.username)
-    })
-  }
-
-  const handle_logout = () => {
-    request({ path: "/api/logout/", method: "post" }).then(() => {
-      setLoggedIn(false)
-      setEmail(null)
-      setDisplayedForm("login")
+      parser: parseIdentity,
+    }).then(() => {
+      setUser({})
     })
   }
 
@@ -80,9 +61,7 @@ export default function TokenPage(): JSX.Element {
 
   return (
     <>
-      {logged_in === true ? (
-        <Dashboard handle_logout={handle_logout} email={email} />
-      ) : displayedForm === "signup" ? (
+      {displayedForm === "signup" ? (
         <SignupForm handle_signup={handle_signup} errorMessage={errMessage} />
       ) : (
         <Grid container className={classes.pageStyle}>

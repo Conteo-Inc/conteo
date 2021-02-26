@@ -8,19 +8,19 @@ import {
   Checkbox,
   Button,
   Typography,
-  Link,
+  Link as MuiLink,
 } from "@material-ui/core"
 import { withStyles, makeStyles } from "@material-ui/core/styles"
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined"
 import { red } from "@material-ui/core/colors"
+import { Link } from "react-router-dom"
 
 export type UserHandlerArgs = {
-  e: React.FormEvent<HTMLFormElement>
   username: string | null
   password: string | null
 }
 type LoginFormProps = {
-  handle_login: ({ e, username, password }: UserHandlerArgs) => void
+  handle_login: ({ username, password }: UserHandlerArgs) => void
   errorMessage: string | null
 }
 
@@ -36,6 +36,11 @@ export const useStyles = makeStyles({
   },
   btnstyle: {
     margin: "8px 0",
+    color: "#fff",
+    backgroundColor: red[500],
+    "&:hover": {
+      backgroundColor: red[700],
+    },
   },
 })
 
@@ -73,7 +78,7 @@ export default function LoginForm({
           </Avatar>
           <h2>Log In </h2>
         </Grid>
-        <form onSubmit={(e) => handle_login({ e, username, password })}>
+        <form>
           <TextField
             label="Email"
             placeholder="Enter email"
@@ -96,16 +101,19 @@ export default function LoginForm({
             control={<Checkbox name="checkedB" color="primary" />}
             label="Stay Signed in"
           />
-          <ColorButton
+          <Button
             type="submit"
             variant="contained"
             fullWidth
             className={classes.btnstyle}
+            component={Link}
+            to="/"
+            onClick={() => handle_login({ username, password })}
           >
             Sign In
-          </ColorButton>
+          </Button>
           <Typography>
-            <Link href="#">Forgot password</Link>
+            <MuiLink href="#">Forgot password</MuiLink>
           </Typography>
           <br />
           <span>{errorMessage}</span>

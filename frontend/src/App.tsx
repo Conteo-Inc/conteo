@@ -1,13 +1,20 @@
 import * as React from "react"
 import { render } from "react-dom"
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom"
+import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom"
 import LinkItem from "./components/LinkItem"
 import TokenPage from "./FullPageRoutes/TokenPage"
 import ProfilePage from "./FullPageRoutes/Profile"
-import { Box, Grid, makeStyles, Typography } from "@material-ui/core"
+import { Box, Button, Grid, makeStyles, Typography } from "@material-ui/core"
 import RecordPage from "./FullPageRoutes/RecordPage"
 import VideoListPage from "./FullPageRoutes/VideoListPage"
-import { AppContext, NullableId } from "./utils/context"
+import {
+  AppContext,
+  Nullable,
+  NullableId,
+  User,
+  useUser,
+} from "./utils/context"
+import { parseIdentity, request } from "./utils/fetch"
 
 const useStyles = makeStyles({
   header: {
@@ -34,7 +41,7 @@ const useStyles = makeStyles({
 function MainPage() {
   return (
     <ul>
-      <LinkItem to="/Tokens" text="Tokens" />
+      <LinkItem to="/login" text="Tokens" />
       <LinkItem to="/Record" text="Record" />
       <LinkItem to="/Watch" text="Watch" />
       <LinkItem to="/Profile" text="Profile" />
@@ -42,44 +49,70 @@ function MainPage() {
   )
 }
 
-export default function App(): JSX.Element {
-  const classes = useStyles()
+function AppWrapper(): JSX.Element {
   return (
     <AppContext.Provider
-      //@TODO: Handle default better or ensure change before use
-      value={{ focusedUser: React.useState<NullableId>(null) }}
+      value={{
+        user: React.useState<Nullable<User>>(null),
+        focusedUser: React.useState<NullableId>(null),
+      }}
     >
-      <Router>
-        <Grid
-          container
-          direction="row"
-          justify="space-between"
-          alignItems="center"
-          className={classes.header}
-        >
-          <Typography variant="h5" className={classes.bannerText}>
-            {"Hi, Jane"}
-          </Typography>
-          {/* Figure out sizes */}
-          <Grid item lg={2} sm={2} xs={2}>
-            <Grid container direction="row" justify="space-between">
-              <Typography className={classes.bannerText}>{"About"}</Typography>
-              <Typography className={classes.bannerText}>
-                {"Contact Us"}
-              </Typography>
-              <Typography className={classes.bannerText}>{"Help"}</Typography>
+      <App />
+    </AppContext.Provider>
+  )
+}
+
+export default function App(): JSX.Element {
+  const classes = useStyles()
+  //This could be problematic because it's defined before AppContext.Provider
+  const [user, setUser] = useUser()
+
+  const logout = () => {
+    request({
+      path: "/api/logout",
+      method: "post",
+      parser: parseIdentity,
+    }).then(() => {
+      setUser(null)
+    })
+  }
+
+  React.useEffect(() => {
+    //figure out if we're logged in
+  }, [])
+
+  return (
+    <Router>
+      <Grid
+        container
+        direction="row"
+        justify="space-between"
+        alignItems="center"
+        className={classes.header}
+      >
+        <Typography variant="h5" className={classes.bannerText}>
+          {"Hi, Jane"}
+        </Typography>
+        {/* Figure out sizes */}
+        <Grid item lg={2} sm={2} xs={2}>
+          <Grid container direction="row" justify="space-between">
+            <Typography className={classes.bannerText}>{"About"}</Typography>
+            <Typography className={classes.bannerText}>
+              {"Contact Us"}
+            </Typography>
+            <Typography className={classes.bannerText}>{"Help"}</Typography>
+            <Button component={Link} to="/" onClick={() => logout()}>
               <Typography className={classes.bannerText}>
                 {"Log Out"}
               </Typography>
-            </Grid>
+            </Button>
           </Grid>
         </Grid>
-        {/* Here's where the body of the App will live */}
-        <Box className={classes.app}>
+      </Grid>
+      {/* Here's where the body of the App will live */}
+      <Box className={classes.app}>
+        {user ? (
           <Switch>
-            <Route path="/Tokens">
-              <TokenPage />
-            </Route>
             <Route path="/Record">
               <RecordPage />
             </Route>
@@ -93,32 +126,38 @@ export default function App(): JSX.Element {
               <MainPage />
             </Route>
           </Switch>
-        </Box>
-        <Grid
-          container
-          direction="row"
-          justify="space-between"
-          alignItems="flex-end"
-          className={classes.footer}
-        >
-          <Grid item lg={2}>
-            <Grid container direction="row" justify="space-between">
-              <Typography className={classes.bannerText}>
-                {"Privacy Policy"}
-              </Typography>
-              <Typography className={classes.bannerText}>
-                {"Terms of Service"}
-              </Typography>
-            </Grid>
+        ) : (
+          <Switch>
+            <Route path="/">
+              <TokenPage />
+            </Route>
+          </Switch>
+        )}
+      </Box>
+      <Grid
+        container
+        direction="row"
+        justify="space-between"
+        alignItems="flex-end"
+        className={classes.footer}
+      >
+        <Grid item lg={2}>
+          <Grid container direction="row" justify="space-between">
+            <Typography className={classes.bannerText}>
+              {"Privacy Policy"}
+            </Typography>
+            <Typography className={classes.bannerText}>
+              {"Terms of Service"}
+            </Typography>
           </Grid>
-          <Typography className={classes.bannerText}>
-            {"Copyright 2020"}
-          </Typography>
         </Grid>
-      </Router>
-    </AppContext.Provider>
+        <Typography className={classes.bannerText}>
+          {"Copyright 2020"}
+        </Typography>
+      </Grid>
+    </Router>
   )
 }
 
 const container = document.getElementById("app")
-render(<App />, container)
+render(<AppWrapper />, container)
