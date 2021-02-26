@@ -6,7 +6,6 @@ import TokenPage from "./FullPageRoutes/TokenPage"
 import ProfilePage from "./FullPageRoutes/Profile"
 import { Box, Grid, makeStyles, Typography } from "@material-ui/core"
 import RecordPage from "./FullPageRoutes/RecordPage"
-import VideoListPage from "./FullPageRoutes/VideoListPage"
 import { AppContext, NullableId } from "./utils/context"
 
 const useStyles = makeStyles({
@@ -36,7 +35,6 @@ function MainPage() {
     <ul>
       <LinkItem to="/Tokens" text="Tokens" />
       <LinkItem to="/Record" text="Record" />
-      <LinkItem to="/Watch" text="Watch" />
       <LinkItem to="/Profile" text="Profile" />
     </ul>
   )
@@ -82,9 +80,6 @@ export default function App(): JSX.Element {
             </Route>
             <Route path="/Record">
               <RecordPage />
-            </Route>
-            <Route path="/Watch">
-              <VideoListPage />
             </Route>
             <Route path="/Profile">
               <ProfilePage />
