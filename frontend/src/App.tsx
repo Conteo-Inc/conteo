@@ -41,7 +41,6 @@ const useStyles = makeStyles({
 function MainPage() {
   return (
     <ul>
-      <LinkItem to="/login" text="Tokens" />
       <LinkItem to="/Record" text="Record" />
       <LinkItem to="/Watch" text="Watch" />
       <LinkItem to="/Profile" text="Profile" />
