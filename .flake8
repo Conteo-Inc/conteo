@@ -1,0 +1,7 @@
+[flake8]
+max-line-length = 88
+extend-ignore = E203, W503
+per-file-ignores =
+    # Some lines in the settings are just very long and it would be
+    # unreasonable to split them
+    conteo/settings.py: E501

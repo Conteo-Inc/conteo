@@ -70,7 +70,7 @@ export default function App(): JSX.Element {
               <Typography className={classes.bannerText}>{"About"}</Typography>
               <Typography className={classes.bannerText}>
                 {"Contact Us"}
-                </Typography>
+              </Typography>
               <Typography className={classes.bannerText}>{"Help"}</Typography>
               <Typography className={classes.bannerText}>
                 {"Log Out"}
@@ -89,6 +89,12 @@ export default function App(): JSX.Element {
             </Route>
             <Route path="/Watch">
               <VideoListPage />
+            </Route>
+            <Route path="/Help">
+              <Help />
+            </Route>
+            <Route path="/ContactUs">
+              <ContactUs />
             </Route>
             <Route path="/Profile">
               <ProfilePage />

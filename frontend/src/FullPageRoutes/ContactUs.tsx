@@ -47,7 +47,7 @@ const contactValue = {
   message: "",
 }
 
-export default function ContactUs() {
+export default function ContactUs(): JSX.Element {
   const [values, setValues] = useState(contactValue)
   const classes = useStyles()
 

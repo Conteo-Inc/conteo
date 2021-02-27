@@ -33,7 +33,7 @@ const useStyles = makeStyles({
   },
 })
 
-export default function Help() {
+export default function Help(): JSX.Element {
   const classes = useStyles()
   const pages: helpBtns[] = [
     {
