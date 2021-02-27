@@ -2,7 +2,7 @@ from django.core.files.base import ContentFile
 from django.utils.timezone import now
 from rest_framework import serializers
 
-from .models import Profile, Report, Video
+from .models import MatchStatus, Profile, Report, Video
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -76,3 +76,9 @@ class ReportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Report
         fields = ("report_type", "reporter", "reportee", "description")
+
+
+class MatchStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MatchStatus
+        fields = ("user_lo_response", "user_hi_response")

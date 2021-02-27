@@ -3,10 +3,23 @@ import random
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.db.models import Q
-from rest_framework import generics, permissions, request, response, status, views
+from rest_framework import (
+    generics,
+    permissions,
+    request,
+    response,
+    status,
+    views,
+    viewsets,
+)
 
-from .models import Video
-from .serializers import ProfileSerializer, ReportSerializer, VideoSerializer
+from .models import MatchStatus, Video
+from .serializers import (
+    MatchStatusSerializer,
+    ProfileSerializer,
+    ReportSerializer,
+    VideoSerializer,
+)
 
 
 class UserRegistrationView(generics.CreateAPIView):
@@ -79,12 +92,17 @@ class VideoListCreate(generics.ListCreateAPIView):
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class Matches(generics.ListAPIView):
+class Matches(viewsets.ModelViewSet):
     """
     View for requesting new matches for a user.
     """
 
-    serializer_class = ProfileSerializer
+    def get_serializer_class(self):
+        if self.action == "list":
+            return ProfileSerializer
+        if self.action == "partial_update":
+            return MatchStatusSerializer
+        return super().get_serializer_class()
 
     def get_queryset(self):
         """
@@ -116,9 +134,24 @@ class Matches(generics.ListAPIView):
         ).exclude(pk=req_user.pk)
         return unmatched_users.union(q1, q2, q3)
 
-    def get(self, request: request.Request):
+    def get_object(self):
+        match_id = self.request.data["matchId"]
+        lo = min(match_id, self.request.user.id)
+        hi = max(match_id, self.request.user.id)
+
+        # Amend request data for the serializer later
+        if match_id == lo:
+            self.request.data["user_hi_response"] = self.request.data["response"]
+        else:
+            self.request.data["user_lo_response"] = self.request.data["response"]
+
+        obj, _ = MatchStatus.objects.get_or_create(user_lo_id=lo, user_hi_id=hi)
+        self.check_object_permissions(self.request, obj)
+        return obj
+
+    def list(self, request: request.Request):
         max_amount = request.query_params.get("amount", 20)
-        response = self.list(request)
+        response = super().list(request)
         response.data = random.sample(
             response.data, min(max_amount, len(response.data))
         )

@@ -24,29 +24,43 @@ export default function MatchingPage(): JSX.Element {
   const [match, next, enqueue] = useQueue<Match>()
 
   React.useEffect(() => {
-    request<Match[]>("/api/match/", "get")
+    // TODO request more matches when match queue gets low
+    request<Match[]>({ path: "/api/matches/", method: "get" })
       .then((resp) => {
-        if (resp.parsedBody) {
-          enqueue(...resp.parsedBody)
-        } else {
-          throw new Error("Response body is not JSON")
-        }
+        enqueue(...resp.parsedBody)
       })
-      .catch((err) => console.error(`Failed getting matches: ${err}`))
+      .catch((err) => console.error(`Failed to get matches: ${err}`))
   }, [])
 
   const onAccept = (matchId: number) => {
-    // TODO update match status on backend
+    request({
+      path: "/api/matches/",
+      method: "put",
+      body: { matchId, response: true },
+    }).catch((err) => console.error(`Failed to update match status: ${err}`))
     next()
   }
 
   const onReject = (matchId: number) => {
-    // TODO update match status on backend
+    request({
+      path: "/api/matches/",
+      method: "put",
+      body: { matchId, response: false },
+    }).catch((err) => console.error(`Failed to update match status: ${err}`))
     next()
   }
 
   const onReport = (matchId: number) => {
-    // TODO submit report and update match status on backend
+    request({
+      path: "/api/matches/",
+      method: "put",
+      body: { matchId, response: false },
+    }).catch((err) => console.error(`Failed to update match status: ${err}`))
+    request({
+      path: "/api/reports/",
+      method: "post",
+      body: { report_type: "P", reportee: matchId },
+    }).catch((err) => console.error(`Failed to report match: ${err}`))
     next()
   }
 
