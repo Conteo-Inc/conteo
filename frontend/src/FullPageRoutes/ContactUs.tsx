@@ -12,24 +12,24 @@ const useStyles = makeStyles({
   root: {
     "& .MuiFormControl-root": {
       width: "80%",
-      margin: 8,
+      margin: "8px",
     },
   },
   pageSideBar: {
-    margin: 8,
-    padding: 50,
+    margin: "8px",
+    padding: "50px",
     backgroundColor: "rgb(238,235,228)",
   },
   pageContent: {
-    margin: 8,
-    padding: 110,
+    margin: "10px",
+    padding: "80px",
     backgroundColor: "rgb(234,232,224)",
   },
   submitButton: {
-    margin: 1,
+    margin: "1px",
   },
   cancelButton: {
-    margin: 1,
+    margin: "1px",
   },
   sideBar: {
     fontSize: "1rem",
