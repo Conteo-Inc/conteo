@@ -5,9 +5,10 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from rest_framework import generics, permissions, request, response, status, views
 
-from .models import Video
+from .models import Video, Profile
 from .serializers import (
     ProfileSerializer,
+    ReportSerializer,
     UserRegistrationSerializer,
     UserSerializer,
     VideoSerializer,
@@ -25,6 +26,13 @@ class UserRegistrationView(generics.CreateAPIView):
         login(request=request, user=user)
 
         return response
+
+class UserAccountDeleteView(views.APIView):
+    permission_classes = (permissions.AllowAny,)
+    def delete(self, request):
+        req_user = request.user
+        req_user.delete()
+        return response.Response(status=status.HTTP_200_OK)
 
 
 class UserLoginView(views.APIView):
@@ -58,8 +66,21 @@ class ProfileView(views.APIView):
 
 
 class VideoListCreate(generics.ListCreateAPIView):
-    queryset = Video.objects.all()
     serializer_class = VideoSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        return Video.objects.filter(receiver=user)
+
+    def post(self, request, format=None):
+        data = request.data.pop("data")
+        serializer = self.serializer_class(
+            data=request.data, context={"data": data, "user": request.user}
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return response.Response(serializer.data, status=status.HTTP_201_CREATED)
+        return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class Matches(generics.GenericAPIView):
@@ -105,3 +126,11 @@ class Matches(generics.GenericAPIView):
         serializer = self.get_serializer(queryset, many=True)
         matches = random.sample(serializer.data, min(max_amount, len(serializer.data)))
         return response.Response(matches)
+
+
+class Reports(generics.CreateAPIView):
+    serializer_class = ReportSerializer
+
+    def post(self, request: request.Request, *args, **kwargs):
+        request.data["reporter"] = request.user.id
+        return self.create(request, *args, **kwargs)
