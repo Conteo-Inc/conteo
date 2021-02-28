@@ -1,8 +1,6 @@
 from django.contrib.auth.models import User
-from factory.declarations import Sequence
 from rest_framework.test import APITestCase
 
-from api.factory import MatchStatusFactory, UserFactory
 from api.models import MatchStatus, Report
 
 
@@ -153,31 +151,6 @@ class MatchesViewTestCase(APITestCase):
                 {"username": "fog"},
             ],
         )
-
-
-class ProfileListViewTestCase(APITestCase):
-    def setUp(self):
-        # We get profiles for free here
-        main_user = UserFactory(username="foo@foo.foo", pw="ls")
-        penpals = UserFactory.create_batch(5)
-
-        MatchStatusFactory.create_batch(
-            5,
-            user_lo=main_user,
-            user_hi=Sequence(lambda n: penpals[n]),
-            user_lo_response=True,
-            user_hi_response=True,
-        )
-
-    def test_get_match(self):
-        """
-        Ensure that the view correctly gets all match profiles, with no duplicates
-        """
-
-        self.client.login(username="foo@foo.foo", password="ls")
-        res = self.client.get("/api/profiles/", format="json")
-        self.assertTrue(res.status_code, 200)
-        self.assertEqual(len(res.json()), 5)
 
 
 class VideoViewTestCase(APITestCase):

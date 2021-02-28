@@ -91,9 +91,7 @@ class VideoListCreate(generics.ListCreateAPIView):
 
     def get(self, request):
         queryset = self.filter_queryset(self.get_queryset())
-        serializer = self.list_serializer_class(
-            queryset, context={"receiver": request.user}, many=True
-        )
+        serializer = self.list_serializer_class(queryset, many=True)
         return response.Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
