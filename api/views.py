@@ -4,7 +4,6 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.db.models.query import QuerySet
-from django.http.response import HttpResponseRedirect
 from rest_framework import generics, permissions, request, response, status, views
 
 from .models import Profile, Video
@@ -52,7 +51,7 @@ class UserLoginView(views.APIView):
         user = authenticate(request=request, username=username, password=password)
         if user is not None:
             login(request=request, user=user)
-            return HttpResponseRedirect(redirect_to="/dashboard/")
+            return response.Response(status=status.HTTP_200_OK)
 
         return response.Response(status=status.HTTP_400_BAD_REQUEST)
 

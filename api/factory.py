@@ -5,7 +5,7 @@ from django.contrib.auth.hashers import make_password
 from django.db.models.signals import post_save
 from factory.helpers import lazy_attribute
 
-from api.models import GENDER_CHOICES, MatchStatus, Profile, User
+from api.models import MatchStatus, Profile, User
 
 
 @factory.django.mute_signals()
@@ -24,13 +24,14 @@ class ProfileFactory(factory.django.DjangoModelFactory):
 
     @factory.lazy_attribute
     def gender(self):
-        return random.choice(GENDER_CHOICES)[0]
+        return random.choice(self.gender_choices)[0]
 
     class Meta:
         model = Profile
 
     class Params:
         full_name = factory.Faker("name")
+        gender_choices = Profile.GENDER_CHOICES
 
 
 @factory.django.mute_signals(post_save)

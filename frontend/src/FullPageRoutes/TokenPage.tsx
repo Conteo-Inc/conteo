@@ -4,15 +4,10 @@ import LoginForm, {
   ColorButton,
 } from "../components/LoginForm"
 import SignupForm from "../components/SignupForm"
-import { request } from "../utils/fetch"
+import { parseIdentity, request } from "../utils/fetch"
 import { Grid, Paper } from "@material-ui/core"
 import { makeStyles } from "@material-ui/core/styles"
 import Dashboard from "../FullPageRoutes/Dashboard"
-
-type TokenResponse = {
-  username: string
-  token: string
-}
 
 const useStyles = makeStyles({
   paperStyle: {
@@ -31,7 +26,6 @@ const useStyles = makeStyles({
 export default function TokenPage(): JSX.Element {
   const [displayedForm, setDisplayedForm] = React.useState<string | null>(null)
   const [logged_in, setLoggedIn] = React.useState<boolean>(false)
-  const [, setEmail] = React.useState<string | null>(null)
   const [errMessage, seterrMessage] = React.useState<string | null>(null)
   const classes = useStyles()
 
@@ -41,13 +35,13 @@ export default function TokenPage(): JSX.Element {
 
   const handle_login = ({ e, ...data }: UserHandlerArgs) => {
     e.preventDefault()
-    request<TokenResponse>({
+    request({
       path: "/api/login/",
       method: "post",
       body: data,
-    }).then((json) => {
+      parser: parseIdentity,
+    }).then(() => {
       setLoggedIn(true)
-      setEmail(json.parsedBody.username)
       setDisplayedForm(null)
       seterrMessage(null)
     })
@@ -55,24 +49,16 @@ export default function TokenPage(): JSX.Element {
 
   const handle_signup = ({ e, ...data }: UserHandlerArgs) => {
     e.preventDefault()
-    request<TokenResponse>({
+    request({
       path: "/api/register/",
       method: "post",
       body: data,
-    }).then((resp) => {
+      parser: parseIdentity,
+    }).then(() => {
       setLoggedIn(true)
       setDisplayedForm(null)
-      setEmail(resp.parsedBody.username)
     })
   }
-
-  // const handle_logout = () => {
-  //   request({ path: "/api/logout/", method: "post" }).then(() => {
-  //     setLoggedIn(false)
-  //     setEmail(null)
-  //     setDisplayedForm("login")
-  //   })
-  // }
 
   const display_form = (form: string) => {
     setDisplayedForm(form)
@@ -81,7 +67,6 @@ export default function TokenPage(): JSX.Element {
   return (
     <>
       {logged_in === true ? (
-        //@TODO: Time to do some heavy restructuring
         <Dashboard />
       ) : displayedForm === "signup" ? (
         <SignupForm handle_signup={handle_signup} errorMessage={errMessage} />
