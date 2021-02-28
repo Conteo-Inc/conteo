@@ -1,6 +1,12 @@
 import { Grid, makeStyles, Typography } from "@material-ui/core"
-import { AccountCircle, ArrowDropDown } from "@material-ui/icons"
+import {
+  AccountCircle,
+  ArrowDropDown,
+  DraftsRounded,
+  MailOutlineRounded,
+} from "@material-ui/icons"
 import * as React from "react"
+import { Nullable } from "../../utils/context"
 
 const useStyles = makeStyles({
   mailItem: {
@@ -9,21 +15,19 @@ const useStyles = makeStyles({
   },
 })
 
-type Gender = "Male" | "Female" | "Other"
-
 export type MailListItem = {
-  profileImage?: string
+  // profileImage?: string //FUTUREEEEEEE
   first_name: string
   last_name: string
-  birth_date: number
-  gender: Gender
+  viewed_at: Nullable<string>
+  created_at: string
 }
 
 export default function MailItem({
   first_name,
   last_name,
-  birth_date,
-  gender,
+  viewed_at,
+  created_at,
 }: MailListItem): JSX.Element {
   const { mailItem } = useStyles()
   return (
@@ -37,8 +41,12 @@ export default function MailItem({
         <AccountCircle fontSize="large" style={{ color: "#4b5e82" }} />
         <Typography variant="h6">{`${first_name} ${last_name}`}</Typography>
       </Grid>
-      <Typography variant="h6">{birth_date}</Typography>
-      <Typography variant="h6">{gender}</Typography>
+      <Typography variant="h6">{created_at}</Typography>
+      {viewed_at ? (
+        <DraftsRounded fontSize="large" style={{ color: "#4b5e82" }} />
+      ) : (
+        <MailOutlineRounded fontSize="large" style={{ color: "#4b5282" }} />
+      )}
       <ArrowDropDown fontSize="large" style={{ color: "#4b5e82" }} />
     </Grid>
   )

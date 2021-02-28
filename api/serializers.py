@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
+from django.db.models.query_utils import Q
 from django.utils.timezone import now
 from rest_framework import serializers
 
@@ -34,6 +35,21 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         model = User
         fields = "__all__"
         extra_kwargs = {"password": {"write_only": True}}
+
+
+class VideoListSerializer(serializers.ModelSerializer):
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        sender_profile = instance.sender.profile
+
+        rep["first_name"] = sender_profile.first_name
+        rep["last_name"] = sender_profile.last_name
+
+        return rep
+
+    class Meta:
+        model = Video
+        fields = ("created_at", "viewed_at")
 
 
 class VideoSerializer(serializers.ModelSerializer):

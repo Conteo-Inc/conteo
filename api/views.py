@@ -3,15 +3,15 @@ import random
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.db.models import Q
-from django.db.models.query import QuerySet
 from rest_framework import generics, permissions, request, response, status, views
 
-from .models import Profile, Video
+from .models import Video
 from .serializers import (
     ProfileSerializer,
     ReportSerializer,
     UserRegistrationSerializer,
     UserSerializer,
+    VideoListSerializer,
     VideoSerializer,
 )
 
@@ -73,10 +73,11 @@ class ProfileView(views.APIView):
 
 class VideoListCreate(generics.ListCreateAPIView):
     serializer_class = VideoSerializer
+    list_serializer_class = VideoListSerializer
 
     def get_queryset(self):
         user = self.request.user
-        return Video.objects.filter(receiver=user)
+        return Video.objects.filter(receiver=user).order_by("-created_at")
 
     def post(self, request, format=None):
         data = request.data.pop("data")
@@ -87,6 +88,13 @@ class VideoListCreate(generics.ListCreateAPIView):
             serializer.save()
             return response.Response(serializer.data, status=status.HTTP_201_CREATED)
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def get(self, request):
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.list_serializer_class(
+            queryset, context={"receiver": request.user}, many=True
+        )
+        return response.Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
 class Matches(generics.GenericAPIView):
@@ -132,26 +140,6 @@ class Matches(generics.GenericAPIView):
         serializer = self.get_serializer(queryset, many=True)
         matches = random.sample(serializer.data, min(max_amount, len(serializer.data)))
         return response.Response(matches)
-
-
-class ProfileListView(generics.ListAPIView):
-    serializer_class = ProfileSerializer
-
-    def get_queryset(self):
-        user = self.request.user
-        # Case 1: User is user_lo
-        case1 = Profile.objects.filter(
-            Q(user__matchstatus_hi__user_lo=user)
-            & Q(user__matchstatus_hi__user_lo_response=True)
-            & Q(user__matchstatus_hi__user_hi_response=True)
-        )
-        # Case 2: User is user_hi
-        case2 = Profile.objects.filter(
-            Q(user__matchstatus_lo__user_hi=user)
-            & Q(user__matchstatus_lo__user_lo_response=True)
-            & Q(user__matchstatus_lo__user_hi_response=True)
-        )
-        return QuerySet.union(case1, case2)
 
 
 class Reports(generics.CreateAPIView):

@@ -7,7 +7,7 @@ export default function MailList(): JSX.Element {
   const [mail, setMail] = React.useState<MailListItem[]>([])
 
   React.useEffect(() => {
-    request<MailListItem[]>({ path: "/api/profiles/", method: "get" }).then(
+    request<MailListItem[]>({ path: "/api/mail/", method: "get" }).then(
       (mailList) => {
         setMail(mailList.parsedBody)
       }
