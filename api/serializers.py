@@ -1,6 +1,5 @@
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
-from django.db.models.query_utils import Q
 from django.utils.timezone import now
 from rest_framework import serializers
 
