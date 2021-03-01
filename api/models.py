@@ -15,6 +15,7 @@ class Profile(models.Model):
         ("F", "Female"),
     )
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True)
+    interests = models.CharField(max_length=200, blank=True)
 
 
 class Video(models.Model):

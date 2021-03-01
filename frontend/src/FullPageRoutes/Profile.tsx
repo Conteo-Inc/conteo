@@ -15,6 +15,7 @@ export type UserProfile = {
   phone_number: string
   birth_date: string
   gender: string
+  interests: string
 }
 
 const useStyles = makeStyles({
@@ -42,6 +43,7 @@ export default function Profile(): JSX.Element {
     lastName: "",
     birthday: new Date(),
     gender: "",
+    interests: "",
   })
   const { editableContent, setters } = useProfile(readonlyContent)
 
@@ -55,13 +57,14 @@ export default function Profile(): JSX.Element {
           lastName: profile.last_name,
           birthday: new Date(profile.birth_date),
           gender: profile.gender,
+          interests: profile.interests,
         }
         setProfile(content)
       })
       .catch((err) => {
         console.log(err)
       })
-  }, [readonlyContent, editableContent])
+  }, [])
 
   const handleEditFields = () => {
     toggleEditMode(true)

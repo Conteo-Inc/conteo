@@ -1,12 +1,15 @@
 import { useState } from "react"
 import { ProfileContentType } from "../components/ProfileContent"
 
+type SetStateDispatch<T> = React.Dispatch<React.SetStateAction<T>>
+
 export type ProfileContentSetters = {
-  setUsername: React.Dispatch<React.SetStateAction<string>>
-  setFirstName: React.Dispatch<React.SetStateAction<string>>
-  setLastName: React.Dispatch<React.SetStateAction<string>>
-  setBirthday: React.Dispatch<React.SetStateAction<Date>>
-  setGender: React.Dispatch<React.SetStateAction<string>>
+  setUsername: SetStateDispatch<string>
+  setFirstName: SetStateDispatch<string>
+  setLastName: SetStateDispatch<string>
+  setBirthday: SetStateDispatch<Date>
+  setGender: SetStateDispatch<string>
+  setInterests: SetStateDispatch<string>
 }
 
 // Custom profile hook. This separates saved profile content from edited, unsaved profile content.
@@ -21,6 +24,7 @@ export function useProfile(
   const [lastName, setLastName] = useState<string>(content.lastName)
   const [birthday, setBirthday] = useState<Date>(content.birthday)
   const [gender, setGender] = useState<string>(content.gender)
+  const [interests, setInterests] = useState<string>(content.interests)
 
   const editableContent: ProfileContentType = {
     username: username,
@@ -28,6 +32,7 @@ export function useProfile(
     lastName: lastName,
     birthday: birthday,
     gender: gender,
+    interests: interests,
   }
 
   const setters: ProfileContentSetters = {
@@ -36,6 +41,7 @@ export function useProfile(
     setLastName,
     setBirthday,
     setGender,
+    setInterests,
   }
 
   return { editableContent, setters }
