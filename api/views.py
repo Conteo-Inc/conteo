@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from rest_framework import generics, permissions, request, response, status, views
 
-from .models import Video, Profile
+from .models import Video
 from .serializers import (
     ProfileSerializer,
     ReportSerializer,
@@ -27,8 +27,10 @@ class UserRegistrationView(generics.CreateAPIView):
 
         return response
 
+
 class UserAccountDeleteView(views.APIView):
     permission_classes = (permissions.AllowAny,)
+
     def delete(self, request):
         req_user = request.user
         req_user.delete()
@@ -81,6 +83,21 @@ class VideoListCreate(generics.ListCreateAPIView):
             serializer.save()
             return response.Response(serializer.data, status=status.HTTP_201_CREATED)
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class VideoRetrieveView(generics.RetrieveAPIView):
+    serializer_class = VideoSerializer
+
+    def get_object(self, sender, receiver):
+        videos = Video.objects.filter(Q(sender=sender) & Q(receiver=receiver)).order_by(
+            "-created_at"
+        )
+        return videos[0]
+
+    def get(self, request, sender):
+        video = self.get_object(sender=sender, receiver=request.user)
+        serializer = self.serializer_class(video)
+        return response.Response(serializer.data)
 
 
 class Matches(generics.GenericAPIView):
