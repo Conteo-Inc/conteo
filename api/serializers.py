@@ -11,10 +11,13 @@ class ProfileSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         rep = super().to_representation(instance)
         # get video
-        video = Video.objects.get(Q(sender=instance.user) & Q(receiver=instance.user))
-        rep["video"] = read_video(video.video_file)
-
-        return rep
+        video = None
+        try:
+            video = Video.objects.get(Q(sender=instance.user) & Q(receiver=instance.user))
+            video = read_video(video.video_file)
+        finally:
+            rep["video"] = video
+            return rep
 
     class Meta:
         model = Profile

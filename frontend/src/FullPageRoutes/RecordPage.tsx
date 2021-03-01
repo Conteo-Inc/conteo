@@ -2,7 +2,7 @@ import * as React from "react"
 import { useReactMediaRecorder } from "react-media-recorder"
 import { Grid, makeStyles } from "@material-ui/core"
 import Controls from "../components/video/Controls"
-import { request } from "../utils/fetch"
+import { parseIdentity, request } from "../utils/fetch"
 import useFocusedUser, { Nullable, NullableId } from "../utils/context"
 
 const useStyles = makeStyles({
@@ -42,6 +42,7 @@ function sendVideo(blob: Nullable<Blob>, receiver: NullableId) {
           receiver: receiver,
           data: reader.result,
         },
+        parser: parseIdentity,
       })
     }
   }

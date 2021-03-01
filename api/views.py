@@ -87,6 +87,21 @@ class VideoListCreate(generics.ListCreateAPIView):
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class VideoRetrieveView(generics.RetrieveAPIView):
+    serializer_class = VideoSerializer
+
+    def get_object(self, sender, receiver):
+        videos = Video.objects.filter(Q(sender=sender) & Q(receiver=receiver)).order_by(
+            "-created_at"
+        )
+        return videos[0]
+
+    def get(self, request, sender):
+        video = self.get_object(sender=sender, receiver=request.user)
+        serializer = self.serializer_class(video)
+        return response.Response(serializer.data)
+
+
 class Matches(generics.GenericAPIView):
     """
     View for requesting new matches for a user.
