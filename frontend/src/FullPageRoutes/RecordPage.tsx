@@ -36,7 +36,7 @@ function sendVideo(blob: Nullable<Blob>, receiver: NullableId) {
     reader.readAsDataURL(blob)
     reader.onload = () => {
       request({
-        path: "/api/video/",
+        path: "/api/videos/",
         method: "post",
         body: {
           receiver: receiver,
