@@ -13,7 +13,9 @@ class ProfileSerializer(serializers.ModelSerializer):
         # get video
         video = None
         try:
-            video = Video.objects.get(Q(sender=instance.user) & Q(receiver=instance.user))
+            video = Video.objects.get(
+                Q(sender=instance.user) & Q(receiver=instance.user)
+            )
             video = read_video(video.video_file)
         finally:
             rep["video"] = video
