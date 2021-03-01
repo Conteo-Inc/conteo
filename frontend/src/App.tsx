@@ -13,11 +13,17 @@ const useStyles = makeStyles({
     backgroundColor: "#cd0b2d",
     height: "3rem",
     padding: "0 1rem",
+    position: "fixed",
+    left: 0,
+    top: 0,
   },
   footer: {
     backgroundColor: "#760000",
     height: "3rem",
     padding: "0 1rem",
+    position: "fixed",
+    left: 0,
+    bottom: 0,
   },
   bannerText: {
     color: "white",
@@ -26,6 +32,7 @@ const useStyles = makeStyles({
     height: "40rem",
     display: "flex",
     flexDirection: "column",
+    paddingTop: "50px"
   },
 })
 

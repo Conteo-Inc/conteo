@@ -22,10 +22,7 @@ const useStyles = makeStyles({
   },
   btnStyle: {
     margin: "8px 0",
-  },
-  pageStyle: {
-    margin: "100px auto",
-  },
+  }
 })
 
 export default function TokenPage(): JSX.Element {
@@ -85,7 +82,7 @@ export default function TokenPage(): JSX.Element {
       ) : displayedForm === "signup" ? (
         <SignupForm handle_signup={handle_signup} errorMessage={errMessage} />
       ) : (
-        <Grid container className={classes.pageStyle}>
+        <Grid container>
           <Grid
             container
             spacing={0}
