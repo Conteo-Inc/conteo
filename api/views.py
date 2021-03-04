@@ -9,10 +9,19 @@ from .models import Video
 from .serializers import (
     ProfileSerializer,
     ReportSerializer,
+    UserAuthSerializer,
     UserRegistrationSerializer,
     UserSerializer,
     VideoSerializer,
 )
+
+
+class UserAuthView(generics.RetrieveAPIView):
+    serializer_class = UserAuthSerializer
+
+    def get(self, request):
+        serializer = self.get_serializer(request.user)
+        return response.Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class UserRegistrationView(generics.CreateAPIView):
