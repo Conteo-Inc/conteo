@@ -3,13 +3,16 @@ import random
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.db.models import Q
-from rest_framework import (generics, permissions, request, response, status,
-                            views)
+from rest_framework import generics, permissions, request, response, status, views
 
 from .models import Profile, Video
-from .serializers import (ProfileSerializer, ReportSerializer,
-                          UserRegistrationSerializer, UserSerializer,
-                          VideoSerializer)
+from .serializers import (
+    ProfileSerializer,
+    ReportSerializer,
+    UserRegistrationSerializer,
+    UserSerializer,
+    VideoSerializer,
+)
 
 
 class UserRegistrationView(generics.CreateAPIView):

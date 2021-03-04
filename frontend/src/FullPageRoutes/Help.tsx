@@ -46,7 +46,7 @@ export default function Help(): JSX.Element {
     },
     {
       href: "Tutorials",
-      value: "Tuturials",
+      value: "Tutorials",
     },
   ]
 
