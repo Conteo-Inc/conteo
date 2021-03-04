@@ -3,7 +3,10 @@ from django.db import models
 from django.db.models import F, Q
 
 
-class Profile(User):
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    first_name = models.CharField(max_length=50, blank=True)
+    last_name = models.CharField(max_length=50, blank=True)
     phone_number = models.CharField(max_length=10, unique=True, null=True)
     age = models.PositiveIntegerField(null=True)
     GENDER_CHOICES = (
@@ -11,10 +14,6 @@ class Profile(User):
         ("F", "Female"),
     )
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True)
-
-    class Meta:
-        verbose_name = "Profile"
-        verbose_name_plural = "Profiles"
 
 
 class Video(models.Model):
