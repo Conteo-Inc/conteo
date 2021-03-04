@@ -17,7 +17,6 @@ type ModalType = {
   confirmText?: string
   cancelText?: string
   isOpen: boolean
-  setisOpen: React.Dispatch<React.SetStateAction<boolean>>
   handleConfirm: any
   handleCancel: any
 }

@@ -11,4 +11,5 @@ urlpatterns = [
     path("match/", views.Matches.as_view()),
     path("profile/", views.ProfileView.as_view()),
     path("report/", views.Reports.as_view()),
+    path("account/", views.Accounts.as_view()),
 ]

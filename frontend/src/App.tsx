@@ -8,6 +8,7 @@ import { Box, Grid, makeStyles, Typography } from "@material-ui/core"
 import RecordPage from "./FullPageRoutes/RecordPage"
 import VideoListPage from "./FullPageRoutes/VideoListPage"
 import { AppContext, NullableId } from "./utils/context"
+import AccountsPage from "./FullPageRoutes/AccountsPage"
 
 const useStyles = makeStyles({
   header: {
@@ -24,7 +25,7 @@ const useStyles = makeStyles({
     color: "white",
   },
   app: {
-    height: "40rem",
+    minHeight: "40rem",
     display: "flex",
     flexDirection: "column",
   },
@@ -38,6 +39,7 @@ function MainPage() {
       <LinkItem to="/Record" text="Record" />
       <LinkItem to="/Watch" text="Watch" />
       <LinkItem to="/Profile" text="Profile" />
+      <LinkItem to="/Account" text="Accounts" />
     </ul>
   )
 }
@@ -88,6 +90,9 @@ export default function App(): JSX.Element {
             </Route>
             <Route path="/Profile">
               <ProfilePage />
+            </Route>
+            <Route path="/Account">
+              <AccountsPage />
             </Route>
             <Route path="/">
               <MainPage />

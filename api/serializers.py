@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
+from django.db.models import Q
 from django.utils.timezone import now
 from rest_framework import serializers
 
@@ -85,3 +86,16 @@ class ReportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Report
         fields = ("report_type", "reporter", "reportee", "description")
+
+
+class AccountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ("email",)
+
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        profile = Profile.objects.get(Q(user__email=instance.email))
+        rep["first_name"] = profile.first_name
+        rep["last_name"] = profile.last_name
+        return rep
