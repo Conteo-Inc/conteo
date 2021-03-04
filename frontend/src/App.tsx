@@ -4,35 +4,19 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom"
 import LinkItem from "./components/LinkItem"
 import TokenPage from "./FullPageRoutes/TokenPage"
 import ProfilePage from "./FullPageRoutes/Profile"
-import { Box, Grid, makeStyles, Typography } from "@material-ui/core"
+import { Box, makeStyles } from "@material-ui/core"
 import RecordPage from "./FullPageRoutes/RecordPage"
-import { AppContext, NullableId } from "./utils/context"
+import ProvideContext from "./components/utils/ProvideContext"
+import AppHeader from "./components/AppHeader"
+import AppFooter from "./components/AppFooter"
+import { ProtectedRoute } from "./components/ProtectedRoute"
 
 const useStyles = makeStyles({
-  header: {
-    backgroundColor: "#cd0b2d",
-    height: "3rem",
-    padding: "0 1rem",
-    position: "fixed",
-    left: 0,
-    top: 0,
-  },
-  footer: {
-    backgroundColor: "#760000",
-    height: "3rem",
-    padding: "0 1rem",
-    position: "fixed",
-    left: 0,
-    bottom: 0,
-  },
-  bannerText: {
-    color: "white",
-  },
   app: {
     height: "40rem",
     display: "flex",
     flexDirection: "column",
-    paddingTop: "50px"
+    paddingTop: "50px",
   },
 })
 
@@ -40,85 +24,38 @@ const useStyles = makeStyles({
 function MainPage() {
   return (
     <ul>
-      <LinkItem to="/Tokens" text="Tokens" />
-      <LinkItem to="/Record" text="Record" />
-      <LinkItem to="/Profile" text="Profile" />
+      <LinkItem to="/record" text="Record" />
+      <LinkItem to="/profile" text="Profile" />
     </ul>
   )
 }
 
 export default function App(): JSX.Element {
   const classes = useStyles()
+
   return (
-    <AppContext.Provider
-      //@TODO: Handle default better or ensure change before use
-      value={{ focusedUser: React.useState<NullableId>(null) }}
-    >
+    <ProvideContext>
       <Router>
-        <Grid
-          container
-          direction="row"
-          justify="space-between"
-          alignItems="center"
-          className={classes.header}
-        >
-          <Typography variant="h5" className={classes.bannerText}>
-            {"Hi, Jane"}
-          </Typography>
-          {/* Figure out sizes */}
-          <Grid item lg={2} sm={2} xs={2}>
-            <Grid container direction="row" justify="space-between">
-              <Typography className={classes.bannerText}>{"About"}</Typography>
-              <Typography className={classes.bannerText}>
-                {"Contact Us"}
-              </Typography>
-              <Typography className={classes.bannerText}>{"Help"}</Typography>
-              <Typography className={classes.bannerText}>
-                {"Log Out"}
-              </Typography>
-            </Grid>
-          </Grid>
-        </Grid>
-        {/* Here's where the body of the App will live */}
+        <AppHeader />
         <Box className={classes.app}>
           <Switch>
-            <Route path="/Tokens">
+            <Route path="/tokens">
               <TokenPage />
             </Route>
-            <Route path="/Record">
+            <ProtectedRoute path="/record">
               <RecordPage />
-            </Route>
-            <Route path="/Profile">
+            </ProtectedRoute>
+            <ProtectedRoute path="/profile">
               <ProfilePage />
-            </Route>
-            <Route path="/">
+            </ProtectedRoute>
+            <ProtectedRoute path="/">
               <MainPage />
-            </Route>
+            </ProtectedRoute>
           </Switch>
         </Box>
-        <Grid
-          container
-          direction="row"
-          justify="space-between"
-          alignItems="flex-end"
-          className={classes.footer}
-        >
-          <Grid item lg={2}>
-            <Grid container direction="row" justify="space-between">
-              <Typography className={classes.bannerText}>
-                {"Privacy Policy"}
-              </Typography>
-              <Typography className={classes.bannerText}>
-                {"Terms of Service"}
-              </Typography>
-            </Grid>
-          </Grid>
-          <Typography className={classes.bannerText}>
-            {"Copyright 2020"}
-          </Typography>
-        </Grid>
+        <AppFooter />
       </Router>
-    </AppContext.Provider>
+    </ProvideContext>
   )
 }
 

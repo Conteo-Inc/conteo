@@ -61,7 +61,7 @@ export default function Profile(): JSX.Element {
       .catch((err) => {
         console.log(err)
       })
-  }, [readonlyContent, editableContent])
+  }, [])
 
   const handleEditFields = () => {
     toggleEditMode(true)
