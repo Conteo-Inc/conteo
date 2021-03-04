@@ -1,12 +1,13 @@
 import { Snackbar, makeStyles } from "@material-ui/core"
 import * as React from "react"
 import Alert from "@material-ui/lab/Alert"
+import { SetStateDispatch } from "../utils/context"
 
 type NotificationType = {
   isOpen: boolean
   type: "error" | "info" | "success" | "warning"
   message: string
-  setisOpen: React.Dispatch<React.SetStateAction<boolean>>
+  setisOpen: SetStateDispatch<boolean>
   handleClose: (event: React.SyntheticEvent<Element, Event>) => void
 }
 

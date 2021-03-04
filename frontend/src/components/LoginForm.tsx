@@ -13,6 +13,8 @@ import {
 import { withStyles, makeStyles } from "@material-ui/core/styles"
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined"
 import { red } from "@material-ui/core/colors"
+import { Nullable, useStatefulLocation, useUser } from "../utils/context"
+import { useHistory } from "react-router-dom"
 
 export type UserHandlerArgs = {
   e: React.FormEvent<HTMLFormElement>
@@ -20,7 +22,6 @@ export type UserHandlerArgs = {
   password: string | null
 }
 type LoginFormProps = {
-  handle_login: ({ e, username, password }: UserHandlerArgs) => void
   errorMessage: string | null
 }
 
@@ -50,11 +51,15 @@ export const ColorButton = withStyles((theme) => ({
 }))(Button)
 
 export default function LoginForm({
-  handle_login,
   errorMessage,
 }: LoginFormProps): JSX.Element {
-  const [username, setUsername] = React.useState<string | null>(null)
-  const [password, setPassword] = React.useState<string | null>(null)
+  const [username, setUsername] = React.useState<Nullable<string>>(null)
+  const [password, setPassword] = React.useState<Nullable<string>>(null)
+  const { login } = useUser()
+  const location = useStatefulLocation()
+  const history = useHistory()
+
+  const { from } = location.state || { from: { pathname: "/" } }
 
   const classes = useStyles()
 
@@ -73,7 +78,16 @@ export default function LoginForm({
           </Avatar>
           <h2>Log In </h2>
         </Grid>
-        <form onSubmit={(e) => handle_login({ e, username, password })}>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            if (username && password) {
+              login({ username, password }).then(() => {
+                history.replace(from)
+              })
+            }
+          }}
+        >
           <TextField
             label="Email"
             placeholder="Enter email"

@@ -25,6 +25,10 @@ async function parseAsJson<T>(res: Response): Promise<T> {
   return (await res.json()) as T
 }
 
+export async function parseIdentity(res: Response): Promise<Response> {
+  return await res
+}
+
 const defaultRequestArgs = {
   headers: {
     "Content-Type": "application/json",

@@ -11,7 +11,19 @@ from .models import MatchStatus, Profile, Report, Video
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        exclude = ("user", "id")
+        fields = "__all__"
+
+
+class UserAuthSerializer(serializers.ModelSerializer):
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        rep["first_name"] = instance.profile.first_name
+
+        return rep
+
+    class Meta:
+        model = User
+        fields = ("email",)
 
 
 class ProfileFromUserSerializer(serializers.ModelSerializer):

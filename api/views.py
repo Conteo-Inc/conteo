@@ -19,9 +19,18 @@ from .serializers import (
     ProfileFromUserSerializer,
     ProfileSerializer,
     ReportSerializer,
+    UserAuthSerializer,
     UserRegistrationSerializer,
     VideoSerializer,
 )
+
+
+class UserAuthView(generics.RetrieveAPIView):
+    serializer_class = UserAuthSerializer
+
+    def get(self, request):
+        serializer = self.get_serializer(request.user)
+        return response.Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class UserRegistrationView(generics.CreateAPIView):
@@ -92,6 +101,21 @@ class VideoListCreate(generics.ListCreateAPIView):
             serializer.save()
             return response.Response(serializer.data, status=status.HTTP_201_CREATED)
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class VideoRetrieveView(generics.RetrieveAPIView):
+    serializer_class = VideoSerializer
+
+    def get_object(self, sender, receiver):
+        videos = Video.objects.filter(Q(sender=sender) & Q(receiver=receiver)).order_by(
+            "-created_at"
+        )
+        return videos[0]
+
+    def get(self, request, sender):
+        video = self.get_object(sender=sender, receiver=request.user)
+        serializer = self.serializer_class(video)
+        return response.Response(serializer.data)
 
 
 class Matches(viewsets.ModelViewSet):
