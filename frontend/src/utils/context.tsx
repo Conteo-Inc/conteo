@@ -1,15 +1,37 @@
 import * as React from "react"
+import { useLocation } from "react-router-dom"
+import { parseIdentity, request } from "./fetch"
+import { Location } from "history"
 
 export type Nullable<T> = T | null
 export type NullableId = Nullable<number>
 
+export type User = {
+  email: string
+  first_name: string
+}
+
+export type UserAuth = {
+  logged_in: Nullable<boolean>
+  user: Nullable<User>
+}
+export type AuthInformation = {
+  username: string
+  password: string
+}
+export type SetStateDispatch<T> = React.Dispatch<React.SetStateAction<T>>
+
+export type CallBack = () => void
+
 // Define the type so that createContext understands what to expect for focusedUser
 type AppContextType = {
-  focusedUser: [NullableId, React.Dispatch<React.SetStateAction<NullableId>>]
+  user: [UserAuth, SetStateDispatch<UserAuth>]
+  focusedUser: [NullableId, SetStateDispatch<NullableId>]
 }
 
 // Even though this is initialized as null, using it will supply the correct type
 export const AppContext = React.createContext<AppContextType>({
+  user: [{ logged_in: null, user: null }, () => {}], // eslint-disable-line
   focusedUser: [null, () => {}], // eslint-disable-line
 })
 
@@ -17,4 +39,74 @@ export const AppContext = React.createContext<AppContextType>({
 export default function useFocusedUser(): AppContextType["focusedUser"] {
   const context = React.useContext(AppContext)
   return context.focusedUser
+}
+
+type UseUserReturnType = {
+  user: Nullable<User>
+  logged_in: Nullable<boolean>
+  register: (authInfo: AuthInformation, callBack: CallBack) => void
+  login: (authInfo: AuthInformation, callBack: CallBack) => void
+  logout: (CallBack: CallBack) => void
+}
+export function useUser(): UseUserReturnType {
+  const context = React.useContext(AppContext)
+  const [{ logged_in, user }, setUser] = context.user
+
+  const register = (authInfo: AuthInformation, callback: CallBack): void => {
+    request({
+      path: "/api/register",
+      method: "post",
+      body: authInfo,
+    }).then(() => {
+      //TODO: replace with response
+      setUser({
+        logged_in: true,
+        user: {
+          email: "foo",
+          first_name: "foo",
+        },
+      })
+      callback()
+    })
+  }
+
+  const login = (authInfo: AuthInformation, callback: CallBack): void => {
+    request({
+      path: "/api/login/",
+      method: "post",
+      body: authInfo,
+      parser: parseIdentity,
+    }).then(() => {
+      //TODO: replace with response
+      setUser({
+        logged_in: true,
+        user: {
+          email: "foo",
+          first_name: "foo",
+        },
+      })
+      callback()
+    })
+  }
+
+  const logout = (callback: CallBack): void => {
+    request({
+      path: "/api/logout/",
+      method: "post",
+      parser: parseIdentity,
+    }).then(() => {
+      setUser({ logged_in: false, user: null })
+      callback()
+    })
+  }
+
+  return { user, logged_in, register, login, logout }
+}
+
+type LocationState = {
+  from: Location
+}
+export function useStatefulLocation(): Location<LocationState> {
+  const location = useLocation<LocationState>()
+  return location
 }

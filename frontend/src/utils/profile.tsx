@@ -1,12 +1,13 @@
 import { useState } from "react"
 import { ProfileContentType } from "../components/ProfileContent"
+import { SetStateDispatch } from "./context"
 
 export type ProfileContentSetters = {
-  setUsername: React.Dispatch<React.SetStateAction<string>>
-  setFirstName: React.Dispatch<React.SetStateAction<string>>
-  setLastName: React.Dispatch<React.SetStateAction<string>>
-  setBirthday: React.Dispatch<React.SetStateAction<Date>>
-  setGender: React.Dispatch<React.SetStateAction<string>>
+  setUsername: SetStateDispatch<string>
+  setFirstName: SetStateDispatch<string>
+  setLastName: SetStateDispatch<string>
+  setBirthday: SetStateDispatch<Date>
+  setGender: SetStateDispatch<string>
 }
 
 // Custom profile hook. This separates saved profile content from edited, unsaved profile content.
