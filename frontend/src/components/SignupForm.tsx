@@ -43,13 +43,14 @@ export default function SignupForm({
           <h2>Sign Up </h2>
         </Grid>
         <form
-          onSubmit={() =>
-            username &&
-            password &&
-            register({ username, password }, () => {
-              history.replace(from)
-            })
-          }
+          onSubmit={(e) => {
+            e.preventDefault()
+            if (username && password) {
+              register({ username, password }).then(() => {
+                history.replace(from)
+              })
+            }
+          }}
         >
           <TextField
             label="Email"

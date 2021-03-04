@@ -51,7 +51,7 @@ export default function AppHeader(): JSX.Element {
           <Typography className={classes.bannerText}>{"About"}</Typography>
           <Typography className={classes.bannerText}>{"Contact Us"}</Typography>
           <Typography className={classes.bannerText}>{"Help"}</Typography>
-          <Button onClick={() => logout(() => history.push("/"))}>
+          <Button onClick={() => logout().then(() => history.push("/"))}>
             <Typography className={classes.bannerText}>{"Log Out"}</Typography>
           </Button>
         </Grid>

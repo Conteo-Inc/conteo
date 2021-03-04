@@ -82,7 +82,7 @@ export default function LoginForm({
           onSubmit={(e) => {
             e.preventDefault()
             if (username && password) {
-              login({ username, password }, () => {
+              login({ username, password }).then(() => {
                 history.replace(from)
               })
             }

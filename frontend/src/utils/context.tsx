@@ -44,17 +44,17 @@ export default function useFocusedUser(): AppContextType["focusedUser"] {
 type UseUserReturnType = {
   user: Nullable<User>
   logged_in: Nullable<boolean>
-  register: (authInfo: AuthInformation, callBack: CallBack) => void
-  login: (authInfo: AuthInformation, callBack: CallBack) => void
-  logout: (CallBack: CallBack) => void
+  register: (authInfo: AuthInformation) => Promise<void>
+  login: (authInfo: AuthInformation) => Promise<void>
+  logout: () => Promise<void>
 }
 export function useUser(): UseUserReturnType {
   const context = React.useContext(AppContext)
   const [{ logged_in, user }, setUser] = context.user
 
-  const register = (authInfo: AuthInformation, callback: CallBack): void => {
-    request({
-      path: "/api/register",
+  const register = (authInfo: AuthInformation): Promise<void> => {
+    return request({
+      path: "/api/register/",
       method: "post",
       body: authInfo,
     }).then(() => {
@@ -66,18 +66,16 @@ export function useUser(): UseUserReturnType {
           first_name: "foo",
         },
       })
-      callback()
     })
   }
 
-  const login = (authInfo: AuthInformation, callback: CallBack): void => {
-    request({
+  const login = (authInfo: AuthInformation): Promise<void> => {
+    return request({
       path: "/api/login/",
       method: "post",
       body: authInfo,
       parser: parseIdentity,
     }).then(() => {
-      //TODO: replace with response
       setUser({
         logged_in: true,
         user: {
@@ -85,18 +83,16 @@ export function useUser(): UseUserReturnType {
           first_name: "foo",
         },
       })
-      callback()
     })
   }
 
-  const logout = (callback: CallBack): void => {
-    request({
+  const logout = (): Promise<void> => {
+    return request({
       path: "/api/logout/",
       method: "post",
       parser: parseIdentity,
     }).then(() => {
       setUser({ logged_in: false, user: null })
-      callback()
     })
   }
 
