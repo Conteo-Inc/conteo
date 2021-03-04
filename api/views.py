@@ -16,15 +16,17 @@ from rest_framework import (
 from .models import MatchStatus, Video
 from .serializers import (
     MatchStatusSerializer,
+    ProfileFromUserSerializer,
     ProfileSerializer,
     ReportSerializer,
+    UserRegistrationSerializer,
     VideoSerializer,
 )
 
 
 class UserRegistrationView(generics.CreateAPIView):
     permission_classes = (permissions.AllowAny,)
-    serializer_class = ProfileSerializer
+    serializer_class = UserRegistrationSerializer
 
     def post(self, request: request.Request):
         response = self.create(request=request)
@@ -94,12 +96,12 @@ class VideoListCreate(generics.ListCreateAPIView):
 
 class Matches(viewsets.ModelViewSet):
     """
-    View for requesting new matches for a user.
+    Manages the collection of matches.
     """
 
     def get_serializer_class(self):
         if self.action == "list":
-            return ProfileSerializer
+            return ProfileFromUserSerializer
         if self.action == "partial_update":
             return MatchStatusSerializer
         return super().get_serializer_class()

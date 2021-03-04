@@ -1,3 +1,6 @@
+from typing import OrderedDict
+
+from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
 from django.utils.timezone import now
 from rest_framework import serializers
@@ -6,24 +9,44 @@ from .models import MatchStatus, Profile, Report, Video
 
 
 class ProfileSerializer(serializers.ModelSerializer):
-    def create(self, validated_data):
-        profile = Profile.objects.create_user(
-            **validated_data, email=validated_data["username"]
-        )
-        return profile
-
     class Meta:
         model = Profile
-        fields = (
-            "id",
-            "username",
-            "email",
-            "first_name",
-            "last_name",
-            "phone_number",
-            "age",
-            "gender",
-        )
+        exclude = ("user", "id")
+
+
+class ProfileFromUserSerializer(serializers.ModelSerializer):
+    def to_representation(self, instance: User):
+        rep = super().to_representation(instance)  # type: OrderedDict
+        rep.update(instance.profile.__dict__)
+        del rep["_state"]  # Not meant to be serialized
+        return rep
+
+    class Meta:
+        model = User
+        exclude = ("first_name", "last_name")
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = "__all__"
+
+
+class UserRegistrationSerializer(serializers.ModelSerializer):
+    def create(self, validated_data):
+        user = User.objects.create_user(**validated_data)
+        user.email = user.username
+        user.save()
+
+        # A profile with default data is created here. We can add more as needed
+        # in the profile model.
+        user.profile = Profile(user.id)
+        user.profile.save()
+        return user
+
+    class Meta:
+        model = User
+        fields = "__all__"
         extra_kwargs = {"password": {"write_only": True}}
 
 

@@ -33,13 +33,18 @@ class ReportViewTestCase(APITestCase):
 
 class MatchesViewTestCase(APITestCase):
     def setUp(self):
-        ale = Profile.objects.create_user(username="ale", password="password")
-        boy = Profile.objects.create_user(username="boy", password="password")
-        cad = Profile.objects.create_user(username="cad", password="password")
-        dig = Profile.objects.create_user(username="dig", password="password")
-        eel = Profile.objects.create_user(username="eel", password="password")
-        fog = Profile.objects.create_user(username="fog", password="password")
-        Profile.objects.create_user(username="gil", password="password")
+        def make_user(name: str):
+            user = User.objects.create_user(username=name, password="password")
+            Profile.objects.create(user=user, first_name=name)
+            return user
+
+        ale = make_user("ale")
+        boy = make_user("boy")
+        cad = make_user("cad")
+        dig = make_user("dig")
+        eel = make_user("eel")
+        fog = make_user("fog")
+        make_user("gil")
         MatchStatus.objects.create(
             user_lo=ale, user_hi=boy, user_lo_response=True, user_hi_response=True
         )
@@ -78,53 +83,53 @@ class MatchesViewTestCase(APITestCase):
         for which the requesting user has not already made a decision for.
         """
 
-        def usernames(data: list[dict]):
+        def firstnames(data: list[dict]):
             for profile in data:
-                yield profile["username"]
+                yield profile["first_name"]
 
         endpoint = "/api/matches/"
 
         self.client.login(username="ale", password="password")
         res = self.client.get(endpoint, format="json")
         self.assertEqual(res.status_code, 200)
-        self.assertCountEqual(usernames(res.json()), ("gil",))
+        self.assertCountEqual(firstnames(res.json()), ("gil",))
         self.client.login(username="boy", password="password")
         res = self.client.get(endpoint, format="json")
         self.assertEqual(res.status_code, 200)
-        self.assertCountEqual(usernames(res.json()), ("dig", "fog", "gil"))
+        self.assertCountEqual(firstnames(res.json()), ("dig", "fog", "gil"))
         self.client.login(username="cad", password="password")
         res = self.client.get(endpoint, format="json")
         self.assertEqual(res.status_code, 200)
         self.assertCountEqual(
-            usernames(res.json()),
+            firstnames(res.json()),
             ("dig", "eel", "fog", "gil"),
         )
         self.client.login(username="dig", password="password")
         res = self.client.get(endpoint, format="json")
         self.assertEqual(res.status_code, 200)
         self.assertCountEqual(
-            usernames(res.json()),
+            firstnames(res.json()),
             ("ale", "cad", "eel", "fog", "gil"),
         )
         self.client.login(username="eel", password="password")
         res = self.client.get(endpoint, format="json")
         self.assertEqual(res.status_code, 200)
         self.assertCountEqual(
-            usernames(res.json()),
+            firstnames(res.json()),
             ("cad", "dig", "fog", "gil"),
         )
         self.client.login(username="fog", password="password")
         res = self.client.get(endpoint, format="json")
         self.assertEqual(res.status_code, 200)
         self.assertCountEqual(
-            usernames(res.json()),
+            firstnames(res.json()),
             ("boy", "cad", "dig", "eel", "gil"),
         )
         self.client.login(username="gil", password="password")
         res = self.client.get(endpoint, format="json")
         self.assertEqual(res.status_code, 200)
         self.assertCountEqual(
-            usernames(res.json()),
+            firstnames(res.json()),
             ("ale", "boy", "cad", "dig", "eel", "fog"),
         )
 
