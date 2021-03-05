@@ -56,7 +56,7 @@ class MatchesViewTestCase(APITestCase):
         for which the requesting user has not already made a decision for.
         """
 
-        def firstnames(data: list[dict]):
+        def firstnames(data):
             for profile in data:
                 yield profile["first_name"]
 
