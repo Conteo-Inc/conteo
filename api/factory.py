@@ -1,9 +1,8 @@
-import random
-
 import factory
 from django.contrib.auth.hashers import make_password
 from django.db.models.signals import post_save
 from factory.helpers import lazy_attribute
+from factory.random import random
 
 from api.models import MatchStatus, Profile, User
 
@@ -19,7 +18,7 @@ class ProfileFactory(factory.django.DjangoModelFactory):
         return self.full_name.split(" ")[1]
 
     phone_number = factory.Faker("phone_number")
-    user = factory.SubFactory("api.factories.UserFactory", profile=None)
+    user = factory.SubFactory("api.factory.UserFactory", profile=None)
     birth_date = factory.Faker("date")
 
     @factory.lazy_attribute
