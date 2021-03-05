@@ -55,6 +55,7 @@ class VideoListSerializer(serializers.ModelSerializer):
 
         rep["first_name"] = sender_profile.first_name
         rep["last_name"] = sender_profile.last_name
+        rep["sender_id"] = sender_profile.id
 
         return rep
 

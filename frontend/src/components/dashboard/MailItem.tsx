@@ -1,4 +1,4 @@
-import { Grid, makeStyles, Typography } from "@material-ui/core"
+import { Grid, makeStyles, Typography, IconButton } from "@material-ui/core"
 import {
   AccountCircle,
   ArrowDropDown,
@@ -21,6 +21,7 @@ export type MailListItem = {
   last_name: string
   viewed_at: Nullable<string>
   created_at: string
+  sender_id: number
 }
 
 export default function MailItem({
@@ -28,8 +29,13 @@ export default function MailItem({
   last_name,
   viewed_at,
   created_at,
+  sender_id
 }: MailListItem): JSX.Element {
   const { mailItem } = useStyles()
+
+  const viewVideo = ()=>{
+    console.log("Life is good for sender: ", sender_id)
+  }
   return (
     <Grid
       container
@@ -42,11 +48,13 @@ export default function MailItem({
         <Typography variant="h6">{`${first_name} ${last_name}`}</Typography>
       </Grid>
       <Typography variant="h6">{created_at}</Typography>
+      <IconButton onClick={viewVideo}>
       {viewed_at ? (
         <DraftsRounded fontSize="large" style={{ color: "#4b5e82" }} />
       ) : (
         <MailOutlineRounded fontSize="large" style={{ color: "#4b5282" }} />
       )}
+      </IconButton>
       <ArrowDropDown fontSize="large" style={{ color: "#4b5e82" }} />
     </Grid>
   )
