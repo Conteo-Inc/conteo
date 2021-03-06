@@ -184,7 +184,7 @@ export default function ProfileContent({
                 className={classes.recordButton}
                 size="large"
                 component={Link}
-                to="/record"
+                to={`/record/${readonlyContent.id}`}
               >
                 <Typography variant="h6">Record Intro Video</Typography>
               </Button>
