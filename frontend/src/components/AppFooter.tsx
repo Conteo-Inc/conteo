@@ -20,6 +20,7 @@ export default function AppFooter(): JSX.Element {
   const classes = useStyles()
   return (
     <Grid
+      item
       container
       direction="row"
       justify="space-between"
@@ -36,7 +37,11 @@ export default function AppFooter(): JSX.Element {
           </Typography>
         </Grid>
       </Grid>
-      <Typography className={classes.bannerText}>{"Copyright 2020"}</Typography>
+      <Grid item container xs={1} alignContent="flex-end">
+        <Typography className={classes.bannerText}>
+          {"Copyright 2020"}
+        </Typography>
+      </Grid>
     </Grid>
   )
 }

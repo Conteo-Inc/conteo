@@ -26,10 +26,9 @@ type ProfileContentProps = {
 
 // This is what the ProfileContent component expects to receive from storage.
 export type ProfileContentType = {
-  username: string
-  firstName: string
-  lastName: string
-  birthday: Date
+  first_name: string
+  last_name: string
+  birth_date: Date
   gender: string
   video: Nullable<string>
   id: number
@@ -107,7 +106,7 @@ export default function ProfileContent({
   const fields: ProfileField[] = [
     {
       title: "First Name",
-      value: readonlyContent.firstName,
+      value: readonlyContent.first_name,
       textFieldProps: {
         required: true,
         disabled: false,
@@ -121,7 +120,7 @@ export default function ProfileContent({
     },
     {
       title: "Last Name",
-      value: readonlyContent.lastName,
+      value: readonlyContent.last_name,
       textFieldProps: {
         required: true,
         disabled: false,
@@ -134,24 +133,13 @@ export default function ProfileContent({
       },
     },
     {
-      title: "Username",
-      value: readonlyContent.username,
-      textFieldProps: {
-        required: true,
-        disabled: true,
-        onChange: (e) => {
-          setters.setUsername(e.currentTarget.value)
-        },
-      },
-    },
-    {
       title: "Birthday",
-      value: readonlyContent.birthday.toLocaleDateString(),
+      value: readonlyContent.birth_date.toLocaleDateString(),
       textFieldProps: {
         required: true,
         disabled: true,
         onChange: (e) => {
-          setters.setBirthday(new Date(e.currentTarget.value))
+          setters.setBirthDate(new Date(e.currentTarget.value))
         },
       },
     },

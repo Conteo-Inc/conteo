@@ -1,16 +1,14 @@
 import * as React from "react"
 import { request } from "../utils/fetch"
-import { useProfile } from "../utils/profile"
+import { getUpdates, useProfile } from "../utils/profile"
 import ProfileSidebar from "../components/ProfileSidebar"
 import ProfileContent from "../components/ProfileContent"
 import type { ProfileContentType } from "../components/ProfileContent"
 import { makeStyles } from "@material-ui/core/styles"
 import { Grid } from "@material-ui/core"
-import useFocusedUser, { Nullable } from "../utils/context"
+import { Nullable } from "../utils/context"
 
 export type UserProfile = {
-  username: string
-  email: string
   first_name: string
   last_name: string
   phone_number: string
@@ -38,13 +36,11 @@ export default function Profile(): JSX.Element {
   const [isEditMode, toggleEditMode] = React.useState<boolean>(false)
   const [errMessage, seterrMessage] = React.useState<string>("")
   const classes = useStyles()
-  const [, setFocusedUser] = useFocusedUser()
 
   const [readonlyContent, setProfile] = React.useState<ProfileContentType>({
-    username: "",
-    firstName: "",
-    lastName: "",
-    birthday: new Date(),
+    first_name: "",
+    last_name: "",
+    birth_date: new Date(),
     gender: "",
     video: "",
     id: -1,
@@ -56,16 +52,18 @@ export default function Profile(): JSX.Element {
       .then((res) => {
         const profile: UserProfile = res.parsedBody
         const content: ProfileContentType = {
-          username: profile.username,
-          firstName: profile.first_name,
-          lastName: profile.last_name,
-          birthday: new Date(profile.birth_date),
+          first_name: profile.first_name,
+          last_name: profile.last_name,
+          birth_date: new Date(profile.birth_date),
           gender: profile.gender,
           video: profile.video,
           id: profile.id,
         }
         setProfile(content)
-        setFocusedUser(profile.id)
+        setters.setFirstName(content.first_name)
+        setters.setLastName(content.last_name)
+        setters.setGender(content.gender)
+        setters.setBirthDate(content.birth_date)
       })
       .catch((err) => {
         console.log(err)
@@ -83,7 +81,11 @@ export default function Profile(): JSX.Element {
 
   const handleSaveFields = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    request({ path: "/api/profile/", method: "put", body: editableContent })
+    request({
+      path: "/api/profile/",
+      method: "post",
+      body: getUpdates(readonlyContent, editableContent),
+    })
       .then(() => {
         setProfile(editableContent)
         toggleEditMode(false)
@@ -97,8 +99,8 @@ export default function Profile(): JSX.Element {
     <Grid container className={classes.root}>
       <Grid container item className={classes.sideBar} xs={3}>
         <ProfileSidebar
-          firstName={readonlyContent.firstName}
-          lastName={readonlyContent.lastName}
+          firstName={readonlyContent.first_name}
+          lastName={readonlyContent.last_name}
         />
       </Grid>
       <Grid container item className={classes.section} xs={9}>
