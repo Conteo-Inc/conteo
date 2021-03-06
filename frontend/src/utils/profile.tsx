@@ -10,6 +10,7 @@ export type ProfileContentSetters = {
   setGender: SetStateDispatch<string>
   setVideo: SetStateDispatch<Nullable<string>>
   setId: SetStateDispatch<number>
+  setInterests: SetStateDispatch<string>
 }
 
 // Custom profile hook. This separates saved profile content from edited, unsaved profile content.
@@ -23,6 +24,7 @@ export function useProfile(
   const [lastName, setLastName] = useState<string>(content.last_name)
   const [birthDate, setBirthDate] = useState<Date>(content.birth_date)
   const [gender, setGender] = useState<string>(content.gender)
+  const [interests, setInterests] = useState<string>(content.interests)
   const [video, setVideo] = useState<Nullable<string>>(content.video)
   const [id, setId] = useState<number>(content.id)
 
@@ -31,6 +33,7 @@ export function useProfile(
     last_name: lastName,
     birth_date: birthDate,
     gender: gender,
+    interests: interests,
     video: video,
     id: id,
   }
@@ -40,6 +43,7 @@ export function useProfile(
     setLastName,
     setBirthDate,
     setGender,
+    setInterests,
     setVideo,
     setId,
   }
@@ -51,7 +55,9 @@ type ProfileContentStrings = Omit<ProfileContentType, "birth_date"> & {
   birth_date: string
 }
 function toDateString(date: Date): string {
-  return `${date.getFullYear()}-${date.getMonth()}-${date.getDay()}`
+  //Month is zero-indexed in Typescript
+  const month = (date.getMonth() + 1) % 12
+  return `${date.getFullYear()}-${month}-${date.getDay()}`
 }
 
 export function getUpdates(

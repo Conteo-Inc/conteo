@@ -30,6 +30,7 @@ export type ProfileContentType = {
   last_name: string
   birth_date: Date
   gender: string
+  interests: string
   video: Nullable<string>
   id: number
 }
@@ -151,6 +152,17 @@ export default function ProfileContent({
         disabled: false,
         onChange: (e) => {
           setters.setGender(e.currentTarget.value)
+        },
+      },
+    },
+    {
+      title: "Interests",
+      value: readonlyContent.interests,
+      textFieldProps: {
+        required: false,
+        disabled: false,
+        onChange: (e) => {
+          setters.setInterests(e.currentTarget.value)
         },
       },
     },

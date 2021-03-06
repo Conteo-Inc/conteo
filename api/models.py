@@ -12,6 +12,7 @@ class Profile(models.Model):
     phone_number = models.CharField(max_length=10, unique=True, null=True)
     birth_date = models.DateField(null=True)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True)
+    interests = models.CharField(max_length=200, blank=True)
 
 
 class Video(models.Model):

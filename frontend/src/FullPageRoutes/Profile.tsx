@@ -14,6 +14,7 @@ export type UserProfile = {
   phone_number: string
   birth_date: string
   gender: string
+  interests: string
   video: Nullable<string>
   id: number
 }
@@ -42,6 +43,7 @@ export default function Profile(): JSX.Element {
     last_name: "",
     birth_date: new Date(),
     gender: "",
+    interests: "",
     video: "",
     id: -1,
   })
@@ -56,6 +58,7 @@ export default function Profile(): JSX.Element {
           last_name: profile.last_name,
           birth_date: new Date(profile.birth_date),
           gender: profile.gender,
+          interests: profile.interests,
           video: profile.video,
           id: profile.id,
         }
