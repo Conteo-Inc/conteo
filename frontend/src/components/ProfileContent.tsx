@@ -10,6 +10,9 @@ import {
   Paper,
   TextFieldProps,
 } from "@material-ui/core"
+import { Nullable } from "../utils/context"
+import { Colors } from "../utils/colors"
+import { Link } from "react-router-dom"
 
 type ProfileContentProps = {
   readonlyContent: ProfileContentType
@@ -23,12 +26,13 @@ type ProfileContentProps = {
 
 // This is what the ProfileContent component expects to receive from storage.
 export type ProfileContentType = {
-  username: string
-  firstName: string
-  lastName: string
-  birthday: Date
+  first_name: string
+  last_name: string
+  birth_date: Date
   gender: string
   interests: string
+  video: Nullable<string>
+  id: number
 }
 
 // A field listed in the content.
@@ -48,11 +52,9 @@ const useStyles = makeStyles({
     width: 200,
   },
   introVideo: {
-    height: 200,
-    width: 400,
-    backgroundColor: "#bdbdbd",
     color: "white",
     textAlign: "center",
+    marginBottom: "1rem",
   },
   fieldsContainer: {
     position: "relative",
@@ -81,6 +83,13 @@ const useStyles = makeStyles({
     right: "0",
     transform: "translate(-100%, -10%)",
   },
+  recordButton: {
+    backgroundColor: Colors.DEEP_BLUE,
+    color: "white",
+    "&:hover": {
+      backgroundColor: Colors.DEEP_RED,
+    },
+  },
 })
 
 export default function ProfileContent({
@@ -98,7 +107,7 @@ export default function ProfileContent({
   const fields: ProfileField[] = [
     {
       title: "First Name",
-      value: readonlyContent.firstName,
+      value: readonlyContent.first_name,
       textFieldProps: {
         required: true,
         disabled: false,
@@ -112,7 +121,7 @@ export default function ProfileContent({
     },
     {
       title: "Last Name",
-      value: readonlyContent.lastName,
+      value: readonlyContent.last_name,
       textFieldProps: {
         required: true,
         disabled: false,
@@ -125,24 +134,13 @@ export default function ProfileContent({
       },
     },
     {
-      title: "Username",
-      value: readonlyContent.username,
-      textFieldProps: {
-        required: true,
-        disabled: true,
-        onChange: (e) => {
-          setters.setUsername(e.currentTarget.value)
-        },
-      },
-    },
-    {
       title: "Birthday",
-      value: readonlyContent.birthday.toLocaleDateString(),
+      value: readonlyContent.birth_date.toLocaleDateString(),
       textFieldProps: {
         required: true,
         disabled: true,
         onChange: (e) => {
-          setters.setBirthday(new Date(e.currentTarget.value))
+          setters.setBirthDate(new Date(e.currentTarget.value))
         },
       },
     },
@@ -177,8 +175,32 @@ export default function ProfileContent({
           <Grid item xs={12} sm={6}>
             <Avatar src={""} className={classes.profileAvatar} />
           </Grid>
-          <Grid item xs={12} sm={6}>
-            <div className={classes.introVideo}>Intro Video</div>
+          <Grid
+            item
+            xs={12}
+            sm={6}
+            container
+            alignItems="center"
+            justify="center"
+            className={classes.introVideo}
+          >
+            {readonlyContent.video ? (
+              <video
+                controls
+                src={readonlyContent.video}
+                width={"100%"}
+                height={"100%"}
+              />
+            ) : (
+              <Button
+                className={classes.recordButton}
+                size="large"
+                component={Link}
+                to={`/record/${readonlyContent.id}`}
+              >
+                <Typography variant="h6">Record Intro Video</Typography>
+              </Button>
+            )}
           </Grid>
         </Grid>
       </Grid>

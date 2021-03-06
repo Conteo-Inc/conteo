@@ -4,29 +4,29 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom"
 import LinkItem from "./components/LinkItem"
 import TokenPage from "./FullPageRoutes/TokenPage"
 import ProfilePage from "./FullPageRoutes/Profile"
-import { Box, Grid, makeStyles, Typography } from "@material-ui/core"
+import MatchingPage from "./FullPageRoutes/Matching"
+import { Box, makeStyles } from "@material-ui/core"
 import RecordPage from "./FullPageRoutes/RecordPage"
-import VideoListPage from "./FullPageRoutes/VideoListPage"
-import { AppContext, NullableId } from "./utils/context"
+import ProvideContext from "./components/utils/ProvideContext"
+import AppHeader from "./components/AppHeader"
+import AppFooter from "./components/AppFooter"
+import { ProtectedRoute } from "./components/ProtectedRoute"
+import Dashboard from "./FullPageRoutes/Dashboard"
+import VideoViewPage from "./FullPageRoutes/VideoViewPage"
 
 const useStyles = makeStyles({
-  header: {
-    backgroundColor: "#cd0b2d",
-    height: "3rem",
-    padding: "0 1rem",
-  },
-  footer: {
-    backgroundColor: "#760000",
-    height: "3rem",
-    padding: "0 1rem",
-  },
-  bannerText: {
-    color: "white",
-  },
   app: {
     height: "40rem",
     display: "flex",
     flexDirection: "column",
+    paddingTop: "50px",
+  },
+  appRoot: {
+    minHeight: "55rem",
+  },
+  appBody: {
+    minHeight: "49rem",
+    width: "100%",
   },
 })
 
@@ -34,89 +34,50 @@ const useStyles = makeStyles({
 function MainPage() {
   return (
     <ul>
-      <LinkItem to="/Tokens" text="Tokens" />
-      <LinkItem to="/Record" text="Record" />
-      <LinkItem to="/Watch" text="Watch" />
-      <LinkItem to="/Profile" text="Profile" />
+      <LinkItem to="/dashboard" text="Dashboard" />
+      <LinkItem to="/matches" text="Matches" />
+      <LinkItem to="/record" text="Record" />
+      <LinkItem to="/watch" text="Watch" />
+      <LinkItem to="/profile" text="Profile" />
     </ul>
   )
 }
 
 export default function App(): JSX.Element {
   const classes = useStyles()
+
   return (
-    <AppContext.Provider
-      //@TODO: Handle default better or ensure change before use
-      value={{ focusedUser: React.useState<NullableId>(null) }}
-    >
+    <ProvideContext>
       <Router>
-        <Grid
-          container
-          direction="row"
-          justify="space-between"
-          alignItems="center"
-          className={classes.header}
-        >
-          <Typography variant="h5" className={classes.bannerText}>
-            {"Hi, Jane"}
-          </Typography>
-          {/* Figure out sizes */}
-          <Grid item lg={2} sm={2} xs={2}>
-            <Grid container direction="row" justify="space-between">
-              <Typography className={classes.bannerText}>{"About"}</Typography>
-              <Typography className={classes.bannerText}>
-                {"Contact Us"}
-              </Typography>
-              <Typography className={classes.bannerText}>{"Help"}</Typography>
-              <Typography className={classes.bannerText}>
-                {"Log Out"}
-              </Typography>
-            </Grid>
-          </Grid>
-        </Grid>
-        {/* Here's where the body of the App will live */}
+        <AppHeader />
         <Box className={classes.app}>
           <Switch>
-            <Route path="/Tokens">
+            <Route path="/tokens">
               <TokenPage />
             </Route>
-            <Route path="/Record">
+            <ProtectedRoute path="/record/:receiver">
               <RecordPage />
-            </Route>
-            <Route path="/Watch">
-              <VideoListPage />
-            </Route>
-            <Route path="/Profile">
+            </ProtectedRoute>
+            <ProtectedRoute path="/matches">
+              <MatchingPage />
+            </ProtectedRoute>
+            <ProtectedRoute path="/profile">
               <ProfilePage />
-            </Route>
-            <Route path="/">
+            </ProtectedRoute>
+            <ProtectedRoute path="/dashboard">
+              <Dashboard />
+            </ProtectedRoute>
+            <ProtectedRoute path="/watch">
+              <VideoViewPage />
+            </ProtectedRoute>
+            <ProtectedRoute path="/">
               <MainPage />
-            </Route>
+            </ProtectedRoute>
           </Switch>
         </Box>
-        <Grid
-          container
-          direction="row"
-          justify="space-between"
-          alignItems="flex-end"
-          className={classes.footer}
-        >
-          <Grid item lg={2}>
-            <Grid container direction="row" justify="space-between">
-              <Typography className={classes.bannerText}>
-                {"Privacy Policy"}
-              </Typography>
-              <Typography className={classes.bannerText}>
-                {"Terms of Service"}
-              </Typography>
-            </Grid>
-          </Grid>
-          <Typography className={classes.bannerText}>
-            {"Copyright 2020"}
-          </Typography>
-        </Grid>
+        <AppFooter />
       </Router>
-    </AppContext.Provider>
+    </ProvideContext>
   )
 }
 
