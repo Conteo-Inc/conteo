@@ -3,9 +3,8 @@ from django.db import models
 from django.db.models import F, Q
 
 
-# Note that enforcement on these fields should be done on the frontend --- Very easy!
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=50, blank=True)
     last_name = models.CharField(max_length=50, blank=True)
     phone_number = models.CharField(max_length=10, unique=True, null=True)
@@ -62,6 +61,7 @@ class MatchStatus(models.Model):
                 check=Q(user_lo_id__lt=F("user_hi_id")), name="user_lo_lt_user_hi"
             )
         ]
+        verbose_name_plural = "MatchStatuses"
 
     def __str__(self):
         return f"{self.user_lo} [{self.user_lo_response}] - {self.user_hi} [{self.user_hi_response}]"  # noqa: E501

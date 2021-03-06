@@ -18,7 +18,7 @@ class ReportViewTestCase(APITestCase):
         """
         self.client.login(username="ale", password="password")
         res = self.client.post(
-            "/api/report/",
+            "/api/reports/",
             {
                 "report_type": Report.ReportType.PROFILE,
                 "reportee": self.boy.id,

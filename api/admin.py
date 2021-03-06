@@ -1,8 +1,8 @@
 from django.contrib import admin
 
-from .models import MatchStatus, Report, Video
+from .models import MatchStatus, Profile, Report, Video
 
-# Register your models here.
-admin.site.register(Video)
 admin.site.register(MatchStatus)
+admin.site.register(Profile)
+admin.site.register(Video)
 admin.site.register(Report)

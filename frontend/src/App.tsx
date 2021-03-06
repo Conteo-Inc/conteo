@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom"
 import LinkItem from "./components/LinkItem"
 import TokenPage from "./FullPageRoutes/TokenPage"
 import ProfilePage from "./FullPageRoutes/Profile"
+import MatchingPage from "./FullPageRoutes/Matching"
 import { Box, makeStyles } from "@material-ui/core"
 import RecordPage from "./FullPageRoutes/RecordPage"
 import ProvideContext from "./components/utils/ProvideContext"
@@ -24,6 +25,7 @@ const useStyles = makeStyles({
 function MainPage() {
   return (
     <ul>
+      <LinkItem to="/matches" text="Matches" />
       <LinkItem to="/record" text="Record" />
       <LinkItem to="/profile" text="Profile" />
     </ul>
@@ -44,6 +46,9 @@ export default function App(): JSX.Element {
             </Route>
             <ProtectedRoute path="/record">
               <RecordPage />
+            </ProtectedRoute>
+            <ProtectedRoute path="/matches">
+              <MatchingPage />
             </ProtectedRoute>
             <ProtectedRoute path="/profile">
               <ProfilePage />
