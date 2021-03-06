@@ -31,30 +31,34 @@ export default function AppHeader(): JSX.Element {
   return (
     <Grid
       container
+      item
       direction="row"
       justify="space-between"
       alignItems="center"
       className={classes.header}
+      wrap="nowrap"
     >
-      <Typography variant="h5" className={classes.bannerText}>
-        {/* TODO: Replace if profile exists */}
-        {`Hi ${name}`}
-      </Typography>
+      <Grid item xs={2}>
+        <Typography variant="h5" className={classes.bannerText}>
+          {/* TODO: Replace if profile exists */}
+          {`Hi ${name}`}
+        </Typography>
+      </Grid>
       {/* Figure out sizes */}
-      <Grid item lg={2} sm={2} xs={2}>
-        <Grid
-          container
-          direction="row"
-          justify="space-between"
-          alignItems="center"
-        >
-          <Typography className={classes.bannerText}>{"About"}</Typography>
-          <Typography className={classes.bannerText}>{"Contact Us"}</Typography>
-          <Typography className={classes.bannerText}>{"Help"}</Typography>
-          <Button onClick={() => logout().then(() => history.push("/"))}>
-            <Typography className={classes.bannerText}>{"Log Out"}</Typography>
-          </Button>
-        </Grid>
+      <Grid
+        xs={3}
+        item
+        container
+        direction="row"
+        justify="space-between"
+        alignItems="center"
+      >
+        <Typography className={classes.bannerText}>{"About"}</Typography>
+        <Typography className={classes.bannerText}>{"Contact Us"}</Typography>
+        <Typography className={classes.bannerText}>{"Help"}</Typography>
+        <Button onClick={() => logout().then(() => history.push("/"))}>
+          <Typography className={classes.bannerText}>{"Log Out"}</Typography>
+        </Button>
       </Grid>
     </Grid>
   )

@@ -3,6 +3,7 @@ import random
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.db.models import Q
+from django.db.models.query import QuerySet
 from rest_framework import (
     generics,
     permissions,
@@ -13,8 +14,9 @@ from rest_framework import (
     viewsets,
 )
 
-from .models import MatchStatus, Video
+from .models import MatchStatus, Profile, Video
 from .serializers import (
+    MailListSerializer,
     MatchStatusSerializer,
     ProfileFromUserSerializer,
     ProfileSerializer,
@@ -58,7 +60,10 @@ class UserAccountDeleteView(views.APIView):
 class UserLoginView(views.APIView):
     permission_classes = (permissions.AllowAny,)
 
-    def post(self, request: request.Request):
+    def post(
+        self,
+        request: request.Request,
+    ):
         username = request.data["username"]
         password = request.data["password"]
 
@@ -77,20 +82,61 @@ class UserLogoutView(generics.GenericAPIView):
         return response.Response(status=status.HTTP_200_OK)
 
 
-class ProfileView(views.APIView):
+class ProfileView(generics.RetrieveUpdateAPIView):
+    serializer_class = ProfileSerializer
+
+    def get_object(self):
+        return self.request.user.profile
+
     def get(self, request):
         user = request.user
         return response.Response(
             data=ProfileSerializer(user.profile).data, status=status.HTTP_200_OK
         )
 
+    def post(self, request):
+        return self.update(request=request)
 
-class VideoListCreate(generics.ListCreateAPIView):
-    serializer_class = VideoSerializer
+
+class MailListView(generics.ListAPIView):
+    serializer_class = MailListSerializer
 
     def get_queryset(self):
         user = self.request.user
-        return Video.objects.filter(receiver=user)
+        case1 = Profile.objects.filter(
+            Q(user__matchstatus_hi__user_lo=user)
+            & Q(user__matchstatus_hi__user_lo_response=True)
+            & Q(user__matchstatus_hi__user_hi_response=True)
+        )
+        # Case 2: User is user_hi
+        case2 = Profile.objects.filter(
+            Q(user__matchstatus_lo__user_hi=user)
+            & Q(user__matchstatus_lo__user_lo_response=True)
+            & Q(user__matchstatus_lo__user_hi_response=True)
+        )
+
+        # remove self
+        # union = union.exclude(user=user)
+
+        # make distinct
+        union = QuerySet.union(case1, case2)
+
+        return union
+
+    def get(self, request):
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(
+            queryset, context={"receiver": request.user}, many=True
+        )
+        return response.Response(
+            data=serializer.data,
+            status=status.HTTP_200_OK,
+        )
+
+
+class VideoListCreate(generics.ListCreateAPIView):
+    serializer_class = VideoSerializer
+    queryset = Video.objects.all()
 
     def post(self, request, format=None):
         data = request.data.pop("data")
@@ -101,6 +147,11 @@ class VideoListCreate(generics.ListCreateAPIView):
             serializer.save()
             return response.Response(serializer.data, status=status.HTTP_201_CREATED)
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # def get(self, request):
+    #     queryset = self.filter_queryset(self.get_queryset())
+    #     serializer = self.list_serializer_class(queryset, many=True)
+    #     return response.Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
 class VideoRetrieveView(generics.RetrieveAPIView):
@@ -187,6 +238,6 @@ class Matches(viewsets.ModelViewSet):
 class Reports(generics.CreateAPIView):
     serializer_class = ReportSerializer
 
-    def post(self, request: request.Request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         request.data["reporter"] = request.user.id
         return self.create(request, *args, **kwargs)
