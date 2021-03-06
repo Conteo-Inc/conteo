@@ -81,7 +81,5 @@ export default function App(): JSX.Element {
   )
 }
 
-// export default App;
-
 const container = document.getElementById("app")
 render(<App />, container)
