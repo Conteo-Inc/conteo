@@ -8,6 +8,8 @@ export type ProfileContentSetters = {
   setLastName: SetStateDispatch<string>
   setBirthDate: SetStateDispatch<Date>
   setGender: SetStateDispatch<string>
+  setVideo: SetStateDispatch<Nullable<string>>
+  setId: SetStateDispatch<number>
 }
 
 // Custom profile hook. This separates saved profile content from edited, unsaved profile content.
@@ -21,12 +23,16 @@ export function useProfile(
   const [lastName, setLastName] = useState<string>(content.last_name)
   const [birthDate, setBirthDate] = useState<Date>(content.birth_date)
   const [gender, setGender] = useState<string>(content.gender)
+  const [video, setVideo] = useState<Nullable<string>>(content.video)
+  const [id, setId] = useState<number>(content.id)
 
   const editableContent: ProfileContentType = {
     first_name: firstName,
     last_name: lastName,
     birth_date: birthDate,
     gender: gender,
+    video: video,
+    id: id,
   }
 
   const setters: ProfileContentSetters = {
@@ -34,6 +40,8 @@ export function useProfile(
     setLastName,
     setBirthDate,
     setGender,
+    setVideo,
+    setId,
   }
 
   return { editableContent, setters }

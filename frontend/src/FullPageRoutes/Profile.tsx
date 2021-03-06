@@ -6,6 +6,7 @@ import ProfileContent from "../components/ProfileContent"
 import type { ProfileContentType } from "../components/ProfileContent"
 import { makeStyles } from "@material-ui/core/styles"
 import { Grid } from "@material-ui/core"
+import { Nullable } from "../utils/context"
 
 export type UserProfile = {
   first_name: string
@@ -13,6 +14,8 @@ export type UserProfile = {
   phone_number: string
   birth_date: string
   gender: string
+  video: Nullable<string>
+  id: number
 }
 
 const useStyles = makeStyles({
@@ -39,6 +42,8 @@ export default function Profile(): JSX.Element {
     last_name: "",
     birth_date: new Date(),
     gender: "",
+    video: "",
+    id: -1,
   })
   const { editableContent, setters } = useProfile(readonlyContent)
 
@@ -51,6 +56,8 @@ export default function Profile(): JSX.Element {
           last_name: profile.last_name,
           birth_date: new Date(profile.birth_date),
           gender: profile.gender,
+          video: profile.video,
+          id: profile.id,
         }
         setProfile(content)
         setters.setFirstName(content.first_name)
