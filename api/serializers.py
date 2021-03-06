@@ -48,19 +48,28 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         extra_kwargs = {"password": {"write_only": True}}
 
 
-class VideoListSerializer(serializers.ModelSerializer):
+class MailListSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         rep = super().to_representation(instance)
-        sender_profile = instance.sender.profile
+        rep["created_at"] = None
+        rep["viewed_at"] = None
 
-        rep["first_name"] = sender_profile.first_name
-        rep["last_name"] = sender_profile.last_name
+        receiver = self.context.get("receiver")
+        # get videos sent, filter, and order
+        sent_videos = instance.user.sent_videos.filter(receiver=receiver).order_by(
+            "-created_at"
+        )
+
+        if len(sent_videos) > 0:
+            latest_video = sent_videos[0]
+            rep["created_at"] = latest_video.created_at
+            rep["viewed_at"] = latest_video.viewed_at
 
         return rep
 
     class Meta:
-        model = Video
-        fields = ("created_at", "viewed_at")
+        model = Profile
+        fields = ("id", "first_name", "last_name")
 
 
 class VideoSerializer(serializers.ModelSerializer):
@@ -95,7 +104,6 @@ class VideoSerializer(serializers.ModelSerializer):
         rep = super().to_representation(instance)
 
         video_file = instance.video_file
-        video_file.open()
 
         # Raw base64 bytes need to be decoded to a string
         rep["video_file"] = video_file.read().decode()

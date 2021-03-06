@@ -14,7 +14,7 @@ urlpatterns = [
     # When we get into matching with real data,
     # let's discuss if this needs to be broken into
     # multiple endpoints - Michael
-    path("mail/", views.VideoListCreate.as_view()),
+    path("mail/", views.MailListView.as_view()),
     path("report/", views.Reports.as_view()),
     path("user/", views.UserAuthView.as_view()),
 ]
