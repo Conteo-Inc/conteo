@@ -1,31 +1,15 @@
-from typing import OrderedDict
-
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
-from django.db.models.query_utils import Q
 from django.utils.timezone import now
 from rest_framework import serializers
 
-from .models import MatchStatus, Profile, Report, Video
+from .models import Profile, Report, Video
 
 
 class ProfileSerializer(serializers.ModelSerializer):
-    def to_representation(self, instance):
-        rep = super().to_representation(instance)
-        # get video
-        video = None
-        try:
-            video = Video.objects.get(
-                Q(sender=instance.user) & Q(receiver=instance.user)
-            )
-            video = read_video(video.video_file)
-        finally:
-            rep["video"] = video
-            return rep
-
     class Meta:
         model = Profile
-        exclude = ("user",)
+        fields = "__all__"
 
 
 class UserAuthSerializer(serializers.ModelSerializer):
@@ -38,18 +22,6 @@ class UserAuthSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ("email",)
-
-
-class ProfileFromUserSerializer(serializers.ModelSerializer):
-    def to_representation(self, instance: User):
-        rep = super().to_representation(instance)  # type: OrderedDict
-        rep.update(instance.profile.__dict__)
-        del rep["_state"]  # Not meant to be serialized
-        return rep
-
-    class Meta:
-        model = User
-        exclude = ("first_name", "last_name", "password")
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -76,39 +48,20 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         extra_kwargs = {"password": {"write_only": True}}
 
 
-def read_video(video):
-    """
-    @param video: A FieldFile representing the video.
-    Commonly found on Video.video_file
-    """
-    try:
-        return video.read().decode()
-    finally:
-        video.close()
-
-
-class MailListSerializer(serializers.ModelSerializer):
+class VideoListSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         rep = super().to_representation(instance)
-        rep["created_at"] = None
-        rep["viewed_at"] = None
+        sender_profile = instance.sender.profile
 
-        receiver = self.context.get("receiver")
-        # get videos sent, filter, and order
-        sent_videos = instance.user.sent_videos.filter(receiver=receiver).order_by(
-            "-created_at"
-        )
-
-        if len(sent_videos) > 0:
-            latest_video = sent_videos[0]
-            rep["created_at"] = latest_video.created_at
-            rep["viewed_at"] = latest_video.viewed_at
+        rep["first_name"] = sender_profile.first_name
+        rep["last_name"] = sender_profile.last_name
+        rep["sender_id"] = sender_profile.id
 
         return rep
 
     class Meta:
-        model = Profile
-        fields = ("id", "first_name", "last_name")
+        model = Video
+        fields = ("created_at", "viewed_at")
 
 
 class VideoSerializer(serializers.ModelSerializer):
@@ -143,7 +96,11 @@ class VideoSerializer(serializers.ModelSerializer):
         rep = super().to_representation(instance)
 
         video_file = instance.video_file
-        rep["video_file"] = read_video(video_file)
+        video_file.open()
+
+        # Raw base64 bytes need to be decoded to a string
+        rep["video_file"] = video_file.read().decode()
+        video_file.close()
 
         return rep
 
@@ -156,9 +113,3 @@ class ReportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Report
         fields = ("report_type", "reporter", "reportee", "description")
-
-
-class MatchStatusSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = MatchStatus
-        fields = ("user_lo_response", "user_hi_response")
