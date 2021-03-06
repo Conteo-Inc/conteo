@@ -82,12 +82,20 @@ class UserLogoutView(generics.GenericAPIView):
         return response.Response(status=status.HTTP_200_OK)
 
 
-class ProfileView(views.APIView):
+class ProfileView(generics.RetrieveUpdateAPIView):
+    serializer_class = ProfileSerializer
+
+    def get_object(self):
+        return self.request.user.profile
+
     def get(self, request):
         user = request.user
         return response.Response(
             data=ProfileSerializer(user.profile).data, status=status.HTTP_200_OK
         )
+
+    def post(self, request):
+        return self.update(request=request)
 
 
 class MailListView(generics.ListAPIView):

@@ -11,7 +11,7 @@ from .models import MatchStatus, Profile, Report, Video
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = "__all__"
+        exclude = ("user",)
 
 
 class UserAuthSerializer(serializers.ModelSerializer):
