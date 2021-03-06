@@ -1,18 +1,23 @@
 from django.contrib.auth.models import User
 from rest_framework.test import APITestCase
 
-from api.models import MatchStatus
+from api.models import MatchStatus, Profile
 
 
 class MatchesViewTestCase(APITestCase):
     def setUp(self):
-        ale = User.objects.create_user(username="ale", password="password")
-        boy = User.objects.create_user(username="boy", password="password")
-        cad = User.objects.create_user(username="cad", password="password")
-        dig = User.objects.create_user(username="dig", password="password")
-        eel = User.objects.create_user(username="eel", password="password")
-        fog = User.objects.create_user(username="fog", password="password")
-        User.objects.create_user(username="gil", password="password")
+        def make_user(name: str):
+            user = User.objects.create_user(username=name, password="password")
+            Profile.objects.create(user=user, first_name=name)
+            return user
+
+        ale = make_user("ale")
+        boy = make_user("boy")
+        cad = make_user("cad")
+        dig = make_user("dig")
+        eel = make_user("eel")
+        fog = make_user("fog")
+        make_user("gil")
         MatchStatus.objects.create(
             user_lo=ale, user_hi=boy, user_lo_response=True, user_hi_response=True
         )
@@ -50,78 +55,85 @@ class MatchesViewTestCase(APITestCase):
         user, users who have not declined the requesting user, and users
         for which the requesting user has not already made a decision for.
         """
-        self.client.login(username="ale", password="password")
-        res = self.client.get("/api/match/", format="json")
-        self.assertEqual(res.status_code, 200)
 
-        self.assertCountEqual(res.json(), [{"username": "gil"}])
+        def firstnames(data):
+            for profile in data:
+                yield profile["first_name"]
+
+        endpoint = "/api/matches/"
+
+        self.client.login(username="ale", password="password")
+        res = self.client.get(endpoint, format="json")
+        self.assertEqual(res.status_code, 200)
+        self.assertCountEqual(firstnames(res.json()), ("gil",))
         self.client.login(username="boy", password="password")
-        res = self.client.get("/api/match/", format="json")
+        res = self.client.get(endpoint, format="json")
         self.assertEqual(res.status_code, 200)
-        self.assertCountEqual(
-            res.json(), [{"username": "dig"}, {"username": "fog"}, {"username": "gil"}]
-        )
+        self.assertCountEqual(firstnames(res.json()), ("dig", "fog", "gil"))
         self.client.login(username="cad", password="password")
-        res = self.client.get("/api/match/", format="json")
+        res = self.client.get(endpoint, format="json")
         self.assertEqual(res.status_code, 200)
         self.assertCountEqual(
-            res.json(),
-            [
-                {"username": "dig"},
-                {"username": "eel"},
-                {"username": "fog"},
-                {"username": "gil"},
-            ],
+            firstnames(res.json()),
+            ("dig", "eel", "fog", "gil"),
         )
         self.client.login(username="dig", password="password")
-        res = self.client.get("/api/match/", format="json")
+        res = self.client.get(endpoint, format="json")
         self.assertEqual(res.status_code, 200)
         self.assertCountEqual(
-            res.json(),
-            [
-                {"username": "ale"},
-                {"username": "cad"},
-                {"username": "eel"},
-                {"username": "fog"},
-                {"username": "gil"},
-            ],
+            firstnames(res.json()),
+            ("ale", "cad", "eel", "fog", "gil"),
         )
         self.client.login(username="eel", password="password")
-        res = self.client.get("/api/match/", format="json")
+        res = self.client.get(endpoint, format="json")
         self.assertEqual(res.status_code, 200)
         self.assertCountEqual(
-            res.json(),
-            [
-                {"username": "cad"},
-                {"username": "dig"},
-                {"username": "fog"},
-                {"username": "gil"},
-            ],
+            firstnames(res.json()),
+            ("cad", "dig", "fog", "gil"),
         )
         self.client.login(username="fog", password="password")
-        res = self.client.get("/api/match/", format="json")
+        res = self.client.get(endpoint, format="json")
         self.assertEqual(res.status_code, 200)
         self.assertCountEqual(
-            res.json(),
-            [
-                {"username": "boy"},
-                {"username": "cad"},
-                {"username": "dig"},
-                {"username": "eel"},
-                {"username": "gil"},
-            ],
+            firstnames(res.json()),
+            ("boy", "cad", "dig", "eel", "gil"),
         )
         self.client.login(username="gil", password="password")
-        res = self.client.get("/api/match/", format="json")
+        res = self.client.get(endpoint, format="json")
         self.assertEqual(res.status_code, 200)
         self.assertCountEqual(
-            res.json(),
-            [
-                {"username": "ale"},
-                {"username": "boy"},
-                {"username": "cad"},
-                {"username": "dig"},
-                {"username": "eel"},
-                {"username": "fog"},
-            ],
+            firstnames(res.json()),
+            ("ale", "boy", "cad", "dig", "eel", "fog"),
         )
+
+    def test_update_match_status(self):
+        """
+        Check that a match status can be updated.
+        """
+        self.client.login(username="ale", password="password")
+        res = self.client.put(
+            "/api/matches/", {"matchId": 2, "response": False}, format="json"
+        )
+        self.assertEqual(res.status_code, 200)
+        obj = MatchStatus.objects.get(user_lo_id=1, user_hi_id=2)
+        self.assertEqual(obj.user_lo_response, False)
+        res = self.client.put(
+            "/api/matches/", {"matchId": 2, "response": True}, format="json"
+        )
+        self.assertEqual(res.status_code, 200)
+        obj = MatchStatus.objects.get(user_lo_id=1, user_hi_id=2)
+        self.assertEqual(obj.user_lo_response, True)
+
+        self.client.login(username="boy", password="password")
+        res = self.client.put(
+            "/api/matches/", {"matchId": 1, "response": False}, format="json"
+        )
+        self.assertEqual(res.status_code, 200)
+        obj = MatchStatus.objects.get(user_lo_id=1, user_hi_id=2)
+        self.assertEqual(obj.user_hi_response, False)
+        res = self.client.put(
+            "/api/matches/", {"matchId": 1, "response": True}, format="json"
+        )
+        self.assertEqual(res.status_code, 200)
+        obj = MatchStatus.objects.get(user_lo_id=1, user_hi_id=2)
+        self.assertEqual(obj.user_hi_response, True)

@@ -1,9 +1,11 @@
+from typing import OrderedDict
+
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
 from django.utils.timezone import now
 from rest_framework import serializers
 
-from .models import Profile, Report, Video
+from .models import MatchStatus, Profile, Report, Video
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -22,6 +24,18 @@ class UserAuthSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ("email",)
+
+
+class ProfileFromUserSerializer(serializers.ModelSerializer):
+    def to_representation(self, instance: User):
+        rep = super().to_representation(instance)  # type: OrderedDict
+        rep.update(instance.profile.__dict__)
+        del rep["_state"]  # Not meant to be serialized
+        return rep
+
+    class Meta:
+        model = User
+        exclude = ("first_name", "last_name", "password")
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -120,3 +134,9 @@ class ReportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Report
         fields = ("report_type", "reporter", "reportee", "description")
+
+
+class MatchStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MatchStatus
+        fields = ("user_lo_response", "user_hi_response")
