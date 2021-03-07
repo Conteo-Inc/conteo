@@ -1,6 +1,6 @@
 import { Button, Grid, makeStyles, Typography } from "@material-ui/core"
 import * as React from "react"
-import { useHistory } from "react-router-dom"
+import { Link, useHistory } from "react-router-dom"
 import { useUser } from "../utils/context"
 
 const useStyles = makeStyles({
@@ -40,7 +40,6 @@ export default function AppHeader(): JSX.Element {
     >
       <Grid item xs={2}>
         <Typography variant="h5" className={classes.bannerText}>
-          {/* TODO: Replace if profile exists */}
           {`Hi ${name}`}
         </Typography>
       </Grid>
@@ -53,6 +52,16 @@ export default function AppHeader(): JSX.Element {
         justify="space-between"
         alignItems="center"
       >
+        {user && (
+          <Link to="/dashboard">
+            <Typography className={classes.bannerText}>{"Home"}</Typography>
+          </Link>
+        )}
+        {user && (
+          <Link to="/matches">
+            <Typography className={classes.bannerText}>{"Matching"}</Typography>
+          </Link>
+        )}
         <Typography className={classes.bannerText}>{"About"}</Typography>
         <Typography className={classes.bannerText}>{"Contact Us"}</Typography>
         <Typography className={classes.bannerText}>{"Help"}</Typography>

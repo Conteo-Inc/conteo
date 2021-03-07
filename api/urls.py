@@ -9,6 +9,7 @@ urlpatterns = [
     path("deleteaccount/", views.UserAccountDeleteView.as_view()),
     path("videos/", views.VideoListCreate.as_view()),
     path("video/<int:sender>/", views.VideoRetrieveView.as_view()),
+    path("intro/<int:profile_id>/", views.IntroVideoRetrieveView.as_view()),
     path("matches/", views.Matches.as_view({"get": "list", "put": "partial_update"})),
     path("profile/", views.ProfileView.as_view()),
     # When we get into matching with real data,
