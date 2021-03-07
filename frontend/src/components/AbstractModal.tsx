@@ -20,7 +20,7 @@ type ModalType = {
   isOpen: boolean
   setisOpen: SetStateDispatch<boolean>
   handleConfirm: any
-  handleCancel: any
+  handleCancel?: any
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -42,34 +42,48 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-export default function AbstractModal(props: ModalType): JSX.Element {
+export default function AbstractModal({
+  title,
+  description,
+  confirmText,
+  cancelText,
+  isOpen,
+  setisOpen,
+  handleConfirm,
+  handleCancel,
+}: ModalType): JSX.Element {
   const classes = useStyles()
 
+  const handleAction = (action: any) => {
+    setisOpen(false)
+    action()
+  }
+
   return (
-    <Dialog open={props.isOpen} classes={{ paper: classes.modal }}>
+    <Dialog open={isOpen} classes={{ paper: classes.modal }}>
       <DialogTitle>
-        <IconButton className={classes.modalTitle} onClick={props.handleCancel}>
+        <IconButton className={classes.modalTitle} onClick={() => {handleAction(handleCancel)}}>
           <CloseIcon />
         </IconButton>
       </DialogTitle>
       <DialogContent className={classes.modalContent}>
-        <Typography variant="h6">{props.title}</Typography>
-        <Typography variant="subtitle2">{props.description}</Typography>
+        <Typography variant="h6">{title}</Typography>
+        <Typography variant="subtitle2">{description}</Typography>
       </DialogContent>
       <DialogActions className={classes.modalAction}>
         <Button
           variant="contained"
-          onClick={props.handleCancel}
+          onClick={() => {handleAction(handleCancel)}}
           color="secondary"
         >
-          {props.cancelText || "NO"}
+          {cancelText || "NO"}
         </Button>
         <Button
           variant="contained"
-          onClick={props.handleConfirm}
+          onClick={() => {handleAction(handleConfirm)}}
           color="default"
         >
-          {props.confirmText || "YES"}
+          {confirmText || "YES"}
         </Button>
       </DialogActions>
     </Dialog>

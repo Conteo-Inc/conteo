@@ -5,6 +5,7 @@ import Controls from "../components/video/Controls"
 import { parseIdentity, request } from "../utils/fetch"
 import { useHistory, useParams } from "react-router-dom"
 import { Nullable, NullableId } from "../utils/context"
+import ConfirmationModal from "../components/AbstractModal"
 import { History } from "history"
 
 const useStyles = makeStyles({
@@ -58,6 +59,7 @@ export default function RecordPage(): JSX.Element {
   const [videoBlob, setVideoBlob] = React.useState<Nullable<Blob>>(null)
   const { receiver } = useParams<{ receiver: string }>()
   const history = useHistory()
+  const [modalIsOpen, setModalIsOpen] = React.useState<boolean>(false);
 
   const {
     status,
@@ -77,14 +79,23 @@ export default function RecordPage(): JSX.Element {
         {mediaBlobUrl ? (
           <video src={mediaBlobUrl} controls className={classes.video_root} />
         ) : (
-          <Preview stream={previewStream} />
-        )}
+            <Preview stream={previewStream} />
+          )}
       </Grid>
       <Controls
         status={status}
         startRecording={startRecording}
         stopRecording={stopRecording}
-        sendVideo={() => sendVideo(videoBlob, Number(receiver), history)}
+        sendVideo={() => { setModalIsOpen(true) }}
+      />
+      <ConfirmationModal
+        title={"Confirm"}
+        description={"Would you like to send your video?"}
+        confirmText={"Send"}
+        cancelText={"Cancel"}
+        isOpen={modalIsOpen}
+        setisOpen={setModalIsOpen}
+        handleConfirm={() => { sendVideo(videoBlob, Number(receiver), history) }}
       />
     </Grid>
   )
