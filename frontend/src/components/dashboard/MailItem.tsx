@@ -55,11 +55,13 @@ export default function MailItem({
         )}
       </IconButton>
       <ArrowDropDown fontSize="large" style={{ color: "#4b5e82" }} />
-      <ViewVideo
-        isOpen={visible}
-        senderId={id}
-        handleClose={() => setVisible(false)}
-      />
+      {created_at && (
+        <ViewVideo
+          isOpen={visible}
+          senderId={id}
+          handleClose={() => setVisible(false)}
+        />
+      )}
     </Grid>
   )
 }
