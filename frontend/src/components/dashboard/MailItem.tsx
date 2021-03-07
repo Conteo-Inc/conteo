@@ -1,12 +1,17 @@
-import { Grid, makeStyles, Typography } from "@material-ui/core"
+import {
+  Grid,
+  makeStyles,
+  Typography,
+  Button,
+} from "@material-ui/core"
 import {
   AccountCircle,
-  ArrowDropDown,
   DraftsRounded,
   MailOutlineRounded,
 } from "@material-ui/icons"
 import * as React from "react"
 import { Nullable } from "../../utils/context"
+import { Link } from "react-router-dom"
 
 const useStyles = makeStyles({
   mailItem: {
@@ -21,6 +26,7 @@ export type MailListItem = {
   last_name: string
   viewed_at: Nullable<string>
   created_at: string
+  id: number
 }
 
 export default function MailItem({
@@ -28,6 +34,7 @@ export default function MailItem({
   last_name,
   viewed_at,
   created_at,
+  id,
 }: MailListItem): JSX.Element {
   const { mailItem } = useStyles()
   return (
@@ -45,9 +52,18 @@ export default function MailItem({
       {viewed_at ? (
         <DraftsRounded fontSize="large" style={{ color: "#4b5e82" }} />
       ) : (
-        <MailOutlineRounded fontSize="large" style={{ color: "#4b5282" }} />
-      )}
-      <ArrowDropDown fontSize="large" style={{ color: "#4b5e82" }} />
+          <>
+            <MailOutlineRounded fontSize="large" style={{ color: "#4b5282" }} />
+            <Button
+              variant="contained"
+              color="primary"
+              component={Link}
+              to={`/watch/${id}`}
+            >
+              <Typography variant="h6">View Video</Typography>
+            </Button>
+          </>
+        )}
     </Grid>
   )
 }

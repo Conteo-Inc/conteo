@@ -1,8 +1,15 @@
 import * as React from "react"
-import useFocusedUser from "../utils/context"
 import { request } from "../utils/fetch"
+import { useHistory, useParams } from "react-router-dom"
 import Video from "../components/video/Video"
-import { Dialog } from "@material-ui/core"
+import {
+  Dialog,
+  DialogContent,
+  DialogActions,
+  Grid,
+  Typography,
+  Button,
+} from "@material-ui/core"
 
 type VideoType = {
   video_file: string
@@ -12,7 +19,8 @@ type VideoType = {
 
 export default function VideoViewPage(): JSX.Element {
   // In this case, focusedUser will be the one whose video I am viewing
-  const [focusedUser] = useFocusedUser()
+  const { sender } = useParams<{ sender: string }>()
+  const history = useHistory()
   const [video, setVideo] = React.useState<VideoType>({
     id: 0,
     receiver: 0,
@@ -21,7 +29,7 @@ export default function VideoViewPage(): JSX.Element {
 
   React.useEffect(() => {
     request<VideoType>({
-      path: `/api/video/${focusedUser}/`,
+      path: `/api/video/${sender}/`,
       method: "get",
     }).then((video) => {
       setVideo(video.parsedBody)
@@ -30,7 +38,20 @@ export default function VideoViewPage(): JSX.Element {
 
   return (
     <Dialog open>
-      <Video src={video.video_file} />
+      <DialogContent>
+        <Video src={video.video_file} />
+      </DialogContent>
+      <DialogActions>
+        <Grid container direction="row" justify="center">
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => history.goBack()}
+          >
+            <Typography variant="h6">Back</Typography>
+          </Button>
+        </Grid>
+      </DialogActions>
     </Dialog>
   )
 }
