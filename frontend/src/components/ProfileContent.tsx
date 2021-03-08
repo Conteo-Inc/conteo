@@ -39,6 +39,7 @@ export type ProfileContentType = {
 type ProfileField = {
   title: string
   value: string
+  privacy_level: "Public" | "Private" | "Hidden"
   textFieldProps: TextFieldProps
 }
 
@@ -108,6 +109,7 @@ export default function ProfileContent({
     {
       title: "First Name",
       value: readonlyContent.first_name,
+      privacy_level: "Public",
       textFieldProps: {
         required: true,
         disabled: false,
@@ -122,6 +124,7 @@ export default function ProfileContent({
     {
       title: "Last Name",
       value: readonlyContent.last_name,
+      privacy_level: "Private",
       textFieldProps: {
         required: true,
         disabled: false,
@@ -136,6 +139,7 @@ export default function ProfileContent({
     {
       title: "Birthday",
       value: readonlyContent.birth_date.toLocaleDateString(),
+      privacy_level: "Private",
       textFieldProps: {
         required: true,
         disabled: true,
@@ -147,6 +151,7 @@ export default function ProfileContent({
     {
       title: "Gender",
       value: readonlyContent.gender,
+      privacy_level: "Hidden",
       textFieldProps: {
         required: false,
         disabled: false,
@@ -158,6 +163,7 @@ export default function ProfileContent({
     {
       title: "Interests",
       value: readonlyContent.interests,
+      privacy_level: "Public",
       textFieldProps: {
         required: false,
         disabled: false,
@@ -208,7 +214,7 @@ export default function ProfileContent({
         <Grid item xs={12}>
           <Paper>
             <Grid container spacing={2}>
-              {fields.map(({ title, value }: ProfileField) => (
+              {fields.map(({ title, value, privacy_level }: ProfileField) => (
                 <Grid
                   key={`readonlyField-${title}`}
                   container
@@ -220,7 +226,7 @@ export default function ProfileContent({
                 >
                   <Grid item xs={9}>
                     <Typography>
-                      {title}: {value}
+                      {`${title}: ${value} (${privacy_level})`}
                     </Typography>
                   </Grid>
                 </Grid>
