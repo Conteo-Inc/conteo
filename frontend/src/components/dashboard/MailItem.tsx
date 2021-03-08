@@ -35,6 +35,7 @@ export default function MailItem({
 }: MailListItem): JSX.Element {
   const { mailItem } = useStyles()
   const [visible, setVisible] = React.useState<boolean>(false)
+  const video_date = new Date(created_at)
 
   return (
     <Grid
@@ -48,7 +49,9 @@ export default function MailItem({
         <AccountCircle fontSize="large" style={{ color: "#4b5e82" }} />
         <Typography variant="h6">{`${first_name} ${last_name}`}</Typography>
       </Grid>
-      <Typography variant="h6">{created_at}</Typography>
+      <Typography variant="h6">
+        {created_at ? video_date.toLocaleDateString() : "No video"}
+      </Typography>
       <IconButton onClick={() => setVisible(true)} disabled={!created_at}>
         {viewed_at ? (
           <DraftsRounded fontSize="large" style={{ color: "#4b5e82" }} />
