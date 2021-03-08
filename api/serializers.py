@@ -45,11 +45,25 @@ class ProfileFromUserSerializer(serializers.ModelSerializer):
         rep = super().to_representation(instance)  # type: OrderedDict
         rep.update(instance.profile.__dict__)
         del rep["_state"]  # Not meant to be serialized
-        return rep
+
+        # check for video
+        rep["has_intro"] = False
+        try:
+            video = Video.objects.get(Q(sender=instance) & Q(receiver=instance))
+            rep["has_intro"] = video is not None
+        finally:
+            return rep
 
     class Meta:
+        # TODO: Change to Profile
         model = User
-        exclude = ("first_name", "last_name", "password")
+        exclude = (
+            "first_name",
+            "last_name",
+            "password",
+            "is_superuser",
+            "is_staff",
+        )
 
 
 class UserSerializer(serializers.ModelSerializer):

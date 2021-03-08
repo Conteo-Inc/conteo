@@ -154,6 +154,18 @@ class VideoListCreate(generics.ListCreateAPIView):
     #     return response.Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
+class IntroVideoRetrieveView(views.APIView):
+    serializer_class = VideoSerializer
+
+    def get_object(self, profile_id):
+        return Video.objects.get(Q(sender=profile_id) & Q(receiver=profile_id))
+
+    def get(self, request, profile_id):
+        video = self.get_object(profile_id=profile_id)
+        serializer = self.serializer_class(video)
+        return response.Response(serializer.data)
+
+
 class VideoRetrieveView(generics.RetrieveAPIView):
     serializer_class = VideoSerializer
 

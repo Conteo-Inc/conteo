@@ -1,17 +1,13 @@
-import {
-  Grid,
-  makeStyles,
-  Typography,
-  Button,
-} from "@material-ui/core"
+import { Grid, IconButton, makeStyles, Typography } from "@material-ui/core"
 import {
   AccountCircle,
+  ArrowDropDown,
   DraftsRounded,
   MailOutlineRounded,
 } from "@material-ui/icons"
 import * as React from "react"
 import { Nullable } from "../../utils/context"
-import { Link } from "react-router-dom"
+import ViewVideo from "../video/ViewVideo"
 
 const useStyles = makeStyles({
   mailItem: {
@@ -37,6 +33,8 @@ export default function MailItem({
   id,
 }: MailListItem): JSX.Element {
   const { mailItem } = useStyles()
+  const [visible, setVisible] = React.useState<boolean>(false)
+
   return (
     <Grid
       container
@@ -49,21 +47,21 @@ export default function MailItem({
         <Typography variant="h6">{`${first_name} ${last_name}`}</Typography>
       </Grid>
       <Typography variant="h6">{created_at}</Typography>
-      {viewed_at ? (
-        <DraftsRounded fontSize="large" style={{ color: "#4b5e82" }} />
-      ) : (
-          <>
-            <MailOutlineRounded fontSize="large" style={{ color: "#4b5282" }} />
-            <Button
-              variant="contained"
-              color="primary"
-              component={Link}
-              to={`/watch/${id}`}
-            >
-              <Typography variant="h6">View Video</Typography>
-            </Button>
-          </>
+      <IconButton onClick={() => setVisible(true)} disabled={!created_at}>
+        {viewed_at ? (
+          <DraftsRounded fontSize="large" style={{ color: "#4b5e82" }} />
+        ) : (
+          <MailOutlineRounded fontSize="large" style={{ color: "#4b5282" }} />
         )}
+      </IconButton>
+      <ArrowDropDown fontSize="large" style={{ color: "#4b5e82" }} />
+      {created_at && (
+        <ViewVideo
+          isOpen={visible}
+          senderId={id}
+          handleClose={() => setVisible(false)}
+        />
+      )}
     </Grid>
   )
 }
