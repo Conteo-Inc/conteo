@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { ProfileContentType } from "../components/ProfileContent"
+import { ProfileContentType } from "../components/profile/ProfileContent"
 import { Nullable, SetStateDispatch } from "./context"
 import * as R from "ramda"
 

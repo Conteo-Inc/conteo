@@ -1,6 +1,6 @@
 import * as React from "react"
 import { makeStyles } from "@material-ui/core/styles"
-import type { ProfileContentSetters } from "../utils/profile"
+import type { ProfileContentSetters } from "../../utils/profile"
 import {
   Grid,
   Avatar,
@@ -10,8 +10,8 @@ import {
   Paper,
   TextFieldProps,
 } from "@material-ui/core"
-import { Nullable } from "../utils/context"
-import { Colors } from "../utils/colors"
+import { Nullable } from "../../utils/context"
+import { Colors } from "../../utils/colors"
 import { Link } from "react-router-dom"
 
 type ProfileContentProps = {
