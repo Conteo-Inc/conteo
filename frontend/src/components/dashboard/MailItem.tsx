@@ -1,11 +1,12 @@
 import { Grid, IconButton, makeStyles, Typography } from "@material-ui/core"
 import {
   AccountCircle,
-  ArrowDropDown,
   DraftsRounded,
   MailOutlineRounded,
+  SendRounded,
 } from "@material-ui/icons"
 import * as React from "react"
+import { Link } from "react-router-dom"
 import { Nullable } from "../../utils/context"
 import ViewVideo from "../video/ViewVideo"
 
@@ -40,6 +41,7 @@ export default function MailItem({
       container
       direction="row"
       justify="space-between"
+      alignItems="center"
       className={mailItem}
     >
       <Grid item container direction="row" xs={3} wrap="nowrap">
@@ -54,7 +56,11 @@ export default function MailItem({
           <MailOutlineRounded fontSize="large" style={{ color: "#4b5282" }} />
         )}
       </IconButton>
-      <ArrowDropDown fontSize="large" style={{ color: "#4b5e82" }} />
+      {/* TODO: Re-add dropdown later */}
+      {/* <ArrowDropDown fontSize="large" style={{ color: "#4b5e82" }} /> */}
+      <IconButton component={Link} to={`/record/${id}`}>
+        <SendRounded fontSize="large" style={{ color: "#4b5282" }} />
+      </IconButton>
       {created_at && (
         <ViewVideo
           isOpen={visible}
