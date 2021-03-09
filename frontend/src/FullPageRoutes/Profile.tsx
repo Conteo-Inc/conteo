@@ -1,9 +1,16 @@
 import * as React from "react"
 import { request } from "../utils/fetch"
-import { getUpdates, useProfile } from "../utils/profile"
+import {
+  useProfileComponents,
+  getUpdates,
+  useProfile,
+  usePrivacySettings,
+} from "../utils/profile"
 import ProfileSidebar from "../components/profile/ProfileSidebar"
 import ProfileContent from "../components/profile/ProfileContent"
+import PrivacySettings from "../components/profile/PrivacySettings"
 import type { ProfileContentType } from "../components/profile/ProfileContent"
+import type { PrivacySettingsType } from "../components/profile/PrivacySettings"
 import { makeStyles } from "@material-ui/core/styles"
 import { Grid } from "@material-ui/core"
 import { Nullable } from "../utils/context"
@@ -34,11 +41,12 @@ const useStyles = makeStyles({
 })
 
 export default function Profile(): JSX.Element {
-  const [isEditMode, toggleEditMode] = React.useState<boolean>(false)
-  const [errMessage, seterrMessage] = React.useState<string>("")
   const classes = useStyles()
 
-  const [readonlyContent, setProfile] = React.useState<ProfileContentType>({
+  const [
+    readonlyContent,
+    setProfileContent,
+  ] = React.useState<ProfileContentType>({
     first_name: "",
     last_name: "",
     birth_date: new Date(),
@@ -47,7 +55,7 @@ export default function Profile(): JSX.Element {
     video: "",
     id: -1,
   })
-  const { editableContent, setters } = useProfile(readonlyContent)
+  const { editableContent, contentSetters } = useProfile(readonlyContent)
 
   React.useEffect(() => {
     request<UserProfile>({ path: "/api/profile/", method: "get" })
@@ -62,64 +70,120 @@ export default function Profile(): JSX.Element {
           video: profile.video,
           id: profile.id,
         }
-        setProfile(content)
-        setters.setFirstName(content.first_name)
-        setters.setLastName(content.last_name)
-        setters.setGender(content.gender)
-        setters.setBirthDate(content.birth_date)
+        setProfileContent(content)
+        contentSetters.setFirstName(content.first_name)
+        contentSetters.setLastName(content.last_name)
+        contentSetters.setGender(content.gender)
+        contentSetters.setBirthDate(content.birth_date)
       })
       .catch((err) => {
         console.log(err)
       })
   }, [])
 
-  const handleEditFields = () => {
-    toggleEditMode(true)
-  }
-
-  const handleCancelEdit = () => {
-    seterrMessage("")
-    toggleEditMode(false)
-  }
-
-  const handleSaveFields = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
+  const handleSaveContent = (
+    onSuccess: () => void,
+    onFailure: (error: string) => void
+  ) => {
+    const updates = getUpdates(readonlyContent, editableContent)
+    console.log(updates)
     request({
       path: "/api/profile/",
       method: "post",
       body: getUpdates(readonlyContent, editableContent),
     })
       .then(() => {
-        setProfile(editableContent)
-        toggleEditMode(false)
+        setProfileContent(editableContent)
+        onSuccess()
       })
       .catch((err) => {
-        seterrMessage(err)
+        onFailure(err)
       })
   }
 
+  const [
+    readonlySettings,
+    setPrivacySettings,
+  ] = React.useState<PrivacySettingsType>({
+    first_name: "Public",
+    last_name: "Public",
+    birth_date: "Public",
+    gender: "Public",
+    interests: "Public",
+  })
+  const { editableSettings, privacySetters } = usePrivacySettings(
+    readonlySettings
+  )
+
+  const handleSaveSettings = (
+    onSuccess: () => void,
+    onFailure: (error: string) => void
+  ) => {
+    // Profile view is yet to accomodate privacy settings.
+    // request({
+    //   path: "/api/profileSettings/",
+    //   method: "post",
+    //   body: editableSettings,
+    // })
+    //   .then(() => {
+    //     setPrivacySettings(editableSettings)
+    //     onSuccess()
+    //   })
+    //   .catch((err) => {
+    //     onFailure(err)
+    //   })
+    onFailure("just cuz")
+    setPrivacySettings(editableSettings)
+    onSuccess()
+  }
+
+  const { componentStates, componentSetters } = useProfileComponents()
+  const {
+    isBioActive,
+    isPrivacyActive,
+    // isNotificationsActive,
+    // isSettingsActive,
+    // isContactUsActive,
+  } = componentStates
+
   return (
-    <Grid container className={classes.root}>
-      <Grid container item className={classes.sideBar} xs={3}>
-        <ProfileSidebar
-          firstName={readonlyContent.first_name}
-          lastName={readonlyContent.last_name}
-        />
+    <div>
+      <Grid container className={classes.root}>
+        <Grid item className={classes.sideBar} xs={3}>
+          <ProfileSidebar
+            firstName={readonlyContent.first_name}
+            lastName={readonlyContent.last_name}
+            componentStateSetters={componentSetters}
+          />
+        </Grid>
+        <Grid item className={classes.section} xs={9}>
+          {isBioActive && (
+            <ProfileContent
+              contentSetters={contentSetters}
+              readonlyContent={readonlyContent}
+              handleSaveContent={handleSaveContent}
+            />
+          )}
+          {isPrivacyActive && (
+            <PrivacySettings
+              privacySetters={privacySetters}
+              readonlySettings={readonlySettings}
+              handleSaveSettings={handleSaveSettings}
+            />
+          )}
+          {/*
+            {isNotificationsActive && (
+              // Add notifications component here
+            )}
+            {isSettingsActive && (
+              // Add settings component here
+            )}
+            {isContactUsActive && (
+              // Add contact us component here
+            )}
+          */}
+        </Grid>
       </Grid>
-      <Grid container item className={classes.section} xs={9}>
-        <ProfileContent
-          isEditMode={isEditMode}
-          setters={setters}
-          readonlyContent={readonlyContent}
-          handleEditFields={handleEditFields}
-          handleCancelEdit={handleCancelEdit}
-          handleSaveFields={handleSaveFields}
-          errMessage={errMessage}
-        />
-        {/* Other components (e.g. Notifications, Settings, and Privacy) will be
-        added here to be rendered when the respective component is selected from
-        sidebar. */}
-      </Grid>
-    </Grid>
+    </div>
   )
 }

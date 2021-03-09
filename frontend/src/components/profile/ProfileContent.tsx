@@ -1,5 +1,6 @@
 import * as React from "react"
 import { makeStyles } from "@material-ui/core/styles"
+import type { PrivacySetting } from "./PrivacySettings"
 import type { ProfileContentSetters } from "../../utils/profile"
 import {
   Grid,
@@ -16,12 +17,11 @@ import { Link } from "react-router-dom"
 
 type ProfileContentProps = {
   readonlyContent: ProfileContentType
-  setters: ProfileContentSetters
-  isEditMode: boolean
-  errMessage: string
-  handleEditFields: () => void
-  handleCancelEdit: () => void
-  handleSaveFields: (event: React.FormEvent<HTMLFormElement>) => void
+  contentSetters: ProfileContentSetters
+  handleSaveContent: (
+    onSuccess: () => void,
+    onFailure: (error: string) => void
+  ) => void
 }
 
 // This is what the ProfileContent component expects to receive from storage.
@@ -39,6 +39,7 @@ export type ProfileContentType = {
 type ProfileField = {
   title: string
   value: string
+  privacy_level: PrivacySetting
   textFieldProps: TextFieldProps
 }
 
@@ -57,31 +58,12 @@ const useStyles = makeStyles({
     marginBottom: "1rem",
   },
   fieldsContainer: {
-    position: "relative",
-    boxShadow:
-      "0px 3px 3px -2px rgb(0 0 0 / 20%), 0px 3px 4px 0px rgb(0 0 0 / 14%), 0px 1px 8px 0px rgb(0 0 0 / 12%)",
-    borderRadius: 4,
-    color: "rgba(0, 0, 0, 0.87)",
-    transition: "box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
-    backgroundColor: "#fff",
-    padding: "0 100px",
+    paddingTop: 40,
+    paddingBottom: 10,
   },
   field: {
     fontSize: "2rem",
-    padding: 5,
-    paddingRight: 10,
-  },
-  bottomRight: {
-    position: "absolute",
-    bottom: "0",
-    right: "0",
-    transform: "translate(-10%, -10%)",
-  },
-  bottomRight2: {
-    position: "absolute",
-    bottom: "0",
-    right: "0",
-    transform: "translate(-100%, -10%)",
+    marginBottom: 15,
   },
   recordButton: {
     backgroundColor: Colors.DEEP_BLUE,
@@ -90,29 +72,34 @@ const useStyles = makeStyles({
       backgroundColor: Colors.DEEP_RED,
     },
   },
+  textField: {
+    width: "100%",
+  },
+  button: {
+    margin: 5,
+  },
 })
 
 export default function ProfileContent({
   readonlyContent,
-  setters,
-  isEditMode,
-  errMessage,
-  handleEditFields,
-  handleCancelEdit,
-  handleSaveFields,
+  contentSetters,
+  handleSaveContent,
 }: ProfileContentProps): JSX.Element {
   const classes = useStyles()
+  const [isEditMode, toggleEditMode] = React.useState<boolean>(false)
+  const [errMessage, seterrMessage] = React.useState<string>("")
 
   // User profile field list. Field values are assigned to readonly content.
   const fields: ProfileField[] = [
     {
       title: "First Name",
       value: readonlyContent.first_name,
+      privacy_level: "Public",
       textFieldProps: {
         required: true,
         disabled: false,
         onChange: (e) => {
-          setters.setFirstName(e.currentTarget.value)
+          contentSetters.setFirstName(e.currentTarget.value)
         },
         inputProps: {
           maxLength: 50,
@@ -122,11 +109,12 @@ export default function ProfileContent({
     {
       title: "Last Name",
       value: readonlyContent.last_name,
+      privacy_level: "Public",
       textFieldProps: {
         required: true,
         disabled: false,
         onChange: (e) => {
-          setters.setLastName(e.currentTarget.value)
+          contentSetters.setLastName(e.currentTarget.value)
         },
         inputProps: {
           maxLength: 50,
@@ -136,164 +124,211 @@ export default function ProfileContent({
     {
       title: "Birthday",
       value: readonlyContent.birth_date.toLocaleDateString(),
+      privacy_level: "Public",
       textFieldProps: {
         required: true,
-        disabled: true,
+        disabled: false,
         onChange: (e) => {
-          setters.setBirthDate(new Date(e.currentTarget.value))
+          contentSetters.setBirthDate(new Date(e.currentTarget.value))
         },
       },
     },
     {
       title: "Gender",
       value: readonlyContent.gender,
+      privacy_level: "Public",
       textFieldProps: {
         required: false,
         disabled: false,
         onChange: (e) => {
-          setters.setGender(e.currentTarget.value)
+          contentSetters.setGender(e.currentTarget.value)
         },
       },
     },
     {
       title: "Interests",
       value: readonlyContent.interests,
+      privacy_level: "Public",
       textFieldProps: {
         required: false,
         disabled: false,
         onChange: (e) => {
-          setters.setInterests(e.currentTarget.value)
+          contentSetters.setInterests(e.currentTarget.value)
         },
       },
     },
   ]
 
+  const handleEditFields = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    event.preventDefault()
+    toggleEditMode(true)
+  }
+
+  const handleCancelEdit = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    event.preventDefault()
+    seterrMessage("")
+    toggleEditMode(false)
+  }
+
+  const handleSaveFields = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    handleSaveContent(() => {
+      toggleEditMode(false)
+    }, seterrMessage)
+  }
+
   return (
-    <Grid container spacing={2}>
-      <Grid item className={classes.profileHeader} xs={12}>
-        <Grid container justify="center" spacing={2}>
-          <Grid item xs={12} sm={6}>
-            <Avatar src={""} className={classes.profileAvatar} />
-          </Grid>
-          <Grid
-            item
-            xs={12}
-            sm={6}
-            container
-            alignItems="center"
-            justify="center"
-            className={classes.introVideo}
-          >
-            {readonlyContent.video ? (
-              <video
-                controls
-                src={readonlyContent.video}
-                width={"100%"}
-                height={"100%"}
+    <div>
+      <Grid container spacing={2}>
+        <Grid item className={classes.profileHeader} xs={12}>
+          <Grid container justify="center" spacing={2}>
+            <Grid item xs={12} sm={6}>
+              <Avatar
+                src={"images/profile.jpg"}
+                className={classes.profileAvatar}
               />
-            ) : (
-              <Button
-                className={classes.recordButton}
-                size="large"
-                component={Link}
-                to={`/record/${readonlyContent.id}`}
-              >
-                <Typography variant="h6">Record Intro Video</Typography>
-              </Button>
-            )}
+            </Grid>
+            <Grid
+              item
+              container
+              className={classes.introVideo}
+              alignItems="center"
+              justify="center"
+              xs={12}
+              sm={6}
+            >
+              {readonlyContent.video ? (
+                <video
+                  controls
+                  src={readonlyContent.video}
+                  width={"100%"}
+                  height={"100%"}
+                />
+              ) : (
+                <Button
+                  className={classes.recordButton}
+                  size="large"
+                  component={Link}
+                  to={`/record/${readonlyContent.id}`}
+                >
+                  <Typography variant="h6">Record Intro Video</Typography>
+                </Button>
+              )}
+            </Grid>
           </Grid>
         </Grid>
-      </Grid>
-      {!isEditMode && (
         <Grid item xs={12}>
-          <Paper>
-            <Grid container spacing={2}>
-              {fields.map(({ title, value }: ProfileField) => (
-                <Grid
-                  key={`readonlyField-${title}`}
-                  container
-                  item
-                  justify="flex-end"
-                  className={classes.field}
-                  sm={12}
-                  md={6}
-                >
-                  <Grid item xs={9}>
-                    <Typography>
-                      {title}: {value}
-                    </Typography>
+          <Paper className={classes.fieldsContainer}>
+            {isEditMode ? (
+              <form onSubmit={handleSaveFields}>
+                <Grid container justify="center">
+                  <Grid item xs={10}>
+                    <Grid container justify="space-between">
+                      {fields.map(
+                        ({ title, value, textFieldProps }: ProfileField) => (
+                          <Grid
+                            key={`editableField-${title}`}
+                            container
+                            className={classes.field}
+                            justify="center"
+                            sm={10}
+                            md={5}
+                          >
+                            <Grid item className={classes.textField}>
+                              <TextField
+                                label={title}
+                                defaultValue={value}
+                                {...textFieldProps}
+                                className={classes.textField}
+                              />
+                            </Grid>
+                          </Grid>
+                        )
+                      )}
+                    </Grid>
                   </Grid>
-                </Grid>
-              ))}
-              <Grid container item justify="center" xs={12}>
-                <Grid item>
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    style={{ margin: 5 }}
-                    onClick={handleEditFields}
-                  >
-                    Edit
-                  </Button>
-                </Grid>
-              </Grid>
-            </Grid>
-          </Paper>
-        </Grid>
-      )}
-      {isEditMode && (
-        <Grid item xs={12}>
-          <Paper>
-            <form onSubmit={handleSaveFields}>
-              <Grid container spacing={2}>
-                {fields.map(
-                  ({ title, value, textFieldProps }: ProfileField) => (
-                    <Grid
-                      key={`editableField-${title}`}
-                      container
-                      item
-                      justify="flex-end"
-                      className={classes.field}
-                      sm={12}
-                      md={6}
-                    >
-                      <Grid item xs={9}>
-                        <TextField
-                          label={title}
-                          defaultValue={value}
-                          {...textFieldProps}
-                        />
+                  <Grid item xs={10}>
+                    <Grid container justify="center">
+                      <Grid item>
+                        <Button
+                          variant="contained"
+                          type="submit"
+                          color="primary"
+                          className={classes.button}
+                        >
+                          Save
+                        </Button>
+                        <Button
+                          variant="contained"
+                          className={classes.button}
+                          onClick={(e) => {
+                            handleCancelEdit(e)
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                        <br />
+                        <span>{errMessage}</span>
+                        <br />
                       </Grid>
                     </Grid>
-                  )
-                )}
-                <Grid container item justify="center" xs={12}>
-                  <Grid item>
-                    <Button
-                      variant="contained"
-                      type="submit"
-                      color="primary"
-                      style={{ margin: 5 }}
-                    >
-                      Save
-                    </Button>
-                    <Button
-                      variant="contained"
-                      style={{ margin: 5 }}
-                      onClick={handleCancelEdit}
-                    >
-                      Cancel
-                    </Button>
+                  </Grid>
+                </Grid>
+              </form>
+            ) : (
+              <Grid container justify="center">
+                <Grid item xs={10}>
+                  <Grid container justify="space-between">
+                    {fields.map(
+                      ({ title, value, privacy_level }: ProfileField) => (
+                        <Grid
+                          key={`readonlyField-${title}`}
+                          item
+                          container
+                          className={classes.field}
+                          justify="space-between"
+                          sm={10}
+                          md={5}
+                        >
+                          <Grid item xs={3}>
+                            <Typography>{title}:</Typography>
+                          </Grid>
+                          <Grid item xs={4}>
+                            <Typography>{value}</Typography>
+                          </Grid>
+                          <Grid item xs={4}>
+                            <Typography>({privacy_level})</Typography>
+                          </Grid>
+                        </Grid>
+                      )
+                    )}
+                  </Grid>
+                </Grid>
+                <Grid item xs={10}>
+                  <Grid container justify="center">
+                    <Grid item>
+                      <Button
+                        variant="contained"
+                        color="secondary"
+                        className={classes.button}
+                        onClick={(e) => {
+                          handleEditFields(e)
+                        }}
+                      >
+                        Edit
+                      </Button>
+                    </Grid>
                   </Grid>
                 </Grid>
               </Grid>
-              <br />
-              <span>{errMessage}</span>
-              <br />
-            </form>
+            )}
           </Paper>
         </Grid>
-      )}
-    </Grid>
+      </Grid>
+    </div>
   )
 }
