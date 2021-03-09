@@ -53,7 +53,7 @@ export default function AppHeader(): JSX.Element {
         alignItems="center"
       >
         {user && (
-          <Link to="/dashboard">
+          <Link to="/">
             <Typography className={classes.bannerText}>{"Home"}</Typography>
           </Link>
         )}

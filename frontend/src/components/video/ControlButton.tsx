@@ -1,7 +1,7 @@
 import { IconButton } from "@material-ui/core"
 import {
   Block,
-  PauseCircleFilled,
+  StopRounded,
   PlayCircleFilled,
   SendRounded,
 } from "@material-ui/icons"
@@ -24,7 +24,7 @@ function Button({
   return type === "start" ? (
     <PlayCircleFilled fontSize={size} />
   ) : type === "stop" ? (
-    <PauseCircleFilled fontSize={size} />
+    <StopRounded fontSize={size} />
   ) : type === "send" ? (
     <SendRounded fontSize={size} />
   ) : (

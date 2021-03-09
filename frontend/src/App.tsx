@@ -1,7 +1,6 @@
 import * as React from "react"
 import { render } from "react-dom"
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom"
-import LinkItem from "./components/LinkItem"
 import TokenPage from "./FullPageRoutes/TokenPage"
 import ProfilePage from "./FullPageRoutes/Profile"
 import MatchingPage from "./FullPageRoutes/Matching"
@@ -30,19 +29,6 @@ const useStyles = makeStyles({
   },
 })
 
-//@TODO: Move links to common file
-function MainPage() {
-  return (
-    <ul>
-      <LinkItem to="/dashboard" text="Dashboard" />
-      <LinkItem to="/matches" text="Matches" />
-      <LinkItem to="/record" text="Record" />
-      <LinkItem to="/watch" text="Watch" />
-      <LinkItem to="/profile" text="Profile" />
-    </ul>
-  )
-}
-
 export default function App(): JSX.Element {
   const classes = useStyles()
 
@@ -64,14 +50,11 @@ export default function App(): JSX.Element {
             <ProtectedRoute path="/profile">
               <ProfilePage />
             </ProtectedRoute>
-            <ProtectedRoute path="/dashboard">
-              <Dashboard />
-            </ProtectedRoute>
             <ProtectedRoute path="/watch">
               <VideoViewPage />
             </ProtectedRoute>
             <ProtectedRoute path="/">
-              <MainPage />
+              <Dashboard />
             </ProtectedRoute>
           </Switch>
         </Box>
