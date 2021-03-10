@@ -10,7 +10,6 @@ import {
 } from "@material-ui/core"
 import CloseIcon from "@material-ui/icons/Close"
 import * as React from "react"
-import { SetStateDispatch } from "../utils/context"
 
 type ModalType = {
   title: string
@@ -64,18 +63,10 @@ export default function AbstractModal({
         <Typography variant="subtitle2">{description}</Typography>
       </DialogContent>
       <DialogActions className={classes.modalAction}>
-        <Button
-          variant="contained"
-          onClick={handleCancel}
-          color="secondary"
-        >
+        <Button variant="contained" onClick={handleCancel} color="secondary">
           {cancelText || "NO"}
         </Button>
-        <Button
-          variant="contained"
-          onClick={handleConfirm}
-          color="default"
-        >
+        <Button variant="contained" onClick={handleConfirm} color="default">
           {confirmText || "YES"}
         </Button>
       </DialogActions>
