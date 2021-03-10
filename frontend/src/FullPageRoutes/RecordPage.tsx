@@ -59,7 +59,7 @@ export default function RecordPage(): JSX.Element {
   const [videoBlob, setVideoBlob] = React.useState<Nullable<Blob>>(null)
   const { receiver } = useParams<{ receiver: string }>()
   const history = useHistory()
-  const [modalIsOpen, setModalIsOpen] = React.useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
   const {
     status,
@@ -71,6 +71,15 @@ export default function RecordPage(): JSX.Element {
     video: true,
     onStop: (_, blob) => setVideoBlob(blob),
   })
+
+  const handleConfirm = () => {
+    setIsModalOpen(false)
+    sendVideo(videoBlob, Number(receiver), history)
+  }
+
+  const handleCancel = () => {
+    setIsModalOpen(false)
+  }
 
   const classes = useStyles()
   return (
@@ -86,16 +95,16 @@ export default function RecordPage(): JSX.Element {
         status={status}
         startRecording={startRecording}
         stopRecording={stopRecording}
-        sendVideo={() => { setModalIsOpen(true) }}
+        sendVideo={() => { setIsModalOpen(true) }}
       />
       <ConfirmationModal
         title={"Confirm"}
         description={"Would you like to send your video?"}
         confirmText={"Send"}
         cancelText={"Cancel"}
-        isOpen={modalIsOpen}
-        setisOpen={setModalIsOpen}
-        handleConfirm={() => { sendVideo(videoBlob, Number(receiver), history) }}
+        isModalOpen={isModalOpen}
+        handleConfirm={handleConfirm}
+        handleCancel={handleCancel}
       />
     </Grid>
   )

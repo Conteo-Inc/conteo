@@ -17,10 +17,9 @@ type ModalType = {
   description: string
   confirmText?: string
   cancelText?: string
-  isOpen: boolean
-  setisOpen: SetStateDispatch<boolean>
-  handleConfirm: any
-  handleCancel?: any
+  isModalOpen: boolean
+  handleConfirm: () => void
+  handleCancel: () => void
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -47,22 +46,16 @@ export default function AbstractModal({
   description,
   confirmText,
   cancelText,
-  isOpen,
-  setisOpen,
+  isModalOpen,
   handleConfirm,
   handleCancel,
 }: ModalType): JSX.Element {
   const classes = useStyles()
 
-  const handleAction = (action: any) => {
-    setisOpen(false)
-    action()
-  }
-
   return (
-    <Dialog open={isOpen} classes={{ paper: classes.modal }}>
+    <Dialog open={isModalOpen} classes={{ paper: classes.modal }}>
       <DialogTitle>
-        <IconButton className={classes.modalTitle} onClick={() => {handleAction(handleCancel)}}>
+        <IconButton className={classes.modalTitle} onClick={handleCancel}>
           <CloseIcon />
         </IconButton>
       </DialogTitle>
@@ -73,14 +66,14 @@ export default function AbstractModal({
       <DialogActions className={classes.modalAction}>
         <Button
           variant="contained"
-          onClick={() => {handleAction(handleCancel)}}
+          onClick={handleCancel}
           color="secondary"
         >
           {cancelText || "NO"}
         </Button>
         <Button
           variant="contained"
-          onClick={() => {handleAction(handleConfirm)}}
+          onClick={handleConfirm}
           color="default"
         >
           {confirmText || "YES"}
