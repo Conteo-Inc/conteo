@@ -47,6 +47,7 @@ const useStyles = makeStyles({
     display: "block",
     borderRadius: "2px",
     cursor: "pointer",
+    transition: "0.5s",
     "&:hover": {
       backgroundColor: "lightgrey",
     },
@@ -97,9 +98,7 @@ export default function ProfileSidebar({
   ) => {
     // This is ugly, maybe we're better off breaking up these components
     // into full pages.
-    Object.values(componentStateSetters).map((setter) => {
-      setter(false)
-    })
+    Object.values(componentStateSetters).map((setter) => setter(false))
     setIsActive(true)
   }
 
@@ -129,9 +128,7 @@ export default function ProfileSidebar({
             <Grid container className={classes.tab}>
               <Link
                 className={classes.componentLink}
-                onClick={() => {
-                  handleItemSelected(setIsActive)
-                }}
+                onClick={() => handleItemSelected(setIsActive)}
                 color="inherit"
               >
                 <Grid container alignItems="center" justify="flex-end">
