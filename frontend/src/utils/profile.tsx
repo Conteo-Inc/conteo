@@ -62,9 +62,9 @@ export type ProfileContentSetters = {
   setLastName: SetStateDispatch<string>
   setBirthDate: SetStateDispatch<Date>
   setGender: SetStateDispatch<string>
+  setInterests: SetStateDispatch<string>
   setVideo: SetStateDispatch<Nullable<string>>
   setId: SetStateDispatch<number>
-  setInterests: SetStateDispatch<string>
 }
 
 // Custom profile hook. This separates saved profile content from edited,
@@ -110,27 +110,17 @@ type ProfileContentStrings = Omit<ProfileContentType, "birth_date"> & {
   birth_date: string
 }
 function toDateString(date: Date): string {
-  let day = `${date.getDay()}`
-  // Test if day only has one digit.
-  if (day.length == 1) {
-    day = `0${day}`
-  }
-  // Month is zero-indexed in Typescript
-  let month = `${(date.getMonth() + 1) % 12}`
-  // Test if month only has one digit.
-  if (month.length == 1) {
-    month = `0${month}`
-  }
-  console.log(`${date.getFullYear()}-${month}-${date.getDay()}`)
-  return `${date.getFullYear()}-${month}-${date.getDay()}`
+  // Month is zero-indexed in Typescript.
+  const month = `${date.getMonth() + 1}`
+  return `${date.getFullYear()}-${month}-${date.getDate()}`
 }
 
 export function getUpdates(
   original: ProfileContentType,
   updated: ProfileContentType
 ): ProfileContentStrings {
-  const comparator = (canon: string, other: string): Nullable<string> => {
-    return canon === other ? canon : other === "" ? null : other
+  const comparator = (canon: string, other: string): string => {
+    return canon === other ? canon : other
   }
   const canon: ProfileContentStrings = {
     ...original,
