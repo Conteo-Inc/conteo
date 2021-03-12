@@ -9,14 +9,24 @@ import {
   TextField,
   Button,
   Paper,
-  TextFieldProps,
 } from "@material-ui/core"
+import DateFnsUtils from "@date-io/date-fns"
+import {
+  MuiPickersUtilsProvider,
+  KeyboardDatePicker,
+} from "@material-ui/pickers"
+import Chip from "@material-ui/core/Chip"
+import Autocomplete from "@material-ui/lab/Autocomplete"
+import InputLabel from "@material-ui/core/InputLabel"
+import FormControl from "@material-ui/core/FormControl"
+import Select from "@material-ui/core/Select"
 import { Nullable } from "../../utils/context"
 import { Colors } from "../../utils/colors"
 import { Link } from "react-router-dom"
 
 type ProfileContentProps = {
   readonlyContent: ProfileContentType
+  editableContent: ProfileContentType
   contentSetters: ProfileContentSetters
   handleSaveContent: (
     onSuccess: () => void,
@@ -40,7 +50,7 @@ type ProfileField = {
   title: string
   value: string
   privacy_level: PrivacySetting
-  textFieldProps: TextFieldProps
+  editableElement: JSX.Element
 }
 
 const useStyles = makeStyles({
@@ -80,14 +90,35 @@ const useStyles = makeStyles({
   },
 })
 
+type GenderChoice = {
+  [key: string]: string
+}
+
+const GENDER_CHOICES: GenderChoice = {
+  M: "Male",
+  F: "Female",
+  O: "Other",
+}
+
+const INTEREST_CHOICES: string[] = [
+  "Testing user profiles",
+  "Breakfast",
+  "Conteo",
+]
+
 export default function ProfileContent({
   readonlyContent,
+  editableContent,
   contentSetters,
   handleSaveContent,
 }: ProfileContentProps): JSX.Element {
   const classes = useStyles()
   const [isEditMode, toggleEditMode] = React.useState<boolean>(false)
   const [errMessage, seterrMessage] = React.useState<string>("")
+  // The input value for an interest that a user is typing in.
+  const [interestsInputValue, setInterestsInputValue] = React.useState<string>(
+    ""
+  )
 
   // User profile field list. Field values are assigned to readonly content.
   const fields: ProfileField[] = [
@@ -95,67 +126,124 @@ export default function ProfileContent({
       title: "First Name",
       value: readonlyContent.first_name,
       privacy_level: "Public",
-      textFieldProps: {
-        required: true,
-        disabled: false,
-        onChange: (e) => {
-          contentSetters.setFirstName(e.currentTarget.value)
-        },
-        inputProps: {
-          maxLength: 50,
-        },
-      },
+      editableElement: (
+        <TextField
+          variant="outlined"
+          label={"First Name"}
+          value={editableContent.first_name}
+          required
+          onChange={(e) => contentSetters.setFirstName(e.currentTarget.value)}
+          inputProps={{
+            maxLength: 50,
+          }}
+          className={classes.textField}
+        />
+      ),
     },
     {
       title: "Last Name",
       value: readonlyContent.last_name,
       privacy_level: "Public",
-      textFieldProps: {
-        required: true,
-        disabled: false,
-        onChange: (e) => {
-          contentSetters.setLastName(e.currentTarget.value)
-        },
-        inputProps: {
-          maxLength: 50,
-        },
-      },
+      editableElement: (
+        <TextField
+          variant="outlined"
+          label={"Last Name"}
+          value={editableContent.last_name}
+          required
+          onChange={(e) => contentSetters.setLastName(e.currentTarget.value)}
+          inputProps={{
+            maxLength: 50,
+          }}
+          className={classes.textField}
+        />
+      ),
     },
     {
       title: "Birthday",
-      value: readonlyContent.birth_date.toLocaleDateString(),
+      value:
+        readonlyContent.birth_date &&
+        readonlyContent.birth_date.toLocaleDateString(),
       privacy_level: "Public",
-      textFieldProps: {
-        required: true,
-        disabled: false,
-        onChange: (e) => {
-          contentSetters.setBirthDate(new Date(e.currentTarget.value))
-        },
-      },
+      editableElement: (
+        <MuiPickersUtilsProvider utils={DateFnsUtils}>
+          <KeyboardDatePicker
+            autoOk
+            variant="inline"
+            inputVariant="outlined"
+            margin="none"
+            label="Birthday"
+            format="MM/dd/yyyy"
+            value={editableContent.birth_date}
+            required
+            onChange={(date: Date | null) =>
+              // Attribute required is set, so date should never be null.
+              contentSetters.setBirthDate(date != null ? date : new Date())
+            }
+            KeyboardButtonProps={{
+              "aria-label": "change date",
+            }}
+            className={classes.textField}
+          />
+        </MuiPickersUtilsProvider>
+      ),
     },
     {
       title: "Gender",
-      value: readonlyContent.gender,
+      value: GENDER_CHOICES[readonlyContent.gender],
       privacy_level: "Public",
-      textFieldProps: {
-        required: false,
-        disabled: false,
-        onChange: (e) => {
-          contentSetters.setGender(e.currentTarget.value)
-        },
-      },
+      editableElement: (
+        <FormControl variant="outlined" className={classes.textField}>
+          <InputLabel>Gender</InputLabel>
+          <Select
+            native
+            value={editableContent.gender}
+            onChange={(e: React.ChangeEvent<{ value: unknown }>) =>
+              contentSetters.setGender(e.target.value as string)
+            }
+            label="Gender"
+          >
+            {Object.keys(GENDER_CHOICES).map((key) => (
+              <option key={key} value={key}>
+                {GENDER_CHOICES[key]}
+              </option>
+            ))}
+          </Select>
+        </FormControl>
+      ),
     },
     {
       title: "Interests",
       value: readonlyContent.interests,
       privacy_level: "Public",
-      textFieldProps: {
-        required: false,
-        disabled: false,
-        onChange: (e) => {
-          contentSetters.setInterests(e.currentTarget.value)
-        },
-      },
+      editableElement: (
+        <Autocomplete
+          multiple
+          className={classes.textField}
+          options={INTEREST_CHOICES}
+          defaultValue={editableContent.interests.split(", ")}
+          onChange={(e, value: string[]) =>
+            contentSetters.setInterests(value.join(", "))
+          }
+          inputValue={interestsInputValue}
+          onInputChange={(e, newInputValue: string) =>
+            setInterestsInputValue(newInputValue)
+          }
+          freeSolo
+          renderTags={(value: string[], getTagProps) =>
+            value.map((option: string, index: number) => (
+              <Chip
+                key={`${option}-${index}`}
+                variant="outlined"
+                label={option}
+                {...getTagProps({ index })}
+              />
+            ))
+          }
+          renderInput={(params) => (
+            <TextField {...params} label="Interests" variant="outlined" />
+          )}
+        />
+      ),
     },
   ]
 
@@ -229,9 +317,10 @@ export default function ProfileContent({
                   <Grid item xs={10}>
                     <Grid container justify="space-between">
                       {fields.map(
-                        ({ title, value, textFieldProps }: ProfileField) => (
+                        ({ title, editableElement }: ProfileField) => (
                           <Grid
                             key={`editableField-${title}`}
+                            item
                             container
                             className={classes.field}
                             justify="center"
@@ -239,12 +328,7 @@ export default function ProfileContent({
                             md={5}
                           >
                             <Grid item className={classes.textField}>
-                              <TextField
-                                label={title}
-                                defaultValue={value}
-                                {...textFieldProps}
-                                className={classes.textField}
-                              />
+                              {editableElement}
                             </Grid>
                           </Grid>
                         )
@@ -265,9 +349,7 @@ export default function ProfileContent({
                         <Button
                           variant="contained"
                           className={classes.button}
-                          onClick={(e) => {
-                            handleCancelEdit(e)
-                          }}
+                          onClick={(e) => handleCancelEdit(e)}
                         >
                           Cancel
                         </Button>
@@ -315,9 +397,7 @@ export default function ProfileContent({
                         variant="contained"
                         color="secondary"
                         className={classes.button}
-                        onClick={(e) => {
-                          handleEditFields(e)
-                        }}
+                        onClick={(e) => handleEditFields(e)}
                       >
                         Edit
                       </Button>

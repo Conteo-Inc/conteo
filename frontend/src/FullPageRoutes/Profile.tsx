@@ -61,10 +61,15 @@ export default function Profile(): JSX.Element {
     request<UserProfile>({ path: "/api/profile/", method: "get" })
       .then((res) => {
         const profile: UserProfile = res.parsedBody
+        const splitDate = profile.birth_date.split("-")
+        const year = parseInt(splitDate[0])
+        // Month is 0-indexed in Typescript.
+        const monthIndex = parseInt(splitDate[1]) - 1
+        const day = parseInt(splitDate[2])
         const content: ProfileContentType = {
           first_name: profile.first_name,
           last_name: profile.last_name,
-          birth_date: new Date(profile.birth_date),
+          birth_date: new Date(year, monthIndex, day),
           gender: profile.gender,
           interests: profile.interests,
           video: profile.video,
@@ -75,6 +80,9 @@ export default function Profile(): JSX.Element {
         contentSetters.setLastName(content.last_name)
         contentSetters.setGender(content.gender)
         contentSetters.setBirthDate(content.birth_date)
+        contentSetters.setInterests(content.interests)
+        contentSetters.setVideo(content.video)
+        contentSetters.setId(content.id)
       })
       .catch((err) => {
         console.log(err)
@@ -159,8 +167,9 @@ export default function Profile(): JSX.Element {
         <Grid item className={classes.section} xs={9}>
           {isBioActive && (
             <ProfileContent
-              contentSetters={contentSetters}
               readonlyContent={readonlyContent}
+              editableContent={editableContent}
+              contentSetters={contentSetters}
               handleSaveContent={handleSaveContent}
             />
           )}
