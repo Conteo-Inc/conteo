@@ -14,12 +14,18 @@ from rest_framework import (
     viewsets,
 )
 
-from .models import MatchStatus, Profile, Video
+from .models import (
+    MatchStatus,
+    Profile,
+    Privacy,
+    Video
+)
 from .serializers import (
     MailListSerializer,
     MatchStatusSerializer,
     ProfileFromUserSerializer,
     ProfileSerializer,
+    PrivacySerializer,
     ReportSerializer,
     UserAuthSerializer,
     UserRegistrationSerializer,
@@ -89,13 +95,30 @@ class ProfileView(generics.RetrieveUpdateAPIView):
         return self.request.user.profile
 
     def get(self, request):
-        user = request.user
-        return response.Response(
-            data=ProfileSerializer(user.profile).data, status=status.HTTP_200_OK
-        )
+        profile = request.user.profile
+        profile_content = self.serializer_class(profile).data
+        userId = profile_content.pop("id")
 
-    def post(self, request):
-        return self.update(request=request)
+        privacy = Privacy.objects.get(profile=profile)
+        privacy_settings = PrivacySerializer(privacy).data
+
+        data = {
+            "profile_content": profile_content,
+            "privacy_settings": privacy_settings,
+            "userId": userId,
+        }
+
+        return response.Response(data=data, status=status.HTTP_200_OK)
+
+class PrivacyView(generics.RetrieveUpdateAPIView):
+    serializer_class = PrivacySerializer
+    queryset = Privacy.objects.all()
+
+    def get(self, request):
+        privacy = Privacy.objects.get(profile=request.user.profile)
+        data = self.serializer_class(privacy).data
+
+        return response.Response(data=data, status=status.HTTP_200_OK)
 
 
 class MailListView(generics.ListAPIView):

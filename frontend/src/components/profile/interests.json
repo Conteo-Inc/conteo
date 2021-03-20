@@ -1,0 +1,884 @@
+{
+  "predefined_interests": [
+    {
+      "category": "Alcohol",
+      "interest": "Wine"
+    },
+    {
+      "category": "Alcohol",
+      "interest": "Beer"
+    },
+    {
+      "category": "Alcohol",
+      "interest": "Liquor"
+    },
+    {
+      "category": "Arts & Crafts",
+      "interest": "Knitting"
+    },
+    {
+      "category": "Arts & Crafts",
+      "interest": "Crocheting"
+    },
+    {
+      "category": "Arts & Crafts",
+      "interest": "Paint-By-Numbers"
+    },
+    {
+      "category": "Arts & Crafts",
+      "interest": "Adult Coloring"
+    },
+    {
+      "category": "Arts & Crafts",
+      "interest": "Quilting"
+    },
+    {
+      "category": "Arts & Crafts",
+      "interest": "Sewing"
+    },
+    {
+      "category": "Arts & Crafts",
+      "interest": "Painting"
+    },
+    {
+      "category": "Arts & Crafts",
+      "interest": "Decorative Boxes"
+    },
+    {
+      "category": "Arts & Crafts",
+      "interest": "Candlemaking"
+    },
+    {
+      "category": "Arts & Crafts",
+      "interest": "Spinning wheel"
+    },
+    {
+      "category": "Arts & Crafts",
+      "interest": "Stitch"
+    },
+    {
+      "category": "Arts & Crafts",
+      "interest": "Furniture Rehab"
+    },
+    {
+      "category": "Collecting",
+      "interest": "Making Jewelry"
+    },
+    {
+      "category": "Collecting",
+      "interest": "Antiques"
+    },
+    {
+      "category": "Collecting",
+      "interest": "Stamps"
+    },
+    {
+      "category": "Collecting",
+      "interest": "Fine Art"
+    },
+    {
+      "category": "Collecting",
+      "interest": "Coins"
+    },
+    {
+      "category": "Fishing",
+      "interest": "Flyfishing"
+    },
+    {
+      "category": "Fishing",
+      "interest": "Deep Sea"
+    },
+    {
+      "category": "Fitness",
+      "interest": "Running"
+    },
+    {
+      "category": "Fitness",
+      "interest": "Swimming"
+    },
+    {
+      "category": "Fitness",
+      "interest": "Aerobics"
+    },
+    {
+      "category": "Fitness",
+      "interest": "Yoga"
+    },
+    {
+      "category": "Fitness",
+      "interest": "Weight Lifting"
+    },
+    {
+      "category": "Fitness",
+      "interest": "Pilates"
+    },
+    {
+      "category": "Fitness",
+      "interest": "Ballet"
+    },
+    {
+      "category": "Fitness",
+      "interest": "Tap"
+    },
+    {
+      "category": "Fitness",
+      "interest": "Folk Dancing"
+    },
+    {
+      "category": "Fitness",
+      "interest": "Martial Arts"
+    },
+    {
+      "category": "Fitness",
+      "interest": "Skiing"
+    },
+    {
+      "category": "Fitness",
+      "interest": "Rollerblading"
+    },
+    {
+      "category": "Fitness",
+      "interest": "Rollerskating"
+    },
+    {
+      "category": "Fitness",
+      "interest": "Cycling (Outdoors)"
+    },
+    {
+      "category": "Fitness",
+      "interest": "Cycling (Indoors)"
+    },
+    {
+      "category": "Fitness",
+      "interest": "Horseback Riding"
+    },
+    {
+      "category": "Fitness",
+      "interest": "Kayaking"
+    },
+    {
+      "category": "Fitness",
+      "interest": "Diving"
+    },
+    {
+      "category": "Fitness",
+      "interest": "Belly Dancing"
+    },
+    {
+      "category": "Fitness",
+      "interest": "Canoeing"
+    },
+    {
+      "category": "Fitness",
+      "interest": "Horseback Riding"
+    },
+    {
+      "category": "Fitness",
+      "interest": "Kayaking"
+    },
+    {
+      "category": "Flow Arts",
+      "interest": "Juggling"
+    },
+    {
+      "category": "Flow Arts",
+      "interest": "Poi"
+    },
+    {
+      "category": "Food",
+      "interest": "Vegan/Vegaterian"
+    },
+    {
+      "category": "Food",
+      "interest": "Gluten-Free"
+    },
+    {
+      "category": "Food",
+      "interest": "Keto"
+    },
+    {
+      "category": "Food",
+      "interest": "Paleo"
+    },
+    {
+      "category": "Food",
+      "interest": "Carb-Free"
+    },
+    {
+      "category": "Food",
+      "interest": "International"
+    },
+    {
+      "category": "Food",
+      "interest": "Diner"
+    },
+    {
+      "category": "Food",
+      "interest": "Seafood"
+    },
+    {
+      "category": "Food",
+      "interest": "Gourmet"
+    },
+    {
+      "category": "Food",
+      "interest": "Canning"
+    },
+    {
+      "category": "Gaming",
+      "interest": "MMO"
+    },
+    {
+      "category": "Gaming",
+      "interest": "RPG"
+    },
+    {
+      "category": "Gaming",
+      "interest": "Puzzle Games"
+    },
+    {
+      "category": "Movies/Television",
+      "interest": "Action"
+    },
+    {
+      "category": "Movies/Television",
+      "interest": "Drama"
+    },
+    {
+      "category": "Movies/Television",
+      "interest": "Comedy"
+    },
+    {
+      "category": "Movies/Television",
+      "interest": "Science Fiction"
+    },
+    {
+      "category": "Movies/Television",
+      "interest": "Documentary"
+    },
+    {
+      "category": "Movies/Television",
+      "interest": "Thriller"
+    },
+    {
+      "category": "Movies/Television",
+      "interest": "Horror"
+    },
+    {
+      "category": "Movies/Television",
+      "interest": "Foreign"
+    },
+    {
+      "category": "Movies/Television",
+      "interest": "True Crime"
+    },
+    {
+      "category": "Movies/Television",
+      "interest": "Reality TV"
+    },
+    {
+      "category": "Music",
+      "interest": "Pop"
+    },
+    {
+      "category": "Music",
+      "interest": "Rap"
+    },
+    {
+      "category": "Music",
+      "interest": "Classical"
+    },
+    {
+      "category": "Music",
+      "interest": "Folk"
+    },
+    {
+      "category": "Music",
+      "interest": "Country"
+    },
+    {
+      "category": "Music",
+      "interest": "Techno"
+    },
+    {
+      "category": "Music",
+      "interest": "Industrial"
+    },
+    {
+      "category": "Music",
+      "interest": "70s/80s/90s"
+    },
+    {
+      "category": "Music",
+      "interest": "Golden Oldies"
+    },
+    {
+      "category": "Music",
+      "interest": "Metal"
+    },
+    {
+      "category": "Music",
+      "interest": "Rock"
+    },
+    {
+      "category": "Music",
+      "interest": "Live shows"
+    },
+    {
+      "category": "Pets",
+      "interest": "Dogs"
+    },
+    {
+      "category": "Pets",
+      "interest": "Cats"
+    },
+    {
+      "category": "Pets",
+      "interest": "Rodents"
+    },
+    {
+      "category": "Pets",
+      "interest": "Amphibians"
+    },
+    {
+      "category": "Pets",
+      "interest": "Reptiles"
+    },
+    {
+      "category": "Pets",
+      "interest": "Insects"
+    },
+    {
+      "category": "Pets",
+      "interest": "Birds"
+    },
+    {
+      "category": "Pets",
+      "interest": "Large Animals"
+    },
+    {
+      "category": "Photography",
+      "interest": "Amateur"
+    },
+    {
+      "category": "Photography",
+      "interest": "Black & White"
+    },
+    {
+      "category": "Photography",
+      "interest": "Landscape"
+    },
+    {
+      "category": "Photography",
+      "interest": "Object"
+    },
+    {
+      "category": "Photography",
+      "interest": "Portraits"
+    },
+    {
+      "category": "Photography",
+      "interest": "Street"
+    },
+    {
+      "category": "Photography",
+      "interest": "Abstract"
+    },
+    {
+      "category": "Photography",
+      "interest": "Film"
+    },
+    {
+      "category": "Playing Instruments",
+      "interest": "Accoustic Guitar"
+    },
+    {
+      "category": "Playing Instruments",
+      "interest": "Electric Guitar"
+    },
+    {
+      "category": "Playing Instruments",
+      "interest": "Piano"
+    },
+    {
+      "category": "Playing Instruments",
+      "interest": "String Instruments"
+    },
+    {
+      "category": "Playing Instruments",
+      "interest": "Electric Bass"
+    },
+    {
+      "category": "Playing Instruments",
+      "interest": "Precussion"
+    },
+    {
+      "category": "Playing Instruments",
+      "interest": "Harmonica"
+    },
+    {
+      "category": "Playing Instruments",
+      "interest": "Ukulele"
+    },
+    {
+      "category": "Reading",
+      "interest": "Poetry"
+    },
+    {
+      "category": "Reading",
+      "interest": "Science Fiction"
+    },
+    {
+      "category": "Reading",
+      "interest": "Biographies"
+    },
+    {
+      "category": "Reading",
+      "interest": "History"
+    },
+    {
+      "category": "Reading",
+      "interest": "Classic Literature"
+    },
+    {
+      "category": "Reading",
+      "interest": "Romance"
+    },
+    {
+      "category": "Reading",
+      "interest": "Contemporary Fiction"
+    },
+    {
+      "category": "Reading",
+      "interest": "Graphic Novels"
+    },
+    {
+      "category": "Reading",
+      "interest": "Mysteries"
+    },
+    {
+      "category": "Reading",
+      "interest": "Horror"
+    },
+    {
+      "category": "Religion",
+      "interest": "Protestant Christianity"
+    },
+    {
+      "category": "Religion",
+      "interest": "Catholicism"
+    },
+    {
+      "category": "Religion",
+      "interest": "Orthodox"
+    },
+    {
+      "category": "Religion",
+      "interest": "Judaism"
+    },
+    {
+      "category": "Religion",
+      "interest": "Shia Islam"
+    },
+    {
+      "category": "Religion",
+      "interest": "Sunni Islam"
+    },
+    {
+      "category": "Religion",
+      "interest": "Buddhism"
+    },
+    {
+      "category": "Religion",
+      "interest": "Hinduism"
+    },
+    {
+      "category": "Religion",
+      "interest": "Pagan"
+    },
+    {
+      "category": "Religion",
+      "interest": "Other"
+    },
+    {
+      "category": "Sports: Playing",
+      "interest": "Baseball"
+    },
+    {
+      "category": "Sports: Playing",
+      "interest": "Football"
+    },
+    {
+      "category": "Sports: Playing",
+      "interest": "Hockey"
+    },
+    {
+      "category": "Sports: Playing",
+      "interest": "Cricket"
+    },
+    {
+      "category": "Sports: Playing",
+      "interest": "Basketball"
+    },
+    {
+      "category": "Sports: Playing",
+      "interest": "Soccer"
+    },
+    {
+      "category": "Sports: Playing",
+      "interest": "Tennis"
+    },
+    {
+      "category": "Sports: Playing",
+      "interest": "Rugby"
+    },
+    {
+      "category": "Sports: Playing",
+      "interest": "Raquetball"
+    },
+    {
+      "category": "Sports: Playing",
+      "interest": "Badminton"
+    },
+    {
+      "category": "Sports: Playing",
+      "interest": "Volleyball"
+    },
+    {
+      "category": "Sports: Playing",
+      "interest": "Car Races"
+    },
+    {
+      "category": "Sports: Watching",
+      "interest": "Baseball"
+    },
+    {
+      "category": "Sports: Watching",
+      "interest": "Football"
+    },
+    {
+      "category": "Sports: Watching",
+      "interest": "Hockey"
+    },
+    {
+      "category": "Sports: Watching",
+      "interest": "Cricket"
+    },
+    {
+      "category": "Sports: Watching",
+      "interest": "Basketball"
+    },
+    {
+      "category": "Sports: Watching",
+      "interest": "Soccer"
+    },
+    {
+      "category": "Sports: Watching",
+      "interest": "Tennis"
+    },
+    {
+      "category": "Sports: Watching",
+      "interest": "Rugby"
+    },
+    {
+      "category": "Sports: Watching",
+      "interest": "Volleyball"
+    },
+    {
+      "category": "Sports: Watching",
+      "interest": "Car Races"
+    },
+    {
+      "category": "Support Groups",
+      "interest": "Alcohol"
+    },
+    {
+      "category": "Support Groups",
+      "interest": "Drugs"
+    },
+    {
+      "category": "Support Groups",
+      "interest": "Sex"
+    },
+    {
+      "category": "Support Groups",
+      "interest": "Grief"
+    },
+    {
+      "category": "Support Groups",
+      "interest": "Medical"
+    },
+    {
+      "category": "Support Groups",
+      "interest": "Cancer Survivor"
+    },
+    {
+      "category": "Traveling",
+      "interest": "Domestic"
+    },
+    {
+      "category": "Traveling",
+      "interest": "International"
+    },
+    {
+      "category": "Vehicles",
+      "interest": "Motorcycles"
+    },
+    {
+      "category": "Vehicles",
+      "interest": "Antiques"
+    },
+    {
+      "category": "Vehicles",
+      "interest": "Snowmobiles"
+    },
+    {
+      "category": "Vehicles",
+      "interest": "Dirtbikes"
+    },
+    {
+      "category": "Writing",
+      "interest": "Fiction"
+    },
+    {
+      "category": "Writing",
+      "interest": "Essays"
+    },
+    {
+      "category": "Writing",
+      "interest": "Poetry"
+    },
+    {
+      "category": "YouTube",
+      "interest": "Watching"
+    },
+    {
+      "category": "YouTube",
+      "interest": "Creating"
+    },
+    {
+      "category": "Social Issues",
+      "interest": "Gender Studies"
+    },
+    {
+      "category": "Social Issues",
+      "interest": "Race Relations"
+    },
+    {
+      "category": "Social Issues",
+      "interest": "Feminism"
+    },
+    {
+      "category": "Social Issues",
+      "interest": "Income Inequality"
+    },
+    {
+      "category": "Environmentalism",
+      "interest": "Climate Change"
+    },
+    {
+      "category": "Environmentalism",
+      "interest": "Pollution"
+    },
+    {
+      "category": "Environmentalism",
+      "interest": "Biodiversity"
+    },
+    {
+      "category": "Other",
+      "interest": "3D Printing"
+    },
+    {
+      "category": "Other",
+      "interest": "Aliens"
+    },
+    {
+      "category": "Other",
+      "interest": "Amateur flying"
+    },
+    {
+      "category": "Other",
+      "interest": "Animal training"
+    },
+    {
+      "category": "Other",
+      "interest": "Astrology"
+    },
+    {
+      "category": "Other",
+      "interest": "Astronomy"
+    },
+    {
+      "category": "Other",
+      "interest": "Baking"
+    },
+    {
+      "category": "Other",
+      "interest": "Birding"
+    },
+    {
+      "category": "Other",
+      "interest": "Board games"
+    },
+    {
+      "category": "Other",
+      "interest": "Calligraphy"
+    },
+    {
+      "category": "Other",
+      "interest": "Camping"
+    },
+    {
+      "category": "Other",
+      "interest": "Chicken tending"
+    },
+    {
+      "category": "Other",
+      "interest": "Clubbing"
+    },
+    {
+      "category": "Other",
+      "interest": "Coaching sports"
+    },
+    {
+      "category": "Other",
+      "interest": "Coding"
+    },
+    {
+      "category": "Other",
+      "interest": "Community Theater"
+    },
+    {
+      "category": "Other",
+      "interest": "Continuing Education"
+    },
+    {
+      "category": "Other",
+      "interest": "Cosplay"
+    },
+    {
+      "category": "Other",
+      "interest": "Crosswords"
+    },
+    {
+      "category": "Other",
+      "interest": "D & D"
+    },
+    {
+      "category": "Other",
+      "interest": "Darts"
+    },
+    {
+      "category": "Other",
+      "interest": "Dinosaurs"
+    },
+    {
+      "category": "Other",
+      "interest": "Farming"
+    },
+    {
+      "category": "Other",
+      "interest": "Flying drones"
+    },
+    {
+      "category": "Other",
+      "interest": "Gardening"
+    },
+    {
+      "category": "Other",
+      "interest": "Hiking"
+    },
+    {
+      "category": "Other",
+      "interest": "House Plants"
+    },
+    {
+      "category": "Other",
+      "interest": "Jigsaw Puzzles"
+    },
+    {
+      "category": "Other",
+      "interest": "Lock Picking"
+    },
+    {
+      "category": "Other",
+      "interest": "Logic Games"
+    },
+    {
+      "category": "Other",
+      "interest": "Mah Jong"
+    },
+    {
+      "category": "Other",
+      "interest": "Makeup"
+    },
+    {
+      "category": "Other",
+      "interest": "Meditation"
+    },
+    {
+      "category": "Other",
+      "interest": "Medival Reenactment"
+    },
+    {
+      "category": "Other",
+      "interest": "Podcasts"
+    },
+    {
+      "category": "Other",
+      "interest": "Politics"
+    },
+    {
+      "category": "Other",
+      "interest": "Pyschology"
+    },
+    {
+      "category": "Other",
+      "interest": "Scuba Diving"
+    },
+    {
+      "category": "Other",
+      "interest": "Snorkeling"
+    },
+    {
+      "category": "Other",
+      "interest": "Sociology"
+    },
+    {
+      "category": "Other",
+      "interest": "Steampunk"
+    },
+    {
+      "category": "Other",
+      "interest": "Sudoku"
+    },
+    {
+      "category": "Other",
+      "interest": "Supernatural"
+    },
+    {
+      "category": "Other",
+      "interest": "Tarot"
+    },
+    {
+      "category": "Other",
+      "interest": "Theater"
+    },
+    {
+      "category": "Other",
+      "interest": "Whale watching"
+    },
+    {
+      "category": "Other",
+      "interest": "World History"
+    },
+    {
+      "category": "Other",
+      "interest": "Ziplining"
+    },
+    {
+      "category": "Other",
+      "interest": "Mythology"
+    }
+  ]
+}

@@ -6,7 +6,13 @@ from django.db.models.query_utils import Q
 from django.utils.timezone import now
 from rest_framework import serializers
 
-from .models import MatchStatus, Profile, Report, Video
+from .models import (
+    MatchStatus,
+    Profile,
+    Privacy,
+    Report,
+    Video
+)
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -26,6 +32,12 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         exclude = ("user",)
+
+
+class PrivacySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Privacy
+        fields = "__all__"
 
 
 class UserAuthSerializer(serializers.ModelSerializer):
@@ -82,6 +94,10 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         # in the profile model.
         user.profile = Profile(user.id)
         user.profile.save()
+        
+        privacy = Privacy(profile=user.profile)
+        privacy.save()
+
         return user
 
     class Meta:

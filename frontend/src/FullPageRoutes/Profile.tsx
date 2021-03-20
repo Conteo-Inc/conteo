@@ -1,29 +1,23 @@
 import * as React from "react"
+import { Grid } from "@material-ui/core"
+import { makeStyles } from "@material-ui/core/styles"
+import ProfileSidebar from "../components/profile/ProfileSidebar"
+import type { ProfileContentType } from "../components/profile/ProfileContent"
+import EditableProfileContent from "../components/profile/EditableProfileContent"
+import type { PrivacySettingsType } from "../components/profile/PrivacySettings"
+import PrivacySettings from "../components/profile/PrivacySettings"
 import { request } from "../utils/fetch"
 import {
   useProfileComponents,
-  getUpdates,
-  useProfile,
+  useProfileContent,
   usePrivacySettings,
 } from "../utils/profile"
-import ProfileSidebar from "../components/profile/ProfileSidebar"
-import ProfileContent from "../components/profile/ProfileContent"
-import PrivacySettings from "../components/profile/PrivacySettings"
-import type { ProfileContentType } from "../components/profile/ProfileContent"
-import type { PrivacySettingsType } from "../components/profile/PrivacySettings"
-import { makeStyles } from "@material-ui/core/styles"
-import { Grid } from "@material-ui/core"
 import { Nullable } from "../utils/context"
 
 export type UserProfile = {
-  first_name: string
-  last_name: string
-  phone_number: string
-  birth_date: string
-  gender: string
-  interests: string
-  video: Nullable<string>
-  id: number
+  profile_content: ProfileContentType
+  privacy_settings: PrivacySettingsType
+  userId: number
 }
 
 const useStyles = makeStyles({
@@ -40,9 +34,31 @@ const useStyles = makeStyles({
   },
 })
 
+function parseBirthday(birth_date: Nullable<Date>): Nullable<Date> {
+  let birthday = null
+  if (birth_date !== null) {
+    birthday = new Date(birth_date)
+    // Typescript removes a day.
+    birthday.setDate(birthday.getDate() + 1)
+  }
+
+  return birthday
+}
+
+function parseInterests(interests: string): string {
+  let results = ""
+  if (typeof interests !== "undefined") {
+    results = interests
+  }
+
+  return results
+}
+
 export default function Profile(): JSX.Element {
   const classes = useStyles()
+  const [userId, setUserId] = React.useState<number>(-1)
 
+  // Profile content hooks.
   const [
     readonlyContent,
     setProfileContent,
@@ -53,98 +69,71 @@ export default function Profile(): JSX.Element {
     gender: "",
     interests: "",
     video: "",
-    id: -1,
   })
-  const { editableContent, contentSetters } = useProfile(readonlyContent)
+  const { editableContent, contentSetters } = useProfileContent(readonlyContent)
+
+  // Privacy settings hooks.
+  const [
+    readonlySettings,
+    setPrivacySettings,
+  ] = React.useState<PrivacySettingsType>({
+    first_name_privacy: "",
+    last_name_privacy: "",
+    birth_date_privacy: "",
+    gender_privacy: "",
+    interests_privacy: "",
+  })
+  const { editableSettings, privacySetters } = usePrivacySettings(
+    readonlySettings
+  )
 
   React.useEffect(() => {
     request<UserProfile>({ path: "/api/profile/", method: "get" })
       .then((res) => {
-        const profile: UserProfile = res.parsedBody
-        const splitDate = profile.birth_date.split("-")
-        const year = parseInt(splitDate[0])
-        // Month is 0-indexed in Typescript.
-        const monthIndex = parseInt(splitDate[1]) - 1
-        const day = parseInt(splitDate[2])
-        const content: ProfileContentType = {
-          first_name: profile.first_name,
-          last_name: profile.last_name,
-          birth_date: new Date(year, monthIndex, day),
-          gender: profile.gender,
-          interests: profile.interests,
-          video: profile.video,
-          id: profile.id,
+        const { profile_content, privacy_settings } = res.parsedBody
+        setUserId(res.parsedBody.userId)
+        console.log("res.parsedBody")
+        console.log(res.parsedBody)
+
+        const birthday = parseBirthday(profile_content.birth_date)
+        const interests = parseInterests(profile_content.interests)
+        const profileContent: ProfileContentType = {
+          first_name: profile_content.first_name,
+          last_name: profile_content.last_name,
+          birth_date: birthday,
+          gender: profile_content.gender,
+          interests: interests,
+          video: profile_content.video,
         }
-        setProfileContent(content)
-        contentSetters.setFirstName(content.first_name)
-        contentSetters.setLastName(content.last_name)
-        contentSetters.setGender(content.gender)
-        contentSetters.setBirthDate(content.birth_date)
-        contentSetters.setInterests(content.interests)
-        contentSetters.setVideo(content.video)
-        contentSetters.setId(content.id)
+
+        setProfileContent(profileContent)
+        contentSetters.setFirstName(profileContent.first_name)
+        contentSetters.setLastName(profileContent.last_name)
+        contentSetters.setGender(profileContent.gender)
+        contentSetters.setBirthDate(profileContent.birth_date)
+        contentSetters.setInterests(profileContent.interests)
+
+        const privacySettings: PrivacySettingsType = {
+          first_name_privacy: privacy_settings.first_name_privacy,
+          last_name_privacy: privacy_settings.last_name_privacy,
+          birth_date_privacy: privacy_settings.birth_date_privacy,
+          gender_privacy: privacy_settings.gender_privacy,
+          interests_privacy: privacy_settings.interests_privacy,
+        }
+
+        setPrivacySettings(privacySettings)
+        privacySetters.setFirstNamePrivacy(privacySettings.first_name_privacy)
+        privacySetters.setLastNamePrivacy(privacySettings.last_name_privacy)
+        privacySetters.setBirthDatePrivacy(privacySettings.birth_date_privacy)
+        privacySetters.setGenderPrivacy(privacySettings.gender_privacy)
+        privacySetters.setInterestsPrivacy(privacySettings.interests_privacy)
       })
       .catch((err) => {
         console.log(err)
       })
   }, [])
 
-  const handleSaveContent = (
-    onSuccess: () => void,
-    onFailure: (error: string) => void
-  ) => {
-    const updates = getUpdates(readonlyContent, editableContent)
-    console.log(updates)
-    request({
-      path: "/api/profile/",
-      method: "post",
-      body: getUpdates(readonlyContent, editableContent),
-    })
-      .then(() => {
-        setProfileContent(editableContent)
-        onSuccess()
-      })
-      .catch((err) => {
-        onFailure(err)
-      })
-  }
-
-  const [
-    readonlySettings,
-    setPrivacySettings,
-  ] = React.useState<PrivacySettingsType>({
-    first_name: "Public",
-    last_name: "Public",
-    birth_date: "Public",
-    gender: "Public",
-    interests: "Public",
-  })
-  const { editableSettings, privacySetters } = usePrivacySettings(
-    readonlySettings
-  )
-
-  const handleSaveSettings = (
-    onSuccess: () => void,
-    onFailure: (error: string) => void
-  ) => {
-    // Profile view is yet to accomodate privacy settings.
-    // request({
-    //   path: "/api/profileSettings/",
-    //   method: "post",
-    //   body: editableSettings,
-    // })
-    //   .then(() => {
-    //     setPrivacySettings(editableSettings)
-    //     onSuccess()
-    //   })
-    //   .catch((err) => {
-    //     onFailure(err)
-    //   })
-    onFailure("just cuz")
-    setPrivacySettings(editableSettings)
-    onSuccess()
-  }
-
+  // Component state hooks.
   const { componentStates, componentSetters } = useProfileComponents()
   const {
     isBioActive,
@@ -166,18 +155,22 @@ export default function Profile(): JSX.Element {
         </Grid>
         <Grid item className={classes.section} xs={9}>
           {isBioActive && (
-            <ProfileContent
+            <EditableProfileContent
               readonlyContent={readonlyContent}
+              privacySettings={readonlySettings}
               editableContent={editableContent}
               contentSetters={contentSetters}
-              handleSaveContent={handleSaveContent}
+              setProfileContent={setProfileContent}
+              userId={userId}
             />
           )}
           {isPrivacyActive && (
             <PrivacySettings
-              privacySetters={privacySetters}
               readonlySettings={readonlySettings}
-              handleSaveSettings={handleSaveSettings}
+              editableSettings={editableSettings}
+              privacySetters={privacySetters}
+              setPrivacySettings={setPrivacySettings}
+              userId={userId}
             />
           )}
           {/*

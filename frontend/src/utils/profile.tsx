@@ -1,11 +1,13 @@
 import { useState } from "react"
-import type { ProfileContentType } from "../components/profile/ProfileContent"
+import type {
+  ProfileContentType,
+  GenderKey,
+} from "../components/profile/ProfileContent"
 import type {
   PrivacySettingsType,
-  PrivacySetting,
+  PrivacyKey,
 } from "../components/profile/PrivacySettings"
-import { Nullable, SetStateDispatch } from "./context"
-import * as R from "ramda"
+import { SetStateDispatch } from "./context"
 
 export type ProfileComponentStates = {
   isBioActive: boolean
@@ -60,16 +62,14 @@ export function useProfileComponents(): {
 export type ProfileContentSetters = {
   setFirstName: SetStateDispatch<string>
   setLastName: SetStateDispatch<string>
-  setBirthDate: SetStateDispatch<Date>
-  setGender: SetStateDispatch<string>
+  setBirthDate: SetStateDispatch<Date | null>
+  setGender: SetStateDispatch<GenderKey | null>
   setInterests: SetStateDispatch<string>
-  setVideo: SetStateDispatch<Nullable<string>>
-  setId: SetStateDispatch<number>
 }
 
-// Custom profile hook. This separates saved profile content from edited,
-// unsaved profile content.
-export function useProfile(
+// Custom profile content hook. This separates saved profile content
+// from edited and unsaved profile content.
+export function useProfileContent(
   content: ProfileContentType
 ): {
   editableContent: ProfileContentType
@@ -77,11 +77,9 @@ export function useProfile(
 } {
   const [firstName, setFirstName] = useState<string>(content.first_name)
   const [lastName, setLastName] = useState<string>(content.last_name)
-  const [birthDate, setBirthDate] = useState<Date>(content.birth_date)
-  const [gender, setGender] = useState<string>(content.gender)
+  const [birthDate, setBirthDate] = useState<Date | null>(content.birth_date)
+  const [gender, setGender] = useState<GenderKey | null>(content.gender)
   const [interests, setInterests] = useState<string>(content.interests)
-  const [video, setVideo] = useState<Nullable<string>>(content.video)
-  const [id, setId] = useState<number>(content.id)
 
   const editableContent: ProfileContentType = {
     first_name: firstName,
@@ -89,8 +87,7 @@ export function useProfile(
     birth_date: birthDate,
     gender: gender,
     interests: interests,
-    video: video,
-    id: id,
+    video: content.video,
   }
 
   const contentSetters: ProfileContentSetters = {
@@ -99,82 +96,112 @@ export function useProfile(
     setBirthDate: setBirthDate,
     setGender: setGender,
     setInterests: setInterests,
-    setVideo: setVideo,
-    setId: setId,
   }
 
   return { editableContent, contentSetters }
 }
 
-type ProfileContentStrings = Omit<ProfileContentType, "birth_date"> & {
-  birth_date: string
-}
-function toDateString(date: Date): string {
-  // Month is zero-indexed in Typescript.
-  const month = `${date.getMonth() + 1}`
-  return `${date.getFullYear()}-${month}-${date.getDate()}`
+type ProfileUpdates = {
+  [key: string]: string
 }
 
-export function getUpdates(
+export function getProfileContentUpdates(
   original: ProfileContentType,
   updated: ProfileContentType
-): ProfileContentStrings {
-  const comparator = (canon: string, other: string): string => {
-    return canon === other ? canon : other
+): ProfileUpdates {
+  const contentToString = (content: ProfileContentType): ProfileUpdates => {
+    return {
+      ...content,
+      gender: content.gender !== null ? content.gender : "",
+      birth_date:
+        content.birth_date !== null ? toDateString(content.birth_date) : "",
+      video: content.video !== null ? content.video : "",
+    }
   }
-  const canon: ProfileContentStrings = {
-    ...original,
-    birth_date: toDateString(original.birth_date),
-  }
-  const other: ProfileContentStrings = {
-    ...updated,
-    birth_date: toDateString(updated.birth_date),
-  }
+  const canon: ProfileUpdates = contentToString(original)
+  const other: ProfileUpdates = contentToString(updated)
 
-  const result: ProfileContentStrings = R.mergeWith(comparator, canon, other)
+  const result: ProfileUpdates = {}
+  Object.keys(canon).map((key) => {
+    const originalValue = canon[key]
+    const updatedValue = other[key]
+    if (originalValue != updatedValue) {
+      result[key] = updatedValue
+    }
+  })
+
   return result
 }
 
 export type PrivacySetters = {
-  setFirstName: SetStateDispatch<PrivacySetting>
-  setLastName: SetStateDispatch<PrivacySetting>
-  setBirthDate: SetStateDispatch<PrivacySetting>
-  setGender: SetStateDispatch<PrivacySetting>
-  setInterests: SetStateDispatch<PrivacySetting>
+  setFirstNamePrivacy: SetStateDispatch<PrivacyKey>
+  setLastNamePrivacy: SetStateDispatch<PrivacyKey>
+  setBirthDatePrivacy: SetStateDispatch<PrivacyKey>
+  setGenderPrivacy: SetStateDispatch<PrivacyKey>
+  setInterestsPrivacy: SetStateDispatch<PrivacyKey>
 }
 
-// Custom profile privacy settings hook.
+// Custom privacy settings hook. This separates saved privacy settings
+// from edited and unsaved privacy settings.
 export function usePrivacySettings(
   settings: PrivacySettingsType
 ): {
   editableSettings: PrivacySettingsType
   privacySetters: PrivacySetters
 } {
-  const [firstName, setFirstName] = useState<PrivacySetting>(
-    settings.first_name
+  const [firstNamePrivacy, setFirstNamePrivacy] = useState<PrivacyKey>(
+    settings.first_name_privacy
   )
-  const [lastName, setLastName] = useState<PrivacySetting>(settings.last_name)
-  const [birthDate, setBirthDate] = useState<PrivacySetting>(
-    settings.birth_date
+  const [lastNamePrivacy, setLastNamePrivacy] = useState<PrivacyKey>(
+    settings.last_name_privacy
   )
-  const [gender, setGender] = useState<PrivacySetting>(settings.gender)
-  const [interests, setInterests] = useState<PrivacySetting>(settings.interests)
+  const [birthDatePrivacy, setBirthDatePrivacy] = useState<PrivacyKey>(
+    settings.birth_date_privacy
+  )
+  const [genderPrivacy, setGenderPrivacy] = useState<PrivacyKey>(
+    settings.gender_privacy
+  )
+  const [interestsPrivacy, setInterestsPrivacy] = useState<PrivacyKey>(
+    settings.interests_privacy
+  )
 
   const editableSettings: PrivacySettingsType = {
-    first_name: firstName,
-    last_name: lastName,
-    birth_date: birthDate,
-    gender: gender,
-    interests: interests,
+    first_name_privacy: firstNamePrivacy,
+    last_name_privacy: lastNamePrivacy,
+    birth_date_privacy: birthDatePrivacy,
+    gender_privacy: genderPrivacy,
+    interests_privacy: interestsPrivacy,
   }
 
   const privacySetters: PrivacySetters = {
-    setFirstName: setFirstName,
-    setLastName: setLastName,
-    setBirthDate: setBirthDate,
-    setGender: setGender,
-    setInterests: setInterests,
+    setFirstNamePrivacy: setFirstNamePrivacy,
+    setLastNamePrivacy: setLastNamePrivacy,
+    setBirthDatePrivacy: setBirthDatePrivacy,
+    setGenderPrivacy: setGenderPrivacy,
+    setInterestsPrivacy: setInterestsPrivacy,
   }
 
   return { editableSettings, privacySetters }
+}
+
+export function getPrivacySettingsUpdates(
+  original: ProfileUpdates,
+  updated: ProfileUpdates
+): ProfileUpdates {
+  const result: ProfileUpdates = {}
+  Object.keys(original).map((key) => {
+    const originalValue = original[key]
+    const updatedValue = updated[key]
+    if (originalValue != updatedValue) {
+      result[key] = updatedValue
+    }
+  })
+
+  return result
+}
+
+function toDateString(date: Date): string {
+  // Month is zero-indexed in Typescript.
+  const month = `${date.getMonth() + 1}`
+  return `${date.getFullYear()}-${month}-${date.getDate()}`
 }

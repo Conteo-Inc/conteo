@@ -1,46 +1,59 @@
 import * as React from "react"
-import { makeStyles } from "@material-ui/core/styles"
-import type { PrivacySetters } from "../../utils/profile"
 import { Grid, Button, Paper, Typography } from "@material-ui/core"
 import FormControlLabel from "@material-ui/core/FormControlLabel"
 import Radio from "@material-ui/core/Radio"
 import RadioGroup from "@material-ui/core/RadioGroup"
-
-export type PrivacySetting = "Public" | "Private" | "Hidden"
+import { makeStyles } from "@material-ui/core/styles"
+import { request } from "../../utils/fetch"
+import type { PrivacySetters } from "../../utils/profile"
+import { getPrivacySettingsUpdates } from "../../utils/profile"
 
 type PrivacySettingsProps = {
   readonlySettings: PrivacySettingsType
+  editableSettings: PrivacySettingsType
   privacySetters: PrivacySetters
-  handleSaveSettings: (
-    onSuccess: () => void,
-    onFailure: (error: string) => void
-  ) => void
+  setPrivacySettings: React.Dispatch<React.SetStateAction<PrivacySettingsType>>
+  userId: number
 }
 
 // A user's privacy settings.
 export type PrivacySettingsType = {
-  first_name: PrivacySetting
-  last_name: PrivacySetting
-  birth_date: PrivacySetting
-  gender: PrivacySetting
-  interests: PrivacySetting
+  first_name_privacy: PrivacyKey
+  last_name_privacy: PrivacyKey
+  birth_date_privacy: PrivacyKey
+  gender_privacy: PrivacyKey
+  interests_privacy: PrivacyKey
+}
+
+export type PrivacyKey = "" | "PU" | "PR" | "HI"
+export type PrivacyValue = "Public" | "Private" | "Hidden"
+type PrivacyChoice = {
+  [key: string]: PrivacyValue
+}
+export const PRIVACY_CHOICES: PrivacyChoice = {
+  PU: "Public",
+  PR: "Private",
+  HI: "Hidden",
 }
 
 // A field listed in the settings.
 type PrivacyField = {
   title: string
-  privacy_level: PrivacySetting
-  handleChange: (value: PrivacySetting) => void
+  privacy_level: PrivacyKey
+  setPrivacyLevel: (value: PrivacyKey) => void
 }
 
 const useStyles = makeStyles({
-  field: {
+  pageTitle: {
     fontSize: "2rem",
-    marginBottom: 15,
+    fontWeight: "bold",
   },
   fieldsContainer: {
     paddingTop: 40,
     paddingBottom: 10,
+  },
+  field: {
+    marginBottom: 15,
   },
   button: {
     margin: 5,
@@ -49,8 +62,16 @@ const useStyles = makeStyles({
 
 export default function PrivacySettings({
   readonlySettings,
-  privacySetters,
-  handleSaveSettings,
+  editableSettings,
+  privacySetters: {
+    setFirstNamePrivacy,
+    setLastNamePrivacy,
+    setBirthDatePrivacy,
+    setGenderPrivacy,
+    setInterestsPrivacy,
+  },
+  setPrivacySettings,
+  userId,
 }: PrivacySettingsProps): JSX.Element {
   const classes = useStyles()
   const [isEditMode, toggleEditMode] = React.useState<boolean>(false)
@@ -60,42 +81,56 @@ export default function PrivacySettings({
   const fields: PrivacyField[] = [
     {
       title: "First Name",
-      privacy_level: readonlySettings.first_name,
-      handleChange: (value: PrivacySetting) =>
-        privacySetters.setFirstName(value),
+      privacy_level: readonlySettings.first_name_privacy,
+      setPrivacyLevel: setFirstNamePrivacy,
     },
     {
       title: "Last Name",
-      privacy_level: readonlySettings.last_name,
-      handleChange: (value: PrivacySetting) =>
-        privacySetters.setLastName(value),
+      privacy_level: readonlySettings.last_name_privacy,
+      setPrivacyLevel: setLastNamePrivacy,
     },
     {
       title: "Birthday",
-      privacy_level: readonlySettings.birth_date,
-      handleChange: (value: PrivacySetting) =>
-        privacySetters.setBirthDate(value),
+      privacy_level: readonlySettings.birth_date_privacy,
+      setPrivacyLevel: setBirthDatePrivacy,
     },
     {
       title: "Gender",
-      privacy_level: readonlySettings.gender,
-      handleChange: (value: PrivacySetting) => privacySetters.setGender(value),
+      privacy_level: readonlySettings.gender_privacy,
+      setPrivacyLevel: setGenderPrivacy,
     },
     {
       title: "Interests",
-      privacy_level: readonlySettings.interests,
-      handleChange: (value: PrivacySetting) =>
-        privacySetters.setInterests(value),
+      privacy_level: readonlySettings.interests_privacy,
+      setPrivacyLevel: setInterestsPrivacy,
     },
   ]
+
+  const handleSaveSettings = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const updates = getPrivacySettingsUpdates(
+      readonlySettings,
+      editableSettings
+    )
+    request({
+      path: `/api/privacy/${userId}/`,
+      method: "put",
+      body: { profile: userId, ...updates },
+    })
+      .then(() => {
+        setPrivacySettings(editableSettings)
+        toggleEditMode(false)
+      })
+      .catch((err) => {
+        seterrMessage(err)
+      })
+  }
 
   const handleEditFields = (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     event.preventDefault()
-    console.log(isEditMode)
     toggleEditMode(true)
-    console.log(isEditMode)
   }
 
   const handleCancelEdit = (
@@ -104,24 +139,29 @@ export default function PrivacySettings({
     event.preventDefault()
     seterrMessage("")
     toggleEditMode(false)
-  }
-
-  const handleSaveFields = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    handleSaveSettings(() => {
-      toggleEditMode(false)
-    }, seterrMessage)
+    setFirstNamePrivacy(readonlySettings.first_name_privacy)
+    setLastNamePrivacy(readonlySettings.last_name_privacy)
+    setBirthDatePrivacy(readonlySettings.birth_date_privacy)
+    setGenderPrivacy(readonlySettings.gender_privacy)
+    setInterestsPrivacy(readonlySettings.interests_privacy)
   }
 
   return (
     <div>
+      <Grid container alignItems="baseline" justify="flex-start">
+        <Grid item xs={12}>
+          <Typography className={classes.pageTitle}>
+            Privacy Settings
+          </Typography>
+        </Grid>
+      </Grid>
       <Paper className={classes.fieldsContainer}>
-        <form onSubmit={handleSaveFields}>
+        <form onSubmit={handleSaveSettings}>
           <Grid container justify="center">
             <Grid item xs={10}>
               <Grid container justify="space-between">
                 {fields.map(
-                  ({ title, privacy_level, handleChange }: PrivacyField) => (
+                  ({ title, privacy_level, setPrivacyLevel }: PrivacyField) => (
                     <Grid
                       key={`readonlyField-${title}`}
                       item
@@ -137,39 +177,28 @@ export default function PrivacySettings({
                       </Grid>
                       <Grid item xs={9}>
                         <RadioGroup
-                          aria-label="privacy"
-                          name="privacy"
+                          aria-label="Privacy"
+                          name="Privacy"
                           defaultValue={privacy_level}
                           onChange={(e) => {
-                            handleChange(
-                              e.currentTarget.value as PrivacySetting
-                            )
+                            setPrivacyLevel(e.currentTarget.value as PrivacyKey)
                           }}
                           row
                         >
-                          <FormControlLabel
-                            value="Public"
-                            disabled={!isEditMode && privacy_level !== "Public"}
-                            control={<Radio color="primary" />}
-                            label="Public"
-                            labelPlacement="top"
-                          />
-                          <FormControlLabel
-                            value="Private"
-                            disabled={
-                              !isEditMode && privacy_level !== "Private"
-                            }
-                            control={<Radio color="secondary" />}
-                            label="Private"
-                            labelPlacement="top"
-                          />
-                          <FormControlLabel
-                            value="Hidden"
-                            disabled={!isEditMode && privacy_level !== "Hidden"}
-                            control={<Radio color="default" />}
-                            label="Hidden"
-                            labelPlacement="top"
-                          />
+                          {Object.keys(PRIVACY_CHOICES).map((key) => (
+                            <FormControlLabel
+                              key={`privacyChoice-${key}`}
+                              value={key}
+                              disabled={!isEditMode && privacy_level !== key}
+                              control={
+                                <Radio
+                                  color={isEditMode ? "primary" : "default"}
+                                />
+                              }
+                              label={PRIVACY_CHOICES[key]}
+                              labelPlacement="top"
+                            />
+                          ))}
                         </RadioGroup>
                       </Grid>
                     </Grid>
