@@ -1,14 +1,11 @@
 import * as React from "react"
 import { Grid, Avatar, Typography, Paper } from "@material-ui/core"
 import { makeStyles } from "@material-ui/core/styles"
-import type { PrivacySettingsType, PrivacyValue } from "./PrivacySettings"
-import { PRIVACY_CHOICES } from "./PrivacySettings"
 import { Colors } from "../../utils/colors"
 import { Nullable } from "../../utils/context"
 
 type ProfileContentProps = {
   readonlyContent: ProfileContentType
-  privacySettings: PrivacySettingsType
 }
 
 export type ProfileContentType = {
@@ -43,7 +40,6 @@ export type Interest = {
 type ProfileField = {
   title: string
   value: string
-  privacy_level: PrivacyValue
 }
 
 const useStyles = makeStyles({
@@ -84,13 +80,6 @@ export default function ProfileContent({
     interests,
     video,
   },
-  privacySettings: {
-    first_name_privacy,
-    last_name_privacy,
-    birth_date_privacy,
-    gender_privacy,
-    interests_privacy,
-  },
 }: ProfileContentProps): JSX.Element {
   const classes = useStyles()
 
@@ -99,29 +88,24 @@ export default function ProfileContent({
     {
       title: "First Name",
       value: first_name,
-      privacy_level: PRIVACY_CHOICES[first_name_privacy],
     },
     {
       title: "Last Name",
       value: last_name,
-      privacy_level: PRIVACY_CHOICES[last_name_privacy],
     },
     {
       title: "Birthday",
       value: birth_date !== null ? birth_date.toLocaleDateString() : "",
-      privacy_level: PRIVACY_CHOICES[birth_date_privacy],
     },
     {
       title: "Gender",
       value: gender !== null ? GENDER_CHOICES[gender] : "",
-      privacy_level: PRIVACY_CHOICES[gender_privacy],
     },
     {
       title: "Interests",
       value: interests
         .map((interest: Interest) => `${interest.category}: ${interest.title}`)
         .join(", "),
-      privacy_level: PRIVACY_CHOICES[interests_privacy],
     },
   ]
 
@@ -153,29 +137,24 @@ export default function ProfileContent({
             <Grid container justify="center">
               <Grid item xs={10}>
                 <Grid container justify="space-between">
-                  {fields.map(
-                    ({ title, value, privacy_level }: ProfileField) => (
-                      <Grid
-                        key={`readonlyField-${title}`}
-                        item
-                        container
-                        className={classes.field}
-                        justify="space-between"
-                        sm={10}
-                        md={5}
-                      >
-                        <Grid item xs={3}>
-                          <Typography>{title}:</Typography>
-                        </Grid>
-                        <Grid item xs={4}>
-                          <Typography>{value}</Typography>
-                        </Grid>
-                        <Grid item xs={4}>
-                          <Typography>({privacy_level})</Typography>
-                        </Grid>
+                  {fields.map(({ title, value }: ProfileField) => (
+                    <Grid
+                      key={`readonlyField-${title}`}
+                      item
+                      container
+                      className={classes.field}
+                      justify="space-between"
+                      sm={10}
+                      md={5}
+                    >
+                      <Grid item xs={3}>
+                        <Typography>{title}:</Typography>
                       </Grid>
-                    )
-                  )}
+                      <Grid item xs={8}>
+                        <Typography>{value}</Typography>
+                      </Grid>
+                    </Grid>
+                  ))}
                 </Grid>
               </Grid>
             </Grid>

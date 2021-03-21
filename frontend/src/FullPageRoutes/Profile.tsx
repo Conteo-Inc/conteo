@@ -145,7 +145,6 @@ export default function Profile(): JSX.Element {
           {isBioActive && (
             <EditableProfileContent
               readonlyContent={readonlyContent}
-              privacySettings={readonlySettings}
               editableContent={editableContent}
               contentSetters={contentSetters}
               setProfileContent={setProfileContent}

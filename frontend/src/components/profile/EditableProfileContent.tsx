@@ -14,7 +14,6 @@ import FormControl from "@material-ui/core/FormControl"
 import Select from "@material-ui/core/Select"
 import ProfileContent, { GENDER_CHOICES } from "./ProfileContent"
 import type { ProfileContentType, GenderKey } from "./ProfileContent"
-import type { PrivacySettingsType } from "./PrivacySettings"
 import INTEREST_DATA from "./interests.json"
 import { Colors } from "../../utils/colors"
 import { request } from "../../utils/fetch"
@@ -25,7 +24,6 @@ import {
 
 type EditableProfileContentProps = {
   readonlyContent: ProfileContentType
-  privacySettings: PrivacySettingsType
   editableContent: ProfileContentType
   contentSetters: ProfileContentSetters
   setProfileContent: React.Dispatch<React.SetStateAction<ProfileContentType>>
@@ -93,7 +91,6 @@ const useStyles = makeStyles({
 
 export default function EditableProfileContent({
   readonlyContent,
-  privacySettings,
   editableContent,
   contentSetters: {
     setFirstName,
@@ -237,7 +234,13 @@ export default function EditableProfileContent({
         setInterests(withoutDuplicates)
       }}
       inputValue={interestInputValue}
-      onInputChange={(e, value: string) => setInterestInputValue(value)}
+      onInputChange={(e, value: string) => {
+        // Test if value is greater than max length.
+        if (value.length > MAX_INTEREST_LENGTH) {
+          value = value.substring(0, MAX_INTEREST_LENGTH)
+        }
+        setInterestInputValue(value)
+      }}
       renderOption={(interest) => `${interest.category}: ${interest.title}`}
       renderTags={(interest: Interest[], getTagProps) =>
         interest.map(({ category, title }: Interest, index: number) => (
@@ -250,12 +253,7 @@ export default function EditableProfileContent({
         ))
       }
       renderInput={(params) => (
-        <TextField
-          {...params}
-          label="Interests"
-          variant="outlined"
-          inputProps={{ maxLength: MAX_INTEREST_LENGTH }}
-        />
+        <TextField {...params} label="Interests" variant="outlined" />
       )}
     />,
   ]
@@ -394,10 +392,7 @@ export default function EditableProfileContent({
       ) : (
         <Grid container justify="center" spacing={2}>
           <Grid item xs={12}>
-            <ProfileContent
-              readonlyContent={readonlyContent}
-              privacySettings={privacySettings}
-            />
+            <ProfileContent readonlyContent={readonlyContent} />
           </Grid>
           <Grid item>
             <Button
