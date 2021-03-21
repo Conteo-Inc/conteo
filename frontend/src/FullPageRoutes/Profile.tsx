@@ -56,10 +56,10 @@ export default function Profile(): JSX.Element {
   ] = React.useState<ProfileContentType>({
     first_name: "",
     last_name: "",
-    birth_date: new Date(),
-    gender: "",
+    birth_date: null,
+    gender: null,
     interests: [],
-    video: "",
+    video: null,
   })
   const { editableContent, contentSetters } = useProfileContent(readonlyContent)
 
@@ -124,7 +124,7 @@ export default function Profile(): JSX.Element {
   // Component state hooks.
   const { componentStates, componentSetters } = useProfileComponents()
   const {
-    isBioActive,
+    isProfileActive,
     isPrivacyActive,
     // isNotificationsActive,
     // isSettingsActive,
@@ -142,7 +142,7 @@ export default function Profile(): JSX.Element {
           />
         </Grid>
         <Grid item className={classes.section} xs={9}>
-          {isBioActive && (
+          {isProfileActive && (
             <EditableProfileContent
               readonlyContent={readonlyContent}
               editableContent={editableContent}

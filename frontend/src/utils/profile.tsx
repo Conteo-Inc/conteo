@@ -11,7 +11,7 @@ import type {
 import { SetStateDispatch } from "./context"
 
 export type ProfileComponentStates = {
-  isBioActive: boolean
+  isProfileActive: boolean
   isPrivacyActive: boolean
   isNotificationsActive: boolean
   isSettingsActive: boolean
@@ -19,7 +19,7 @@ export type ProfileComponentStates = {
 }
 
 export type ProfileComponentSetters = {
-  setIsBioActive: React.Dispatch<React.SetStateAction<boolean>>
+  setIsProfileActive: React.Dispatch<React.SetStateAction<boolean>>
   setIsPrivacyActive: React.Dispatch<React.SetStateAction<boolean>>
   setIsNotificationsActive: React.Dispatch<React.SetStateAction<boolean>>
   setIsSettingsActive: React.Dispatch<React.SetStateAction<boolean>>
@@ -42,7 +42,7 @@ export function useProfileComponents(): {
   const [isContactUsActive, setIsContactUsActive] = useState<boolean>(false)
 
   const componentStates: ProfileComponentStates = {
-    isBioActive: isBioActive,
+    isProfileActive: isBioActive,
     isPrivacyActive: isPrivacyActive,
     isNotificationsActive: isNotificationsActive,
     isSettingsActive: isSettingsActive,
@@ -50,7 +50,7 @@ export function useProfileComponents(): {
   }
 
   const componentSetters: ProfileComponentSetters = {
-    setIsBioActive: setIsBioActive,
+    setIsProfileActive: setIsBioActive,
     setIsPrivacyActive: setIsPrivacyActive,
     setIsNotificationsActive: setIsNotificationsActive,
     setIsSettingsActive: setIsSettingsActive,

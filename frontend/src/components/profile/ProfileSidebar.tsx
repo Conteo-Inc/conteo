@@ -65,8 +65,8 @@ export default function ProfileSidebar({
   const items: SidebarItem[] = [
     {
       icon: <PersonIcon />,
-      title: "Bio",
-      setIsActive: componentStateSetters.setIsBioActive,
+      title: "Profile",
+      setIsActive: componentStateSetters.setIsProfileActive,
     },
     {
       icon: <LockIcon />,
@@ -91,13 +91,10 @@ export default function ProfileSidebar({
   ]
 
   // When another component is selected, update the active state of the current
-  // component, the active state of the selected component, and the current
-  // component state setter.
+  // component and the active state of the selected component.
   const handleItemSelected = (
     setIsActive: React.Dispatch<React.SetStateAction<boolean>>
   ) => {
-    // This is ugly, maybe we're better off breaking up these components
-    // into full pages.
     Object.values(componentStateSetters).map((setter) => setter(false))
     setIsActive(true)
   }

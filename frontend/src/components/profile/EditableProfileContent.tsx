@@ -1,7 +1,14 @@
 import * as React from "react"
 import { Link } from "react-router-dom"
 import { makeStyles } from "@material-ui/core/styles"
-import { Grid, Typography, TextField, Button, Paper } from "@material-ui/core"
+import {
+  Grid,
+  Avatar,
+  Typography,
+  TextField,
+  Button,
+  Paper,
+} from "@material-ui/core"
 import DateFnsUtils from "@date-io/date-fns"
 import {
   MuiPickersUtilsProvider,
@@ -40,6 +47,10 @@ const MAX_LAST_NAME_LENGTH = 50
 const MAX_INTEREST_LENGTH = 30
 
 const useStyles = makeStyles({
+  profileAvatar: {
+    height: 200,
+    width: 200,
+  },
   circle: {
     height: 200,
     width: 200,
@@ -51,8 +62,8 @@ const useStyles = makeStyles({
   },
   image: {
     // color: "transparent",
-    width: "100%",
-    height: "100%",
+    width: "inherit",
+    height: "inherit",
     objectFit: "cover",
   },
   uploadImage: {
@@ -303,13 +314,10 @@ export default function EditableProfileContent({
               spacing={2}
             >
               <Grid item>
-                <div className={classes.circle}>
-                  <img
-                    className={classes.image}
-                    src={"/static/images/profile.jpg"}
-                  />
-                  <div className={classes.uploadImage}></div>
-                </div>
+                <Avatar
+                  src={""}
+                  className={classes.profileAvatar}
+                />
               </Grid>
               <Grid item>
                 {editableContent.video ? (

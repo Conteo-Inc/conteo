@@ -121,7 +121,7 @@ export default function ProfileContent({
           >
             <Grid item>
               <Avatar
-                src={"/static/images/profile.jpg"}
+                src={""}
                 className={classes.profileAvatar}
               />
             </Grid>
