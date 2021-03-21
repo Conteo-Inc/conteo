@@ -34,8 +34,12 @@ type EditableProfileContentProps = {
 
 type Interest = {
   category: string
-  interest: string
+  title: string
 }
+
+const MAX_FIRST_NAME_LENGTH = 50
+const MAX_LAST_NAME_LENGTH = 50
+const MAX_INTEREST_LENGTH = 30
 
 const useStyles = makeStyles({
   circle: {
@@ -82,6 +86,9 @@ const useStyles = makeStyles({
   button: {
     margin: 5,
   },
+  error: {
+    color: "red",
+  },
 })
 
 export default function EditableProfileContent({
@@ -102,50 +109,40 @@ export default function EditableProfileContent({
 
   const [isEditMode, toggleEditMode] = React.useState<boolean>(false)
   const [errorMessage, setErrorMessage] = React.useState<string>("")
+  const [interestInputValue, setInterestInputValue] = React.useState<string>("")
 
-  // The input value for an interest that a user is typing in.
-  const [interestsInputValue, setInterestsInputValue] = React.useState<string>(
-    ""
-  )
-
-  const PREDEFINED_INTERESTS: Interest[] = INTEREST_DATA.predefined_interests
-  const INTEREST_OPTIONS: string[] = PREDEFINED_INTERESTS.sort(
-    (a: Interest, b: Interest) => -b.interest.localeCompare(a.interest)
-  )
+  const INTEREST_OPTIONS: Interest[] = INTEREST_DATA.predefined_interests
+    .sort((a: Interest, b: Interest) => -b.title.localeCompare(a.title))
     .sort((a: Interest, b: Interest) => -b.category.localeCompare(a.category))
-    .map(
-      (value: { category: string; interest: string }) =>
-        `${value.category}: ${value.interest}`
-    )
+
+  const isTheSameInterest = (a: Interest, b: Interest): boolean => {
+    return a.category === b.category && a.title === b.title
+  }
 
   // Editable user profile element list.
   const editableElements: JSX.Element[] = [
     // FIRST NAME
     <TextField
       key={"editableContent-firstName"}
+      required
+      className={classes.textField}
       variant="outlined"
       label="First Name"
       value={editableContent.first_name}
-      required
       onChange={(e) => setFirstName(e.currentTarget.value)}
-      inputProps={{
-        maxLength: 50,
-      }}
-      className={classes.textField}
+      inputProps={{ maxLength: MAX_FIRST_NAME_LENGTH }}
     />,
 
     // LAST NAME
     <TextField
       key={"editableContent-lastName"}
+      required
+      className={classes.textField}
       variant="outlined"
       label="Last Name"
       value={editableContent.last_name}
-      required
       onChange={(e) => setLastName(e.currentTarget.value)}
-      inputProps={{
-        maxLength: 50,
-      }}
-      className={classes.textField}
+      inputProps={{ maxLength: MAX_LAST_NAME_LENGTH }}
     />,
 
     // BIRTHDAY
@@ -155,18 +152,16 @@ export default function EditableProfileContent({
     >
       <KeyboardDatePicker
         autoOk
+        required
+        className={classes.textField}
         variant="inline"
         inputVariant="outlined"
         margin="none"
         label="Birthday"
         format="MM/dd/yyyy"
         value={editableContent.birth_date}
-        required
         onChange={setBirthDate}
-        KeyboardButtonProps={{
-          "aria-label": "change date",
-        }}
-        className={classes.textField}
+        KeyboardButtonProps={{ "aria-label": "change date" }}
       />
     </MuiPickersUtilsProvider>,
 
@@ -181,9 +176,7 @@ export default function EditableProfileContent({
         native
         label="Gender"
         value={editableContent.gender ? editableContent.gender : ""}
-        onChange={(e) => {
-          setGender(e.currentTarget.value as GenderKey)
-        }}
+        onChange={(e) => setGender(e.currentTarget.value as GenderKey)}
       >
         <option aria-label="None" value="" />
         {Object.keys(GENDER_CHOICES).map((key) => (
@@ -198,37 +191,76 @@ export default function EditableProfileContent({
     <Autocomplete
       key={"editableContent-interests"}
       multiple
+      clearOnBlur
+      freeSolo
       className={classes.textField}
       options={INTEREST_OPTIONS}
-      defaultValue={editableContent.interests.split(",")}
-      onChange={(e, value: string[]) => {
-        setInterests(value.join(","))
+      groupBy={(interest) => interest.category}
+      getOptionLabel={(interest) =>
+        typeof interest === "string" ? interest : interest.title
+      }
+      getOptionSelected={isTheSameInterest}
+      value={editableContent.interests}
+      onChange={(e, interests: (string | Interest)[]) => {
+        // Get all the new interests.
+        const allNewInterests: Interest[] = interests.map(
+          (val: string | Interest) =>
+            typeof val === "string" ? { category: "Other", title: val } : val
+        )
+
+        // Test if interest a exists in allInterests.
+        const isDuplicate = (
+          a: Interest,
+          allInterests: Interest[]
+        ): boolean => {
+          let isDuplicate = false
+          allInterests.every((b: Interest) => {
+            isDuplicate = isTheSameInterest(a, b)
+            // If interest a is a duplicate,
+            // then return false to break loop,
+            // otherwise return true to continue.
+            return !isDuplicate
+          })
+          return isDuplicate
+        }
+
+        // All new interests without duplicates.
+        const withoutDuplicates: Interest[] = []
+        allNewInterests.forEach((a: Interest) => {
+          // Test if interest is not a duplicate.
+          if (!isDuplicate(a, withoutDuplicates)) {
+            // Push interest to list of new interests.
+            withoutDuplicates.push(a)
+          }
+        })
+
+        setInterests(withoutDuplicates)
       }}
-      inputValue={interestsInputValue}
-      onInputChange={(e, newInputValue: string) => {
-        setInterestsInputValue(newInputValue)
-      }}
-      freeSolo
-      renderTags={(options: string[], getTagProps) =>
-        options.map((option: string, index: number) => (
+      inputValue={interestInputValue}
+      onInputChange={(e, value: string) => setInterestInputValue(value)}
+      renderOption={(interest) => `${interest.category}: ${interest.title}`}
+      renderTags={(interest: Interest[], getTagProps) =>
+        interest.map(({ category, title }: Interest, index: number) => (
           <Chip
-            key={`${option}-${index}`}
+            key={`${category}:${title}-${index}`}
             variant="outlined"
-            label={option}
+            label={`${category}: ${title}`}
             {...getTagProps({ index })}
           />
         ))
       }
       renderInput={(params) => (
-        <TextField {...params} label="Interests" variant="outlined" />
+        <TextField
+          {...params}
+          label="Interests"
+          variant="outlined"
+          inputProps={{ maxLength: MAX_INTEREST_LENGTH }}
+        />
       )}
     />,
   ]
 
-  const handleSaveContent = (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    event.preventDefault()
+  const handleSaveContent = () => {
     const updates = getProfileContentUpdates(readonlyContent, editableContent)
     request({
       path: "/api/profile/",
@@ -239,24 +271,21 @@ export default function EditableProfileContent({
         setProfileContent(editableContent)
         toggleEditMode(false)
       })
-      .catch((err) => {
-        setErrorMessage(err)
+      .catch((error) => {
+        console.log(error)
+        setErrorMessage(error)
       })
   }
 
-  const handleEditContent = (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    event.preventDefault()
+  const handleEditContent = () => {
     toggleEditMode(true)
   }
 
-  const handleCancelEdit = (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    event.preventDefault()
+  const handleCancelEdit = () => {
     setErrorMessage("")
     toggleEditMode(false)
+
+    // Reset editable content values.
     setFirstName(readonlyContent.first_name)
     setLastName(readonlyContent.last_name)
     setBirthDate(readonlyContent.birth_date)
@@ -334,24 +363,30 @@ export default function EditableProfileContent({
           <Grid item xs={12}>
             <Grid container justify="center">
               <Grid item>
+                <Typography className={classes.error}>
+                  {errorMessage}
+                </Typography>
+              </Grid>
+            </Grid>
+          </Grid>
+          <Grid item xs={12}>
+            <Grid container justify="center">
+              <Grid item>
                 <Button
                   variant="contained"
                   color="primary"
                   className={classes.button}
-                  onClick={(e) => handleSaveContent(e)}
+                  onClick={handleSaveContent}
                 >
                   Save
                 </Button>
                 <Button
                   variant="contained"
                   className={classes.button}
-                  onClick={(e) => handleCancelEdit(e)}
+                  onClick={handleCancelEdit}
                 >
                   Cancel
                 </Button>
-                <br />
-                <span>{errorMessage}</span>
-                <br />
               </Grid>
             </Grid>
           </Grid>
@@ -369,7 +404,7 @@ export default function EditableProfileContent({
               variant="contained"
               color="secondary"
               className={classes.button}
-              onClick={(e) => handleEditContent(e)}
+              onClick={handleEditContent}
             >
               Edit
             </Button>

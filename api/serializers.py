@@ -9,6 +9,7 @@ from rest_framework import serializers
 from .models import (
     MatchStatus,
     Profile,
+    Interest,
     Privacy,
     Report,
     Video
@@ -37,6 +38,12 @@ class ProfileSerializer(serializers.ModelSerializer):
 class PrivacySerializer(serializers.ModelSerializer):
     class Meta:
         model = Privacy
+        fields = "__all__"
+
+
+class InterestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Interest
         fields = "__all__"
 
 

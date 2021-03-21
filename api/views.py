@@ -17,6 +17,7 @@ from rest_framework import (
 from .models import (
     MatchStatus,
     Profile,
+    Interest,
     Privacy,
     Video
 )
@@ -25,6 +26,7 @@ from .serializers import (
     MatchStatusSerializer,
     ProfileFromUserSerializer,
     ProfileSerializer,
+    InterestSerializer,
     PrivacySerializer,
     ReportSerializer,
     UserAuthSerializer,
@@ -99,6 +101,18 @@ class ProfileView(generics.RetrieveUpdateAPIView):
         profile_content = self.serializer_class(profile).data
         userId = profile_content.pop("id")
 
+        interests = []
+        try:
+            # Get all interests related to user profile.
+            allInterestObjects = Interest.objects.filter(profile=profile)
+            for interestObject in allInterestObjects:
+                interests.append(InterestSerializer(interestObject).data)
+        except Exception as e:
+            print(e)
+        finally:
+            profile_content["interests"] = interests
+
+        # Get privacy object related to user profile.
         privacy = Privacy.objects.get(profile=profile)
         privacy_settings = PrivacySerializer(privacy).data
 
@@ -109,6 +123,107 @@ class ProfileView(generics.RetrieveUpdateAPIView):
         }
 
         return response.Response(data=data, status=status.HTTP_200_OK)
+
+    def put(self, request):
+        try:
+            # Get updated user interests.
+            allUpdatedInterests = request.data.pop("interests")
+            # Update interests.
+            self.updateInterests(allUpdatedInterests, request.user.profile)
+        except:
+            # User did not updates their interests.
+            pass
+
+        # Update profile content.
+        return self.update(request=request)
+
+    def updateInterests(self, allUpdatedInterests, profile):
+        allPreExistingInterests = self.getAllPreExistingInterests(profile)
+
+        # Test if there are pre-existing interests.
+        if len(allPreExistingInterests) != 0:
+            # Get all outdated interests.
+            allOutdatedInterests = self.getAllOutdatedInterests(
+                allUpdatedInterests, allPreExistingInterests
+            )
+
+            # Delete all outdated interests.
+            for outdatedInterest in allOutdatedInterests:
+                Interest.objects.get(id=outdatedInterest["id"]).delete()
+
+        # Test if there are updated interests.
+        if len(allUpdatedInterests) > 0:
+            allNewInterests = self.getAllNewInterests(
+                allUpdatedInterests, allPreExistingInterests
+            )
+            # Add all new interests.
+            for newInterest in allNewInterests:
+                try:
+                    Interest.objects.create(
+                        profile=profile, category=newInterest["category"],
+                        title=newInterest["title"]
+                    )
+                except Exception as e:
+                    print(e)
+
+    def getAllPreExistingInterests(self, profile):
+        allPreExistingInterests = []
+        try:
+            allPreExistingInterestObjects = Interest.objects.filter(profile=profile)
+            for preExistingInterestObject in allPreExistingInterestObjects:
+                allPreExistingInterests.append(InterestSerializer(preExistingInterestObject).data)
+        except Exception as e:
+            print(e)
+        
+        return allPreExistingInterests
+
+    def getAllOutdatedInterests(self, allUpdatedInterests, allPreExistingInterests):
+        allOutdatedInterests = []
+        for preExistingInterest in allPreExistingInterests:
+            isOutdatedInterest = True
+            for updatedInterest in allUpdatedInterests:
+                if self.isTheSameInterest(preExistingInterest, updatedInterest):
+                    isOutdatedInterest = False
+                    break
+
+            if isOutdatedInterest:
+                allOutdatedInterests.append(preExistingInterest)
+            else:
+                isOutdatedInterest = True
+
+        return allOutdatedInterests
+
+    def getAllNewInterests(self, allUpdatedInterests, allPreExistingInterests):
+        allNewInterests = []
+        for updatedInterest in allUpdatedInterests:
+            isNewInterest = True
+            for preExistingInterest in allPreExistingInterests:
+                if self.isTheSameInterest(updatedInterest, preExistingInterest):
+                    isNewInterest = False
+                    break
+            
+            if isNewInterest:
+                allNewInterests.append(updatedInterest)
+            else:
+                isNewInterest = True
+
+        return allNewInterests
+
+    def isTheSameInterest(self, a, b):
+        return a["category"] == b["category"] and a["title"] == b["title"]
+
+
+
+class InterestView(generics.RetrieveUpdateAPIView):
+    serializer_class = InterestSerializer
+    queryset = Interest.objects.all()
+
+    def get(self, request):
+        interests = Interest.objects.get(profile=request.user.profile)
+        data = self.serializer_class(interests).data
+
+        return response.Response(data=data, status=status.HTTP_200_OK)
+
 
 class PrivacyView(generics.RetrieveUpdateAPIView):
     serializer_class = PrivacySerializer

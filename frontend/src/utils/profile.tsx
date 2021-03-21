@@ -2,6 +2,7 @@ import { useState } from "react"
 import type {
   ProfileContentType,
   GenderKey,
+  Interest,
 } from "../components/profile/ProfileContent"
 import type {
   PrivacySettingsType,
@@ -64,7 +65,7 @@ export type ProfileContentSetters = {
   setLastName: SetStateDispatch<string>
   setBirthDate: SetStateDispatch<Date | null>
   setGender: SetStateDispatch<GenderKey | null>
-  setInterests: SetStateDispatch<string>
+  setInterests: SetStateDispatch<Interest[]>
 }
 
 // Custom profile content hook. This separates saved profile content
@@ -79,7 +80,7 @@ export function useProfileContent(
   const [lastName, setLastName] = useState<string>(content.last_name)
   const [birthDate, setBirthDate] = useState<Date | null>(content.birth_date)
   const [gender, setGender] = useState<GenderKey | null>(content.gender)
-  const [interests, setInterests] = useState<string>(content.interests)
+  const [interests, setInterests] = useState<Interest[]>(content.interests)
 
   const editableContent: ProfileContentType = {
     first_name: firstName,
@@ -101,8 +102,9 @@ export function useProfileContent(
   return { editableContent, contentSetters }
 }
 
+// TODO: fix the or Interest[].
 type ProfileUpdates = {
-  [key: string]: string
+  [key: string]: string | Interest[]
 }
 
 export function getProfileContentUpdates(
@@ -118,6 +120,7 @@ export function getProfileContentUpdates(
       video: content.video !== null ? content.video : "",
     }
   }
+
   const canon: ProfileUpdates = contentToString(original)
   const other: ProfileUpdates = contentToString(updated)
 

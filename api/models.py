@@ -14,7 +14,6 @@ class Profile(models.Model):
     phone_number = models.CharField(max_length=10, unique=True, null=True)
     birth_date = models.DateField(null=True)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True)
-    interests = models.CharField(max_length=200, blank=True)
 
 
 class Privacy(models.Model):
@@ -42,6 +41,15 @@ class Privacy(models.Model):
     interests_privacy = models.CharField(
         max_length=2, choices=Setting.choices, default=Setting.PUBLIC
     )
+
+
+class Interest(models.Model):
+    profile = models.ForeignKey(
+        Profile, on_delete=models.CASCADE, verbose_name="related profile"
+    )
+    # TODO: enforce max lengths in frontend.
+    category = models.CharField(max_length=30, blank=True)
+    title = models.CharField(max_length=30)
 
 
 class Video(models.Model):

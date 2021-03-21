@@ -45,15 +45,6 @@ function parseBirthday(birth_date: Nullable<Date>): Nullable<Date> {
   return birthday
 }
 
-function parseInterests(interests: string): string {
-  let results = ""
-  if (typeof interests !== "undefined") {
-    results = interests
-  }
-
-  return results
-}
-
 export default function Profile(): JSX.Element {
   const classes = useStyles()
   const [userId, setUserId] = React.useState<number>(-1)
@@ -67,7 +58,7 @@ export default function Profile(): JSX.Element {
     last_name: "",
     birth_date: new Date(),
     gender: "",
-    interests: "",
+    interests: [],
     video: "",
   })
   const { editableContent, contentSetters } = useProfileContent(readonlyContent)
@@ -92,17 +83,14 @@ export default function Profile(): JSX.Element {
       .then((res) => {
         const { profile_content, privacy_settings } = res.parsedBody
         setUserId(res.parsedBody.userId)
-        console.log("res.parsedBody")
-        console.log(res.parsedBody)
 
         const birthday = parseBirthday(profile_content.birth_date)
-        const interests = parseInterests(profile_content.interests)
         const profileContent: ProfileContentType = {
           first_name: profile_content.first_name,
           last_name: profile_content.last_name,
           birth_date: birthday,
           gender: profile_content.gender,
-          interests: interests,
+          interests: profile_content.interests,
           video: profile_content.video,
         }
 
@@ -128,8 +116,8 @@ export default function Profile(): JSX.Element {
         privacySetters.setGenderPrivacy(privacySettings.gender_privacy)
         privacySetters.setInterestsPrivacy(privacySettings.interests_privacy)
       })
-      .catch((err) => {
-        console.log(err)
+      .catch((error) => {
+        console.log(error)
       })
   }, [])
 

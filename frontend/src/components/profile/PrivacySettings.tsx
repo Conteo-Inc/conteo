@@ -26,10 +26,13 @@ export type PrivacySettingsType = {
 }
 
 export type PrivacyKey = "" | "PU" | "PR" | "HI"
+
 export type PrivacyValue = "Public" | "Private" | "Hidden"
+
 type PrivacyChoice = {
   [key: string]: PrivacyValue
 }
+
 export const PRIVACY_CHOICES: PrivacyChoice = {
   PU: "Public",
   PR: "Private",
@@ -58,6 +61,9 @@ const useStyles = makeStyles({
   button: {
     margin: 5,
   },
+  error: {
+    color: "red",
+  },
 })
 
 export default function PrivacySettings({
@@ -75,7 +81,7 @@ export default function PrivacySettings({
 }: PrivacySettingsProps): JSX.Element {
   const classes = useStyles()
   const [isEditMode, toggleEditMode] = React.useState<boolean>(false)
-  const [errMessage, seterrMessage] = React.useState<string>("")
+  const [errorMessage, setErrorMessage] = React.useState<string>("")
 
   // User profile privacy field list.
   const fields: PrivacyField[] = [
@@ -106,8 +112,7 @@ export default function PrivacySettings({
     },
   ]
 
-  const handleSaveSettings = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
+  const handleSaveSettings = () => {
     const updates = getPrivacySettingsUpdates(
       readonlySettings,
       editableSettings
@@ -121,24 +126,20 @@ export default function PrivacySettings({
         setPrivacySettings(editableSettings)
         toggleEditMode(false)
       })
-      .catch((err) => {
-        seterrMessage(err)
+      .catch((error) => {
+        setErrorMessage(error)
       })
   }
 
-  const handleEditFields = (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    event.preventDefault()
+  const handleEditFields = () => {
     toggleEditMode(true)
   }
 
-  const handleCancelEdit = (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    event.preventDefault()
-    seterrMessage("")
+  const handleCancelEdit = () => {
+    setErrorMessage("")
     toggleEditMode(false)
+
+    // Reset editable privacy settings.
     setFirstNamePrivacy(readonlySettings.first_name_privacy)
     setLastNamePrivacy(readonlySettings.last_name_privacy)
     setBirthDatePrivacy(readonlySettings.birth_date_privacy)
@@ -148,112 +149,124 @@ export default function PrivacySettings({
 
   return (
     <div>
-      <Grid container alignItems="baseline" justify="flex-start">
+      <Grid container justify="center" spacing={2}>
         <Grid item xs={12}>
-          <Typography className={classes.pageTitle}>
-            Privacy Settings
-          </Typography>
+          <Grid container alignItems="baseline" justify="flex-start">
+            <Grid item xs={12}>
+              <Typography className={classes.pageTitle}>
+                Privacy Settings
+              </Typography>
+            </Grid>
+          </Grid>
         </Grid>
-      </Grid>
-      <Paper className={classes.fieldsContainer}>
-        <form onSubmit={handleSaveSettings}>
-          <Grid container justify="center">
-            <Grid item xs={10}>
-              <Grid container justify="space-between">
-                {fields.map(
-                  ({ title, privacy_level, setPrivacyLevel }: PrivacyField) => (
-                    <Grid
-                      key={`readonlyField-${title}`}
-                      item
-                      container
-                      className={classes.field}
-                      alignItems="flex-start"
-                      justify="space-between"
-                      sm={10}
-                      md={5}
-                    >
-                      <Grid item xs={3}>
-                        <Typography>{title}</Typography>
+        <Grid item xs={12}>
+          <Paper className={classes.fieldsContainer}>
+            <Grid container justify="center">
+              <Grid item xs={10}>
+                <Grid container justify="space-between">
+                  {fields.map(
+                    ({
+                      title,
+                      privacy_level,
+                      setPrivacyLevel,
+                    }: PrivacyField) => (
+                      <Grid
+                        key={`readonlyField-${title}`}
+                        item
+                        container
+                        className={classes.field}
+                        alignItems="flex-start"
+                        justify="space-between"
+                        sm={10}
+                        md={5}
+                      >
+                        <Grid item xs={3}>
+                          <Typography>{title}</Typography>
+                        </Grid>
+                        <Grid item xs={9}>
+                          <RadioGroup
+                            row
+                            aria-label="Privacy"
+                            name="Privacy"
+                            defaultValue={privacy_level}
+                            onChange={(e) =>
+                              setPrivacyLevel(
+                                e.currentTarget.value as PrivacyKey
+                              )
+                            }
+                          >
+                            {Object.keys(PRIVACY_CHOICES).map((key) => (
+                              <FormControlLabel
+                                key={`privacyChoice-${key}`}
+                                disabled={!isEditMode && privacy_level !== key}
+                                value={key}
+                                label={PRIVACY_CHOICES[key]}
+                                labelPlacement="top"
+                                control={
+                                  <Radio
+                                    color={isEditMode ? "primary" : "default"}
+                                  />
+                                }
+                              />
+                            ))}
+                          </RadioGroup>
+                        </Grid>
                       </Grid>
-                      <Grid item xs={9}>
-                        <RadioGroup
-                          aria-label="Privacy"
-                          name="Privacy"
-                          defaultValue={privacy_level}
-                          onChange={(e) => {
-                            setPrivacyLevel(e.currentTarget.value as PrivacyKey)
-                          }}
-                          row
-                        >
-                          {Object.keys(PRIVACY_CHOICES).map((key) => (
-                            <FormControlLabel
-                              key={`privacyChoice-${key}`}
-                              value={key}
-                              disabled={!isEditMode && privacy_level !== key}
-                              control={
-                                <Radio
-                                  color={isEditMode ? "primary" : "default"}
-                                />
-                              }
-                              label={PRIVACY_CHOICES[key]}
-                              labelPlacement="top"
-                            />
-                          ))}
-                        </RadioGroup>
-                      </Grid>
-                    </Grid>
-                  )
-                )}
+                    )
+                  )}
+                </Grid>
               </Grid>
             </Grid>
-            {isEditMode ? (
-              <Grid item xs={10}>
-                <Grid container justify="center">
-                  <Grid item>
-                    <Button
-                      variant="contained"
-                      type="submit"
-                      color="primary"
-                      className={classes.button}
-                    >
-                      Save
-                    </Button>
-                    <Button
-                      variant="contained"
-                      className={classes.button}
-                      onClick={(e) => {
-                        handleCancelEdit(e)
-                      }}
-                    >
-                      Cancel
-                    </Button>
-                    <br />
-                    <span>{errMessage}</span>
-                    <br />
-                  </Grid>
+          </Paper>
+        </Grid>
+        {isEditMode ? (
+          <Grid container justify="center">
+            <Grid item xs={12}>
+              <Grid container justify="center">
+                <Grid item>
+                  <Typography className={classes.error}>
+                    {errorMessage}
+                  </Typography>
                 </Grid>
               </Grid>
-            ) : (
-              <Grid item xs={10}>
-                <Grid container justify="center">
-                  <Grid item>
-                    <Button
-                      variant="contained"
-                      color="secondary"
-                      className={classes.button}
-                      onClick={(e) => {
-                        handleEditFields(e)
-                      }}
-                    >
-                      Edit
-                    </Button>
-                  </Grid>
+            </Grid>
+            <Grid item xs={12}>
+              <Grid container justify="center">
+                <Grid item>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    className={classes.button}
+                    onClick={handleSaveSettings}
+                  >
+                    Save
+                  </Button>
+                  <Button
+                    variant="contained"
+                    className={classes.button}
+                    onClick={handleCancelEdit}
+                  >
+                    Cancel
+                  </Button>
                 </Grid>
               </Grid>
-            )}
+            </Grid>
           </Grid>
-        </form>
-      </Paper>
+        ) : (
+          <Grid container justify="center">
+            <Grid item>
+              <Button
+                variant="contained"
+                color="secondary"
+                className={classes.button}
+                onClick={handleEditFields}
+              >
+                Edit
+              </Button>
+            </Grid>
+          </Grid>
+        )}
+      </Grid>
     </div>
   )
 }

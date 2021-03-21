@@ -16,19 +16,27 @@ export type ProfileContentType = {
   last_name: string
   birth_date: Nullable<Date>
   gender: Nullable<GenderKey>
-  interests: string
+  interests: Interest[]
   video: Nullable<string>
 }
 
 export type GenderKey = "" | "M" | "F" | "O"
+
 type GenderValue = "Male" | "Female" | "Other"
+
 type GenderChoice = {
   [key: string]: GenderValue
 }
+
 export const GENDER_CHOICES: GenderChoice = {
   M: "Male",
   F: "Female",
   O: "Other",
+}
+
+export type Interest = {
+  category: string
+  title: string
 }
 
 // A field listed in the content.
@@ -51,7 +59,7 @@ const useStyles = makeStyles({
     paddingBottom: 10,
   },
   field: {
-    height: 50,
+    minHeight: 50,
     marginBottom: 15,
     fontSize: "2rem",
   },
@@ -110,7 +118,9 @@ export default function ProfileContent({
     },
     {
       title: "Interests",
-      value: interests,
+      value: interests
+        .map((interest: Interest) => `${interest.category}: ${interest.title}`)
+        .join(", "),
       privacy_level: PRIVACY_CHOICES[interests_privacy],
     },
   ]
