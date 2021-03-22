@@ -8,7 +8,7 @@ import type {
   PrivacySettingsType,
   PrivacyKey,
 } from "../components/profile/PrivacySettings"
-import { SetStateDispatch } from "./context"
+import { SetStateDispatch, Nullable } from "./context"
 
 export type ProfileComponentStates = {
   isProfileActive: boolean
@@ -63,9 +63,10 @@ export function useProfileComponents(): {
 export type ProfileContentSetters = {
   setFirstName: SetStateDispatch<string>
   setLastName: SetStateDispatch<string>
-  setBirthDate: SetStateDispatch<Date | null>
-  setGender: SetStateDispatch<GenderKey | null>
+  setBirthDate: SetStateDispatch<Nullable<Date>>
+  setGender: SetStateDispatch<Nullable<GenderKey>>
   setInterests: SetStateDispatch<Interest[]>
+  setVideo: SetStateDispatch<Nullable<string>>
 }
 
 // Custom profile content hook. This separates saved profile content
@@ -78,9 +79,10 @@ export function useProfileContent(
 } {
   const [firstName, setFirstName] = useState<string>(content.first_name)
   const [lastName, setLastName] = useState<string>(content.last_name)
-  const [birthDate, setBirthDate] = useState<Date | null>(content.birth_date)
-  const [gender, setGender] = useState<GenderKey | null>(content.gender)
+  const [birthDate, setBirthDate] = useState<Nullable<Date>>(content.birth_date)
+  const [gender, setGender] = useState<Nullable<GenderKey>>(content.gender)
   const [interests, setInterests] = useState<Interest[]>(content.interests)
+  const [video, setVideo] = useState<Nullable<string>>(content.video)
 
   const editableContent: ProfileContentType = {
     first_name: firstName,
@@ -88,7 +90,7 @@ export function useProfileContent(
     birth_date: birthDate,
     gender: gender,
     interests: interests,
-    video: content.video,
+    video: video,
   }
 
   const contentSetters: ProfileContentSetters = {
@@ -97,6 +99,7 @@ export function useProfileContent(
     setBirthDate: setBirthDate,
     setGender: setGender,
     setInterests: setInterests,
+    setVideo: setVideo,
   }
 
   return { editableContent, contentSetters }

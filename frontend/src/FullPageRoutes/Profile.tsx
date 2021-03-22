@@ -100,6 +100,7 @@ export default function Profile(): JSX.Element {
         contentSetters.setGender(profileContent.gender)
         contentSetters.setBirthDate(profileContent.birth_date)
         contentSetters.setInterests(profileContent.interests)
+        contentSetters.setVideo(profileContent.video)
 
         const privacySettings: PrivacySettingsType = {
           first_name_privacy: privacy_settings.first_name_privacy,
