@@ -19,6 +19,8 @@ import Autocomplete from "@material-ui/lab/Autocomplete"
 import InputLabel from "@material-ui/core/InputLabel"
 import FormControl from "@material-ui/core/FormControl"
 import Select from "@material-ui/core/Select"
+import CameraAltIcon from "@material-ui/icons/CameraAlt"
+import VideocamIcon from "@material-ui/icons/Videocam"
 import ProfileContent, { GENDER_CHOICES } from "./ProfileContent"
 import type { ProfileContentType, GenderKey } from "./ProfileContent"
 import INTEREST_DATA from "./interests.json"
@@ -46,33 +48,92 @@ const MAX_FIRST_NAME_LENGTH = 50
 const MAX_LAST_NAME_LENGTH = 50
 const MAX_INTEREST_LENGTH = 30
 
+const pictureSize = 200
 const useStyles = makeStyles({
-  profileAvatar: {
-    height: 200,
-    width: 200,
-  },
   circle: {
-    height: 200,
-    width: 200,
-    display: "flex",
-    overflow: "hidden",
-    alignItems: "center",
     borderRadius: "50%",
-    justifyContent: "center",
   },
-  image: {
-    // color: "transparent",
-    width: "inherit",
-    height: "inherit",
-    objectFit: "cover",
-  },
-  uploadImage: {
-    width: "100%",
+  overlay: {
     height: "100%",
-    backgroundColor: "grey",
+    width: "100%",
+    position: "absolute",
+    top: 0,
+    right: 0,
+    backgroundColor: "white",
+    opacity: "0%",
+    "&:hover": {
+      opacity: "25%",
+    },
   },
-  introVideo: {
-    maxHeight: 200,
+  iconContainer: {
+    position: "absolute",
+    bottom: 3,
+    right: 3,
+    backgroundColor: "rgba(255, 255, 255, 0.15)",
+    "&:hover": {
+      backgroundColor: "rgba(255, 255, 255, 0.25)",
+    },
+    cursor: "pointer",
+    boxShadow: "0 4px 8px 0 rgb(0 0 0 / 20%), 0 6px 20px 0 rgb(0 0 0 / 19%)",
+  },
+  blur: {
+    height: "25%",
+    width: "100%",
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    backgroundColor: "rgba(200, 200, 200, 0.5)",
+    filter: "blur(8px)",
+  },
+  item: {
+    height: pictureSize,
+    width: pictureSize,
+    position: "relative",
+    cursor: "pointer",
+  },
+  picture: {
+    height: "100%",
+    width: "100%",
+  },
+  cameraContainer: {
+    height: pictureSize / 4,
+    width: pictureSize / 4,
+    borderRadius: "50%",
+  },
+  cameraIconItem: {
+    height: "75%",
+    width: "75%",
+  },
+  cameraIcon: {
+    height: "100%",
+    width: "100%",
+    color: "white",
+  },
+  videoItem: {
+    width: "auto",
+  },
+  video: {
+    height: pictureSize,
+  },
+  videoCamContainer: {
+    maxHeight: "auto",
+    width: "auto",
+    borderRadius: 16,
+  },
+  videoCamIconItem: {
+    height: 25,
+    width: 25,
+    margin: 5,
+  },
+  videoCamIcon: {
+    height: "100%",
+    width: "100%",
+    color: "white",
+  },
+  recordVideoText: {
+    margin: 5,
+    color: "white",
+    textShadow: "1px 1px 3px black",
   },
   fieldsContainer: {
     paddingTop: 40,
@@ -83,8 +144,8 @@ const useStyles = makeStyles({
     marginBottom: 15,
   },
   recordButton: {
-    backgroundColor: Colors.DEEP_BLUE,
     color: "white",
+    backgroundColor: Colors.DEEP_BLUE,
     "&:hover": {
       backgroundColor: Colors.DEEP_RED,
     },
@@ -302,31 +363,62 @@ export default function EditableProfileContent({
     setInterests(readonlyContent.interests)
   }
 
+  const uploadImage = () => {
+    console.log("upload image")
+  }
+
+  const recordIntroVideo = () => {
+    console.log("record intro video")
+  }
+
   return (
     <div>
       {isEditMode ? (
         <Grid container justify="center" spacing={2}>
           <Grid item xs={12}>
-            <Grid
-              container
-              alignItems="center"
-              justify="space-evenly"
-              spacing={2}
-            >
-              <Grid item>
-                <Avatar
-                  src={""}
-                  className={classes.profileAvatar}
-                />
+            <Grid container alignItems="center" justify="space-evenly">
+              <Grid item className={classes.item} onClick={uploadImage}>
+                <Avatar src={""} className={classes.picture} />
+                <div className={`${classes.overlay} ${classes.circle}`}></div>
+                <Grid
+                  container
+                  alignItems="center"
+                  justify="center"
+                  className={`${classes.iconContainer} ${classes.cameraContainer}`}
+                >
+                  <Grid item className={classes.cameraIconItem}>
+                    <CameraAltIcon className={classes.cameraIcon} />
+                  </Grid>
+                </Grid>
               </Grid>
-              <Grid item>
-                {editableContent.video ? (
+              {editableContent.video ? (
+                <Grid
+                  item
+                  className={`${classes.item} ${classes.videoItem}`}
+                  onClick={recordIntroVideo}
+                >
                   <video
-                    controls
                     src={editableContent.video}
-                    className={classes.introVideo}
+                    className={classes.video}
                   />
-                ) : (
+                  <div className={classes.blur}></div>
+                  <div className={classes.overlay}></div>
+                  <Grid
+                    container
+                    alignItems="center"
+                    justify="flex-end"
+                    className={`${classes.iconContainer} ${classes.videoCamContainer}`}
+                  >
+                    <Grid item className={classes.videoCamIconItem}>
+                      <VideocamIcon className={classes.videoCamIcon} />
+                    </Grid>
+                    <Grid item className={classes.recordVideoText}>
+                      <Typography>Record Intro Video</Typography>
+                    </Grid>
+                  </Grid>
+                </Grid>
+              ) : (
+                <Grid item>
                   <Button
                     className={classes.recordButton}
                     size="large"
@@ -335,8 +427,8 @@ export default function EditableProfileContent({
                   >
                     <Typography variant="h6">Record Intro Video</Typography>
                   </Button>
-                )}
-              </Grid>
+                </Grid>
+              )}
             </Grid>
           </Grid>
           <Grid item xs={12}>
