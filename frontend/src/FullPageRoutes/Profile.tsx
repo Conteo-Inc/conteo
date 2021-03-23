@@ -59,6 +59,7 @@ export default function Profile(): JSX.Element {
     birth_date: null,
     gender: null,
     interests: [],
+    image: null,
     video: null,
   })
   const { editableContent, contentSetters } = useProfileContent(readonlyContent)
@@ -91,6 +92,7 @@ export default function Profile(): JSX.Element {
           birth_date: birthday,
           gender: profile_content.gender,
           interests: profile_content.interests,
+          image: profile_content.image,
           video: profile_content.video,
         }
 
@@ -100,6 +102,7 @@ export default function Profile(): JSX.Element {
         contentSetters.setGender(profileContent.gender)
         contentSetters.setBirthDate(profileContent.birth_date)
         contentSetters.setInterests(profileContent.interests)
+        contentSetters.setImage(profileContent.image)
         contentSetters.setVideo(profileContent.video)
 
         const privacySettings: PrivacySettingsType = {

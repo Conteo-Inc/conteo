@@ -386,7 +386,10 @@ export default function EditableProfileContent({
                 className={classes.item}
                 onClick={() => setPictureModalOpen(true)}
               >
-                <Avatar src={""} className={classes.picture} />
+                <Avatar
+                  src={editableContent.image ? editableContent.image : ""}
+                  className={classes.picture}
+                />
                 <div className={`${classes.overlay} ${classes.circle}`}></div>
                 <Grid
                   container
