@@ -139,10 +139,16 @@ def read_video(video):
     @param video: A FieldFile representing the video.
     Commonly found on Video.video_file
     """
+
+    videoData = None
     try:
-        return video.read().decode()
+        videoData = video.read().decode()
+    except Exception as e:
+        print(e)
     finally:
         video.close()
+
+    return videoData
 
 
 class MailListSerializer(serializers.ModelSerializer):
