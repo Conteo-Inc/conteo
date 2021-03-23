@@ -20,7 +20,10 @@ class ProfileSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         rep = super().to_representation(instance)
         videoInstance = getVideoInstance(instance.user, instance.user)
-        videoData = getVideoData(videoInstance)
+        videoData = None
+        if videoInstance is not None:
+            videoData = read_video(videoInstance.video_file)
+
         rep["video"] = videoData
         return rep
 
@@ -46,24 +49,11 @@ def getVideoInstance(sender, receiver):
         videoInstance = allVideoInstances[0]
     # Test if there exists more than one instance.
     elif numVideos > 1:
-        # TODO: should we delete other ones here 
-        # or is that a problem for the view?
+        # TODO: should we double check how many intro videos there are here
+        # or not bother but delete old intro videos as they are updated?
         videoInstance = allVideoInstances[numVideos - 1]
 
     return videoInstance
-
-def getVideoData(videoInstance):
-    videoData = None
-    
-    if videoInstance is not None:
-        try:
-            # Read video file.
-            videoData = read_video(videoInstance.video_file)
-        except Exception as e:
-            # Video file does not exist.
-            print(e)
-
-    return videoData
 
 
 class PrivacySerializer(serializers.ModelSerializer):
