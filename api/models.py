@@ -47,7 +47,6 @@ class Interest(models.Model):
     profile = models.ForeignKey(
         Profile, on_delete=models.CASCADE, verbose_name="related profile"
     )
-    # TODO: enforce max lengths in frontend.
     category = models.CharField(max_length=30, blank=True)
     title = models.CharField(max_length=30)
 
