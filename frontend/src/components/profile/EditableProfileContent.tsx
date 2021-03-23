@@ -24,6 +24,7 @@ import VideocamIcon from "@material-ui/icons/Videocam"
 import ProfileContent, { GENDER_CHOICES } from "./ProfileContent"
 import type { ProfileContentType, GenderKey } from "./ProfileContent"
 import INTEREST_DATA from "./interests.json"
+import AbstractModal from "../AbstractModal"
 import { Colors } from "../../utils/colors"
 import { request } from "../../utils/fetch"
 import {
@@ -177,6 +178,9 @@ export default function EditableProfileContent({
   const classes = useStyles()
 
   const [isEditMode, toggleEditMode] = React.useState<boolean>(false)
+  const [isPictureModalOpen, setPictureModalOpen] = React.useState<boolean>(
+    false
+  )
   const [errorMessage, setErrorMessage] = React.useState<string>("")
   const [interestInputValue, setInterestInputValue] = React.useState<string>("")
 
@@ -363,12 +367,12 @@ export default function EditableProfileContent({
     setInterests(readonlyContent.interests)
   }
 
-  const uploadImage = () => {
-    console.log("upload image")
+  const handleConfirmUploadImage = () => {
+    setPictureModalOpen(false)
   }
 
-  const recordIntroVideo = () => {
-    console.log("record intro video")
+  const hanldeCancelUploadImage = () => {
+    setPictureModalOpen(false)
   }
 
   return (
@@ -377,7 +381,11 @@ export default function EditableProfileContent({
         <Grid container justify="center" spacing={2}>
           <Grid item xs={12}>
             <Grid container alignItems="center" justify="space-evenly">
-              <Grid item className={classes.item} onClick={uploadImage}>
+              <Grid
+                item
+                className={classes.item}
+                onClick={() => setPictureModalOpen(true)}
+              >
                 <Avatar src={""} className={classes.picture} />
                 <div className={`${classes.overlay} ${classes.circle}`}></div>
                 <Grid
@@ -395,7 +403,8 @@ export default function EditableProfileContent({
                 <Grid
                   item
                   className={`${classes.item} ${classes.videoItem}`}
-                  onClick={recordIntroVideo}
+                  component={Link}
+                  to={`/record/${userId}`}
                 >
                   <video
                     src={editableContent.video}
@@ -506,6 +515,17 @@ export default function EditableProfileContent({
           </Grid>
         </Grid>
       )}
+      <AbstractModal
+        title={"Upload your profile picture."}
+        description={"upload here"}
+        confirmText={"Upload"}
+        cancelText={"Cancel"}
+        isModalOpen={isPictureModalOpen}
+        handleConfirm={handleConfirmUploadImage}
+        handleCancel={hanldeCancelUploadImage}
+      >
+        <div>test child</div>
+      </AbstractModal>
     </div>
   )
 }
