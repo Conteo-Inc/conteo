@@ -271,6 +271,17 @@ class MailListView(generics.ListAPIView):
             status=status.HTTP_200_OK,
         )
 
+def getAllIntroVideos(user):
+    allVideoInstances = []
+    try:
+        # Get video instance.
+        allVideoInstances = Video.objects.filter(sender=user, receiver=user)
+    except Exception as e:
+        # Video instance does not exist.
+        print(e)
+
+    return allVideoInstances
+
 
 class VideoListCreate(generics.ListCreateAPIView):
     serializer_class = VideoSerializer
@@ -281,10 +292,22 @@ class VideoListCreate(generics.ListCreateAPIView):
         serializer = self.serializer_class(
             data=request.data, context={"data": data, "user": request.user}
         )
+
+        res = None
         if serializer.is_valid():
+            # Delete all old intro videos.
+            allVideoInstances = getAllIntroVideos(request.user)
+            for video in allVideoInstances:
+                video.delete()
+
+            # Save new intro video.
             serializer.save()
-            return response.Response(serializer.data, status=status.HTTP_201_CREATED)
-        return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+            res = response.Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            res = response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        return res
 
     # def get(self, request):
     #     queryset = self.filter_queryset(self.get_queryset())

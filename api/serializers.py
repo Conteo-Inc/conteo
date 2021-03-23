@@ -19,20 +19,51 @@ from .models import (
 class ProfileSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         rep = super().to_representation(instance)
-        # get video
-        video = None
-        try:
-            video = Video.objects.get(
-                Q(sender=instance.user) & Q(receiver=instance.user)
-            )
-            video = read_video(video.video_file)
-        finally:
-            rep["video"] = video
-            return rep
+        videoInstance = getVideoInstance(instance.user, instance.user)
+        videoData = getVideoData(videoInstance)
+        rep["video"] = videoData
+        return rep
 
     class Meta:
         model = Profile
         exclude = ("user",)
+
+
+def getVideoInstance(sender, receiver):
+    videoInstance = None
+    allVideoInstances = []
+    
+    try:
+        # Get video instance.
+        allVideoInstances = Video.objects.filter(sender=sender, receiver=receiver)
+    except Exception as e:
+        # Video instance does not exist.
+        print(e)
+
+    # Test if there exists an instance.
+    numVideos = len(allVideoInstances)
+    if numVideos == 1:
+        videoInstance = allVideoInstances[0]
+    # Test if there exists more than one instance.
+    elif numVideos > 1:
+        # TODO: should we delete other ones here 
+        # or is that a problem for the view?
+        videoInstance = allVideoInstances[numVideos - 1]
+
+    return videoInstance
+
+def getVideoData(videoInstance):
+    videoData = None
+    
+    if videoInstance is not None:
+        try:
+            # Read video file.
+            videoData = read_video(videoInstance.video_file)
+        except Exception as e:
+            # Video file does not exist.
+            print(e)
+
+    return videoData
 
 
 class PrivacySerializer(serializers.ModelSerializer):
