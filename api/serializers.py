@@ -6,23 +6,19 @@ from django.db.models.query_utils import Q
 from django.utils.timezone import now
 from rest_framework import serializers
 
-from .models import (
-    MatchStatus,
-    Profile,
-    Interest,
-    Privacy,
-    Report,
-    Video
-)
+from .models import Interest, MatchStatus, Privacy, Profile, Report, Video
 
 
 class ProfileSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         rep = super().to_representation(instance)
-        videoInstance = getVideoInstance(instance.user, instance.user)
+
         videoData = None
+        videoInstance = getVideoInstance(instance.user, instance.user)
         if videoInstance is not None:
             videoData = read_video(videoInstance.video_file)
+            # TODO: if videoData comes back none, then video file is lost,
+            # should we delete the video instance?
 
         rep["video"] = videoData
         return rep
@@ -35,7 +31,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 def getVideoInstance(sender, receiver):
     videoInstance = None
     allVideoInstances = []
-    
+
     try:
         # Get video instance.
         allVideoInstances = Video.objects.filter(sender=sender, receiver=receiver)
@@ -122,7 +118,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         # in the profile model.
         user.profile = Profile(user.id)
         user.profile.save()
-        
+
         privacy = Privacy(profile=user.profile)
         privacy.save()
 
