@@ -14,7 +14,7 @@ export type ProfileContentType = {
   birth_date: Nullable<Date>
   gender: Nullable<GenderKey>
   interests: Interest[]
-  image: Nullable<string>
+  image_file: Nullable<string>
   video: Nullable<string>
 }
 
@@ -79,7 +79,7 @@ export default function ProfileContent({
     birth_date,
     gender,
     interests,
-    image,
+    image_file,
     video,
   },
 }: ProfileContentProps): JSX.Element {
@@ -123,7 +123,7 @@ export default function ProfileContent({
           >
             <Grid item>
               <Avatar
-                src={image ? image : ""}
+                src={image_file ? image_file : ""}
                 className={classes.profileAvatar}
               />
             </Grid>

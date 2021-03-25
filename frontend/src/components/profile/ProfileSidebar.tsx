@@ -1,17 +1,19 @@
 import * as React from "react"
 import { makeStyles } from "@material-ui/core/styles"
-import type { ProfileComponentSetters } from "../../utils/profile"
 import { Grid, Avatar, Typography, Link } from "@material-ui/core"
 import PersonIcon from "@material-ui/icons/Person"
 import NotificationsIcon from "@material-ui/icons/Notifications"
 import SettingsIcon from "@material-ui/icons/Settings"
 import MailIcon from "@material-ui/icons/Mail"
 import LockIcon from "@material-ui/icons/Lock"
+import { Nullable } from "../../utils/context"
+import type { ProfileComponentSetters } from "../../utils/profile"
 
 // ProfileSidebar props.
 type ProfileSidebarProps = {
   firstName: string
   lastName: string
+  image: Nullable<string>
   componentStateSetters: ProfileComponentSetters
 }
 
@@ -57,6 +59,7 @@ const useStyles = makeStyles({
 export default function ProfileSidebar({
   firstName,
   lastName,
+  image,
   componentStateSetters,
 }: ProfileSidebarProps): JSX.Element {
   const classes = useStyles()
@@ -106,8 +109,7 @@ export default function ProfileSidebar({
           <Grid container className={classes.tab} alignItems="center">
             <Grid item xs={3}>
               <Avatar
-                alt={firstName}
-                src={""}
+                src={image ? image : ""}
                 className={classes.headerAvatar}
               />
             </Grid>

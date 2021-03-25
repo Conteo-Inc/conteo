@@ -23,9 +23,10 @@ import CameraAltIcon from "@material-ui/icons/CameraAlt"
 import VideocamIcon from "@material-ui/icons/Videocam"
 import ProfileContent, { GENDER_CHOICES } from "./ProfileContent"
 import type { ProfileContentType, GenderKey } from "./ProfileContent"
+import UploadImageModal from "./UploadImageModal"
 import INTEREST_DATA from "./interests.json"
-import AbstractModal from "../AbstractModal"
 import { Colors } from "../../utils/colors"
+import { Nullable } from "../../utils/context"
 import { request } from "../../utils/fetch"
 import {
   ProfileContentSetters,
@@ -171,6 +172,7 @@ export default function EditableProfileContent({
     setBirthDate,
     setGender,
     setInterests,
+    setImage,
   },
   setProfileContent,
   userId,
@@ -178,10 +180,9 @@ export default function EditableProfileContent({
   const classes = useStyles()
 
   const [isEditMode, toggleEditMode] = React.useState<boolean>(false)
-  const [isPictureModalOpen, setPictureModalOpen] = React.useState<boolean>(
-    false
+  const [contentErrorMessage, setContentErrorMessage] = React.useState<string>(
+    ""
   )
-  const [errorMessage, setErrorMessage] = React.useState<string>("")
   const [interestInputValue, setInterestInputValue] = React.useState<string>("")
 
   const INTEREST_OPTIONS: Interest[] = INTEREST_DATA.predefined_interests
@@ -347,7 +348,7 @@ export default function EditableProfileContent({
       })
       .catch((error) => {
         console.log(error)
-        setErrorMessage(error)
+        setContentErrorMessage(error)
       })
   }
 
@@ -356,7 +357,7 @@ export default function EditableProfileContent({
   }
 
   const handleCancelEdit = () => {
-    setErrorMessage("")
+    setContentErrorMessage("")
     toggleEditMode(false)
 
     // Reset editable content values.
@@ -366,13 +367,14 @@ export default function EditableProfileContent({
     setGender(readonlyContent.gender)
     setInterests(readonlyContent.interests)
   }
+  const [
+    isUploadImageModalOpen,
+    toggleUploadImageModal,
+  ] = React.useState<boolean>(false)
 
-  const handleConfirmUploadImage = () => {
-    setPictureModalOpen(false)
-  }
-
-  const hanldeCancelUploadImage = () => {
-    setPictureModalOpen(false)
+  const updateProfilePicture = (filePath: Nullable<string>) => {
+    setImage(filePath)
+    setProfileContent(editableContent)
   }
 
   return (
@@ -384,10 +386,14 @@ export default function EditableProfileContent({
               <Grid
                 item
                 className={classes.item}
-                onClick={() => setPictureModalOpen(true)}
+                onClick={() => toggleUploadImageModal(true)}
               >
                 <Avatar
-                  src={editableContent.image ? editableContent.image : ""}
+                  src={
+                    editableContent.image_file !== null
+                      ? editableContent.image_file
+                      : ""
+                  }
                   className={classes.picture}
                 />
                 <div className={`${classes.overlay} ${classes.circle}`}></div>
@@ -474,7 +480,7 @@ export default function EditableProfileContent({
             <Grid container justify="center">
               <Grid item>
                 <Typography className={classes.error}>
-                  {errorMessage}
+                  {contentErrorMessage}
                 </Typography>
               </Grid>
             </Grid>
@@ -518,17 +524,11 @@ export default function EditableProfileContent({
           </Grid>
         </Grid>
       )}
-      <AbstractModal
-        title={"Upload your profile picture."}
-        description={"upload here"}
-        confirmText={"Upload"}
-        cancelText={"Cancel"}
-        isModalOpen={isPictureModalOpen}
-        handleConfirm={handleConfirmUploadImage}
-        handleCancel={hanldeCancelUploadImage}
-      >
-        <div>test child</div>
-      </AbstractModal>
+      <UploadImageModal
+        isModalOpen={isUploadImageModalOpen}
+        toggleModal={toggleUploadImageModal}
+        updateProfilePicture={updateProfilePicture}
+      />
     </div>
   )
 }

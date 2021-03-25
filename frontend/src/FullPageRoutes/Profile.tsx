@@ -59,7 +59,7 @@ export default function Profile(): JSX.Element {
     birth_date: null,
     gender: null,
     interests: [],
-    image: null,
+    image_file: null,
     video: null,
   })
   const { editableContent, contentSetters } = useProfileContent(readonlyContent)
@@ -92,7 +92,7 @@ export default function Profile(): JSX.Element {
           birth_date: birthday,
           gender: profile_content.gender,
           interests: profile_content.interests,
-          image: profile_content.image,
+          image_file: profile_content.image_file,
           video: profile_content.video,
         }
 
@@ -102,7 +102,7 @@ export default function Profile(): JSX.Element {
         contentSetters.setGender(profileContent.gender)
         contentSetters.setBirthDate(profileContent.birth_date)
         contentSetters.setInterests(profileContent.interests)
-        contentSetters.setImage(profileContent.image)
+        contentSetters.setImage(profileContent.image_file)
         contentSetters.setVideo(profileContent.video)
 
         const privacySettings: PrivacySettingsType = {
@@ -142,6 +142,7 @@ export default function Profile(): JSX.Element {
           <ProfileSidebar
             firstName={readonlyContent.first_name}
             lastName={readonlyContent.last_name}
+            image={readonlyContent.image_file}
             componentStateSetters={componentSetters}
           />
         </Grid>
