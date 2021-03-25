@@ -6,9 +6,7 @@ from django.db.models import F, Q
 class Profile(models.Model):
     GENDER_CHOICES = (("M", "Male"), ("F", "Female"), ("O", "Other"))
 
-    user = models.OneToOneField(
-        User, on_delete=models.CASCADE, related_name="profile"
-    )
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     first_name = models.CharField(max_length=50, blank=True)
     last_name = models.CharField(max_length=50, blank=True)
     phone_number = models.CharField(max_length=10, unique=True, null=True)
@@ -23,8 +21,10 @@ class Privacy(models.Model):
         HIDDEN = "HI"
 
     profile = models.OneToOneField(
-        Profile, on_delete=models.CASCADE, primary_key=True,
-        verbose_name="related profile"
+        Profile,
+        on_delete=models.CASCADE,
+        primary_key=True,
+        verbose_name="related profile",
     )
     first_name_privacy = models.CharField(
         max_length=2, choices=Setting.choices, default=Setting.PUBLIC
