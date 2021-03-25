@@ -14,20 +14,14 @@ from rest_framework import (
     viewsets,
 )
 
-from .models import (
-    MatchStatus,
-    Profile,
-    Interest,
-    Privacy,
-    Video
-)
+from .models import Interest, MatchStatus, Privacy, Profile, Video
 from .serializers import (
+    InterestSerializer,
     MailListSerializer,
     MatchStatusSerializer,
+    PrivacySerializer,
     ProfileFromUserSerializer,
     ProfileSerializer,
-    InterestSerializer,
-    PrivacySerializer,
     ReportSerializer,
     UserAuthSerializer,
     UserRegistrationSerializer,
@@ -122,7 +116,7 @@ class ProfileView(generics.RetrieveUpdateAPIView):
             # Updated all user interests.
             allUpdatedInterests = request.data.pop("interests")
             self.updateInterests(allUpdatedInterests, request.user.profile)
-        except:
+        except KeyError:
             # User did not updates their interests.
             pass
 
@@ -130,6 +124,7 @@ class ProfileView(generics.RetrieveUpdateAPIView):
         return self.update(request=request)
 
     def updateInterests(self, updatedInterests, profile):
+        # Get all interests related to user profile.
         preExistingInterests = self.getAllUserInterests(profile)
 
         # Delete all outdated interests.
@@ -140,49 +135,38 @@ class ProfileView(generics.RetrieveUpdateAPIView):
             Interest.objects.get(id=outdatedInterest["id"]).delete()
 
         # Add all new interests.
-        newInterests = self.filterNewInterests(
-            updatedInterests, preExistingInterests
-        )
+        newInterests = self.filterNewInterests(updatedInterests, preExistingInterests)
         for new in newInterests:
-            try:
-                Interest.objects.create(
-                    profile=profile,
-                    category=new["category"],
-                    title=new["title"]
-                )
-            except Exception as e:
-                print(e)
+            Interest.objects.create(
+                profile=profile, category=new["category"], title=new["title"]
+            )
 
     def getAllUserInterests(self, profile):
         allUserInterests = []
-        try:
-            # Get all interests related to user profile.
-            allInterestObjects = Interest.objects.filter(profile=profile)
-            for interestObject in allInterestObjects:
-                allUserInterests.append(InterestSerializer(interestObject).data)
-        except Exception as e:
-            print(e)
+        # Get all interests related to user profile.
+        allInterestObjects = Interest.objects.filter(profile=profile)
+        for interestObject in allInterestObjects:
+            allUserInterests.append(InterestSerializer(interestObject).data)
 
         return allUserInterests
 
     def filterOutdatedInterests(self, updatedInterests, preExistingInterests):
         outdatedInterests = []
-        
-        # Test if there are pre-existing interests.
-        if len(preExistingInterests) != 0:
-            for preExisting in preExistingInterests:
-                isOutdated = True
-                for updated in updatedInterests:
-                    # Test if the pre-existing interest is equal to the updated.
-                    if self.isInterestEqual(preExisting, updated):
-                        isOutdated = False
-                        break
 
-                # Test if the pre-existing interest is outdated.
-                if isOutdated:
-                    outdatedInterests.append(preExisting)
-                else:
-                    isOutdated = True
+        # Test if there are pre-existing interests.
+        for preExisting in preExistingInterests:
+            isOutdated = True
+            for updated in updatedInterests:
+                # Test if the pre-existing interest is equal to the updated.
+                if self.isInterestEqual(preExisting, updated):
+                    isOutdated = False
+                    break
+
+            # Test if the pre-existing interest is outdated.
+            if isOutdated:
+                outdatedInterests.append(preExisting)
+            else:
+                isOutdated = True
 
         return outdatedInterests
 
@@ -190,49 +174,32 @@ class ProfileView(generics.RetrieveUpdateAPIView):
         newInterests = []
 
         # Test if there are updated interests.
-        if len(updatedInterests) > 0:
-            for updated in updatedInterests:
+        for updated in updatedInterests:
+            isNew = True
+            for preExisting in preExistingInterests:
+                # Test if the updated interest is equal to the pre-existing.
+                if self.isInterestEqual(updated, preExisting):
+                    isNew = False
+                    break
+
+            # Test if the updated interest is new.
+            if isNew:
+                newInterests.append(updated)
+            else:
                 isNew = True
-                for preExisting in preExistingInterests:
-                    # Test if the updated interest is equal to the pre-existing.
-                    if self.isInterestEqual(updated, preExisting):
-                        isNew = False
-                        break
-                
-                # Test if the updated interest is new.
-                if isNew:
-                    newInterests.append(updated)
-                else:
-                    isNew = True
 
         return newInterests
 
     def isInterestEqual(self, a, b):
-        return a["category"].lower() == b["category"].lower() \
+        return (
+            a["category"].lower() == b["category"].lower()
             and a["title"].lower() == b["title"].lower()
-
-
-
-class InterestView(generics.RetrieveUpdateAPIView):
-    serializer_class = InterestSerializer
-    queryset = Interest.objects.all()
-
-    def get(self, request):
-        interests = Interest.objects.get(profile=request.user.profile)
-        data = self.serializer_class(interests).data
-
-        return response.Response(data=data, status=status.HTTP_200_OK)
+        )
 
 
 class PrivacyView(generics.RetrieveUpdateAPIView):
     serializer_class = PrivacySerializer
     queryset = Privacy.objects.all()
-
-    def get(self, request):
-        privacy = Privacy.objects.get(profile=request.user.profile)
-        data = self.serializer_class(privacy).data
-
-        return response.Response(data=data, status=status.HTTP_200_OK)
 
 
 class MailListView(generics.ListAPIView):
@@ -270,17 +237,6 @@ class MailListView(generics.ListAPIView):
             status=status.HTTP_200_OK,
         )
 
-def getAllIntroVideos(user):
-    allVideoInstances = []
-    try:
-        # Get video instance.
-        allVideoInstances = Video.objects.filter(sender=user, receiver=user)
-    except Exception as e:
-        # Video instance does not exist.
-        print(e)
-
-    return allVideoInstances
-
 
 class VideoListCreate(generics.ListCreateAPIView):
     serializer_class = VideoSerializer
@@ -294,38 +250,69 @@ class VideoListCreate(generics.ListCreateAPIView):
 
         res = None
         if serializer.is_valid():
-            # Delete all old intro videos.
-            # TODO: if we are deleteing old videos every time a new one is 
-            # posted, then should we expect there to only be one video?
-            allVideoInstances = getAllIntroVideos(request.user)
-            for video in allVideoInstances:
-                video.delete()
+            # Save new intro video.
+            serializer.save()
+            res = response.Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            res = response.Response(
+                serializer.errors, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        return res
+
+
+class IntroVideoRetrieveUpdateView(generics.RetrieveUpdateAPIView):
+    serializer_class = VideoSerializer
+
+    def get_object(self, userId):
+        video = None
+        try:
+            video = Video.objects.get(sender=userId, receiver=userId)
+        except Exception:
+            # No pre-existing video.
+            pass
+
+        return video
+
+    def get(self, request):
+        video = self.get_object(request.user.id)
+
+        # Test if an intro video exists.
+        res = None
+        if video is not None:
+            serializer = self.serializer_class(video)
+            res = response.Response(data=serializer.data, status=status.HTTP_200_OK)
+        else:
+            res = response.Response(status=status.HTTP_404_NOT_FOUND)
+
+        return res
+
+    def post(self, request):
+        data = request.data.pop("data")
+        serializer = self.serializer_class(
+            data=request.data, context={"data": data, "user": request.user}
+        )
+
+        res = None
+        if serializer.is_valid():
+            oldVideo = self.get_object(request.user.id)
 
             # Save new intro video.
             serializer.save()
 
-            res = response.Response(serializer.data, status=status.HTTP_201_CREATED)
+            # Delete old intro video.
+            if oldVideo is not None:
+                oldVideo.delete()
+
+            res = response.Response(
+                data=serializer.data, status=status.HTTP_201_CREATED
+            )
         else:
-            res = response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            res = response.Response(
+                data=serializer.errors, status=status.HTTP_400_BAD_REQUEST
+            )
 
         return res
-
-    # def get(self, request):
-    #     queryset = self.filter_queryset(self.get_queryset())
-    #     serializer = self.list_serializer_class(queryset, many=True)
-    #     return response.Response(data=serializer.data, status=status.HTTP_200_OK)
-
-
-class IntroVideoRetrieveView(views.APIView):
-    serializer_class = VideoSerializer
-
-    def get_object(self, profile_id):
-        return Video.objects.get(Q(sender=profile_id) & Q(receiver=profile_id))
-
-    def get(self, request, profile_id):
-        video = self.get_object(profile_id=profile_id)
-        serializer = self.serializer_class(video)
-        return response.Response(serializer.data)
 
 
 class VideoRetrieveView(generics.RetrieveAPIView):

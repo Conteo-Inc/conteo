@@ -41,7 +41,7 @@ export default function App(): JSX.Element {
             <Route path="/tokens">
               <TokenPage />
             </Route>
-            <ProtectedRoute path="/record/:receiver">
+            <ProtectedRoute path="/record/:receiver/:type?">
               <RecordPage />
             </ProtectedRoute>
             <ProtectedRoute path="/matches">
