@@ -84,7 +84,7 @@ class UserLogoutView(generics.GenericAPIView):
         return response.Response(status=status.HTTP_200_OK)
 
 
-class ProfileView(generics.RetrieveUpdateAPIView):
+class ProfileRetrieveUpdateView(generics.RetrieveUpdateAPIView):
     serializer_class = ProfileSerializer
 
     def get_object(self):
@@ -197,7 +197,7 @@ class ProfileView(generics.RetrieveUpdateAPIView):
         )
 
 
-class PrivacyView(generics.RetrieveUpdateAPIView):
+class PrivacyRetrieveUpdateView(generics.RetrieveUpdateAPIView):
     serializer_class = PrivacySerializer
     queryset = Privacy.objects.all()
 
