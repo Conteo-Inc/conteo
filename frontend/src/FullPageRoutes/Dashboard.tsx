@@ -39,45 +39,51 @@ const useStyles = makeStyles({
   mail: {},
 })
 
+type DrawerLink = {
+  title: string
+  link: string
+  iconJsx: JSX.Element
+}
+
+const drawerLinks: DrawerLink[] = [
+  {
+    title: "Home",
+    link: "/",
+    iconJsx: <HomeIcon />,
+  },
+  {
+    title: "My Profile",
+    link: "/profile",
+    iconJsx: <Person />,
+  },
+  {
+    title: "FAQs",
+    link: "/faqs",
+    iconJsx: <Info />,
+  },
+  {
+    title: "Tutorials",
+    link: "/help",
+    iconJsx: <Help />,
+  },
+]
+
 function Drawer(): JSX.Element {
   const classes = useStyles()
+
   return (
-    <>
-      <List>
-        <Link to="/" className={classes.link}>
-          <ListItem button>
-            <ListItemIcon>
-              <HomeIcon />
-            </ListItemIcon>
-            <ListItemText primary="Home" />
-          </ListItem>
-        </Link>
-      </List>
-      <Link to="/profile" className={classes.link}>
-        <ListItem button>
-          <ListItemIcon>
-            <Person />
-          </ListItemIcon>
-          <ListItemText primary={"My Profile"} />
-        </ListItem>
-      </Link>
-      <Link to="/faqs" className={classes.link}>
-        <ListItem button>
-          <ListItemIcon>
-            <Info />
-          </ListItemIcon>
-          <ListItemText primary={"FAQs"} />
-        </ListItem>
-      </Link>
-      <Link to="/help" className={classes.link}>
-        <ListItem button>
-          <ListItemIcon>
-            <Help />
-          </ListItemIcon>
-          <ListItemText primary={"Tutorials"} />
-        </ListItem>
-      </Link>
-    </>
+    <List>
+      {drawerLinks.map(
+        ({ title, link, iconJsx }: DrawerLink, index: number) => (
+          <Link key={`drawerLink-${index}`} to={link} className={classes.link}>
+            <ListItem button>
+              <ListItemIcon>{iconJsx}</ListItemIcon>
+              <ListItemText primary={title} />
+            </ListItem>
+          </Link>
+        )
+      )}
+    </List>
   )
 }
 
