@@ -84,7 +84,7 @@ class UserLogoutView(generics.GenericAPIView):
         return response.Response(status=status.HTTP_200_OK)
 
 
-class ProfileView(generics.RetrieveUpdateAPIView):
+class ProfileRetrieveUpdateView(generics.RetrieveUpdateAPIView):
     serializer_class = ProfileSerializer
 
     def get_object(self):
@@ -95,7 +95,7 @@ class ProfileView(generics.RetrieveUpdateAPIView):
         profile_content = self.serializer_class(profile).data
         userId = profile_content.pop("id")
 
-        # Add interests to profile content.
+        # Add user interests to profile content.
         interests = self.getUserInterests(profile)
         profile_content["interests"] = interests
 
@@ -113,9 +113,8 @@ class ProfileView(generics.RetrieveUpdateAPIView):
 
     def put(self, request):
         try:
-            # Get updated user interests.
+            # Updated user interests.
             updatedInterests = request.data.pop("interests")
-            # Update interests.
             self.updateInterests(updatedInterests, request.user.profile)
         except KeyError:
             # User did not updates their interests.
@@ -188,26 +187,9 @@ class ProfileView(generics.RetrieveUpdateAPIView):
         )
 
 
-class InterestView(generics.RetrieveUpdateAPIView):
-    serializer_class = InterestSerializer
-    queryset = Interest.objects.all()
-
-    def get(self, request):
-        interests = Interest.objects.get(profile=request.user.profile)
-        data = self.serializer_class(interests).data
-
-        return response.Response(data=data, status=status.HTTP_200_OK)
-
-
-class PrivacyView(generics.RetrieveUpdateAPIView):
+class PrivacyRetrieveUpdateView(generics.RetrieveUpdateAPIView):
     serializer_class = PrivacySerializer
     queryset = Privacy.objects.all()
-
-    def get(self, request):
-        privacy = Privacy.objects.get(profile=request.user.profile)
-        data = self.serializer_class(privacy).data
-
-        return response.Response(data=data, status=status.HTTP_200_OK)
 
 
 class MailListView(generics.ListAPIView):
