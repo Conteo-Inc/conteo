@@ -95,8 +95,8 @@ class ProfileRetrieveUpdateView(generics.RetrieveUpdateAPIView):
         profile_content = self.serializer_class(profile).data
         userId = profile_content.pop("id")
 
-        # Add interests to profile content.
-        interests = self.getAllUserInterests(profile)
+        # Add user interests to profile content.
+        interests = self.getUserInterests(profile)
         profile_content["interests"] = interests
 
         # Get privacy object related to user profile.
@@ -113,9 +113,9 @@ class ProfileRetrieveUpdateView(generics.RetrieveUpdateAPIView):
 
     def put(self, request):
         try:
-            # Updated all user interests.
-            allUpdatedInterests = request.data.pop("interests")
-            self.updateInterests(allUpdatedInterests, request.user.profile)
+            # Updated user interests.
+            updatedInterests = request.data.pop("interests")
+            self.updateInterests(updatedInterests, request.user.profile)
         except KeyError:
             # User did not updates their interests.
             pass
@@ -123,16 +123,24 @@ class ProfileRetrieveUpdateView(generics.RetrieveUpdateAPIView):
         # Update profile content.
         return self.update(request=request)
 
+    def getUserInterests(self, profile):
+        userInterests = []
+        userInterestInstances = Interest.objects.filter(profile=profile)
+        for instance in userInterestInstances:
+            userInterests.append(InterestSerializer(instance).data)
+
+        return userInterests
+
     def updateInterests(self, updatedInterests, profile):
         # Get all interests related to user profile.
-        preExistingInterests = self.getAllUserInterests(profile)
+        preExistingInterests = self.getUserInterests(profile)
 
         # Delete all outdated interests.
         outdatedInterests = self.filterOutdatedInterests(
             updatedInterests, preExistingInterests
         )
-        for outdatedInterest in outdatedInterests:
-            Interest.objects.get(id=outdatedInterest["id"]).delete()
+        for outdated in outdatedInterests:
+            Interest.objects.get(id=outdated["id"]).delete()
 
         # Add all new interests.
         newInterests = self.filterNewInterests(updatedInterests, preExistingInterests)
@@ -141,28 +149,15 @@ class ProfileRetrieveUpdateView(generics.RetrieveUpdateAPIView):
                 profile=profile, category=new["category"], title=new["title"]
             )
 
-    def getAllUserInterests(self, profile):
-        allUserInterests = []
-        # Get all interests related to user profile.
-        allInterestObjects = Interest.objects.filter(profile=profile)
-        for interestObject in allInterestObjects:
-            allUserInterests.append(InterestSerializer(interestObject).data)
-
-        return allUserInterests
-
     def filterOutdatedInterests(self, updatedInterests, preExistingInterests):
         outdatedInterests = []
-
-        # Test if there are pre-existing interests.
         for preExisting in preExistingInterests:
             isOutdated = True
             for updated in updatedInterests:
-                # Test if the pre-existing interest is equal to the updated.
                 if self.isInterestEqual(preExisting, updated):
                     isOutdated = False
                     break
 
-            # Test if the pre-existing interest is outdated.
             if isOutdated:
                 outdatedInterests.append(preExisting)
             else:
@@ -172,17 +167,13 @@ class ProfileRetrieveUpdateView(generics.RetrieveUpdateAPIView):
 
     def filterNewInterests(self, updatedInterests, preExistingInterests):
         newInterests = []
-
-        # Test if there are updated interests.
         for updated in updatedInterests:
             isNew = True
             for preExisting in preExistingInterests:
-                # Test if the updated interest is equal to the pre-existing.
                 if self.isInterestEqual(updated, preExisting):
                     isNew = False
                     break
 
-            # Test if the updated interest is new.
             if isNew:
                 newInterests.append(updated)
             else:
