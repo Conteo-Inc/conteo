@@ -96,7 +96,7 @@ class ProfileView(generics.RetrieveUpdateAPIView):
         userId = profile_content.pop("id")
 
         # Add interests to profile content.
-        interests = self.getAllUserInterests(profile)
+        interests = self.getUserInterests(profile)
         profile_content["interests"] = interests
 
         # Get privacy object related to user profile.
@@ -124,8 +124,16 @@ class ProfileView(generics.RetrieveUpdateAPIView):
         # Update profile content.
         return self.update(request=request)
 
+    def getUserInterests(self, profile):
+        userInterests = []
+        userInterestInstances = Interest.objects.filter(profile=profile)
+        for instance in userInterestInstances:
+            userInterests.append(InterestSerializer(instance).data)
+
+        return userInterests
+
     def updateInterests(self, updatedInterests, profile):
-        preExistingInterests = self.getAllPreExistingInterests(profile)
+        preExistingInterests = self.getUserInterests(profile)
 
         # Delete all outdated interests.
         outdatedInterests = self.filterOutdatedInterests(
@@ -141,20 +149,12 @@ class ProfileView(generics.RetrieveUpdateAPIView):
                 profile=profile, category=new["category"], title=new["title"]
             )
 
-    def getUserInterests(self, profile):
-        userInterests = []
-        userInterestInstances = Interest.objects.filter(profile=profile)
-        for instance in userInterestInstances:
-            userInterests.append(InterestSerializer(instance).data)
-
-        return userInterests
-
     def filterOutdatedInterests(self, updatedInterests, preExistingInterests):
         outdatedInterests = []
         for preExisting in preExistingInterests:
             isOutdated = True
             for updated in updatedInterests:
-                if self.isTheSameInterest(preExisting, updated):
+                if self.isInterestEqual(preExisting, updated):
                     isOutdated = False
                     break
 
@@ -170,7 +170,7 @@ class ProfileView(generics.RetrieveUpdateAPIView):
         for updated in updatedInterests:
             isNew = True
             for preExisting in preExistingInterests:
-                if self.isTheSameInterest(updated, preExisting):
+                if self.isInterestEqual(updated, preExisting):
                     isNew = False
                     break
 
@@ -181,7 +181,7 @@ class ProfileView(generics.RetrieveUpdateAPIView):
 
         return newInterests
 
-    def isTheSameInterest(self, a, b):
+    def isInterestEqual(self, a, b):
         return (
             a["category"].lower() == b["category"].lower()
             and a["title"].lower() == b["title"].lower()
