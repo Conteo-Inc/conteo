@@ -120,10 +120,7 @@ export default function ProfileContent({
             spacing={2}
           >
             <Grid item>
-              <Avatar
-                src={""}
-                className={classes.profileAvatar}
-              />
+              <Avatar src={""} className={classes.profileAvatar} />
             </Grid>
             {video && (
               <Grid item>
