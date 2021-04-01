@@ -8,17 +8,17 @@ import {
   TextField,
   Button,
   Paper,
+  FormControl,
+  InputLabel,
+  Select,
+  Chip,
 } from "@material-ui/core"
 import DateFnsUtils from "@date-io/date-fns"
 import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker,
 } from "@material-ui/pickers"
-import Chip from "@material-ui/core/Chip"
 import Autocomplete from "@material-ui/lab/Autocomplete"
-import InputLabel from "@material-ui/core/InputLabel"
-import FormControl from "@material-ui/core/FormControl"
-import Select from "@material-ui/core/Select"
 import ProfileContent, { GENDER_CHOICES } from "./ProfileContent"
 import type { ProfileContentType, GenderKey } from "./ProfileContent"
 import INTEREST_DATA from "./interests.json"
@@ -44,7 +44,6 @@ type Interest = {
 
 const MAX_FIRST_NAME_LENGTH = 50
 const MAX_LAST_NAME_LENGTH = 50
-const MAX_INTEREST_LENGTH = 30
 
 const useStyles = makeStyles({
   profileAvatar: {
@@ -123,7 +122,7 @@ export default function EditableProfileContent({
     .sort((a: Interest, b: Interest) => -b.title.localeCompare(a.title))
     .sort((a: Interest, b: Interest) => -b.category.localeCompare(a.category))
 
-  const isTheSameInterest = (a: Interest, b: Interest): boolean => {
+  const isInterestEqual = (a: Interest, b: Interest): boolean => {
     return a.category === b.category && a.title === b.title
   }
 
@@ -200,63 +199,20 @@ export default function EditableProfileContent({
       key={"editableContent-interests"}
       multiple
       clearOnBlur
-      freeSolo
       className={classes.textField}
       options={INTEREST_OPTIONS}
       groupBy={(interest) => interest.category}
-      getOptionLabel={(interest) =>
-        typeof interest === "string" ? interest : interest.title
-      }
-      getOptionSelected={isTheSameInterest}
+      getOptionLabel={(interest) => interest.title}
+      getOptionSelected={isInterestEqual}
       value={editableContent.interests}
-      onChange={(e, interests: (string | Interest)[]) => {
-        // Get all the new interests.
-        const allNewInterests: Interest[] = interests.map(
-          (val: string | Interest) =>
-            typeof val === "string" ? { category: "Other", title: val } : val
-        )
-
-        // Test if interest a exists in allInterests.
-        const isDuplicate = (
-          a: Interest,
-          allInterests: Interest[]
-        ): boolean => {
-          let isDuplicate = false
-          allInterests.every((b: Interest) => {
-            isDuplicate = isTheSameInterest(a, b)
-            // If interest a is a duplicate,
-            // then return false to break loop,
-            // otherwise return true to continue.
-            return !isDuplicate
-          })
-          return isDuplicate
-        }
-
-        // All new interests without duplicates.
-        const withoutDuplicates: Interest[] = []
-        allNewInterests.forEach((a: Interest) => {
-          // Test if interest is not a duplicate.
-          if (!isDuplicate(a, withoutDuplicates)) {
-            // Push interest to list of new interests.
-            withoutDuplicates.push(a)
-          }
-        })
-
-        setInterests(withoutDuplicates)
-      }}
+      onChange={(e, interests: Interest[]) => setInterests(interests)}
       inputValue={interestInputValue}
-      onInputChange={(e, value: string) => {
-        // Test if value is greater than max length.
-        if (value.length > MAX_INTEREST_LENGTH) {
-          value = value.substring(0, MAX_INTEREST_LENGTH)
-        }
-        setInterestInputValue(value)
-      }}
+      onInputChange={(e, value: string) => setInterestInputValue(value)}
       renderOption={(interest) => `${interest.category}: ${interest.title}`}
       renderTags={(interest: Interest[], getTagProps) =>
         interest.map(({ category, title }: Interest, index: number) => (
           <Chip
-            key={`${category}:${title}-${index}`}
+            key={`interestChip-${index}`}
             variant="outlined"
             label={`${category}: ${title}`}
             {...getTagProps({ index })}
@@ -264,7 +220,7 @@ export default function EditableProfileContent({
         ))
       }
       renderInput={(params) => (
-        <TextField {...params} label="Interests" variant="outlined" />
+        <TextField {...params} variant="outlined" label="Interests" />
       )}
     />,
   ]
@@ -314,10 +270,7 @@ export default function EditableProfileContent({
               spacing={2}
             >
               <Grid item>
-                <Avatar
-                  src={""}
-                  className={classes.profileAvatar}
-                />
+                <Avatar src={""} className={classes.profileAvatar} />
               </Grid>
               <Grid item>
                 {editableContent.video ? (
