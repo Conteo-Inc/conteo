@@ -2,8 +2,10 @@ import * as React from "react"
 import { useReactMediaRecorder } from "react-media-recorder"
 import { Grid, makeStyles } from "@material-ui/core"
 import Controls from "../components/video/Controls"
-import { request } from "../utils/fetch"
-import useFocusedUser, { Nullable, NullableId } from "../utils/context"
+import { parseIdentity, request } from "../utils/fetch"
+import { useHistory, useParams } from "react-router-dom"
+import { Nullable, NullableId } from "../utils/context"
+import { History } from "history"
 
 const useStyles = makeStyles({
   video_root: {
@@ -30,26 +32,32 @@ function Preview({ stream }: PreviewProps) {
   return <video ref={ref} className={classes.video_root} autoPlay />
 }
 
-function sendVideo(blob: Nullable<Blob>, receiver: NullableId) {
+function sendVideo(
+  blob: Nullable<Blob>,
+  receiver: NullableId,
+  history: History
+) {
   if (blob) {
     const reader = new FileReader()
     reader.readAsDataURL(blob)
     reader.onload = () => {
       request({
-        path: "/api/video/",
+        path: "/api/videos/",
         method: "post",
         body: {
           receiver: receiver,
           data: reader.result,
         },
-      })
+        parser: parseIdentity,
+      }).then(() => history.goBack())
     }
   }
 }
 
 export default function RecordPage(): JSX.Element {
   const [videoBlob, setVideoBlob] = React.useState<Nullable<Blob>>(null)
-  const [focusedUser] = useFocusedUser()
+  const { receiver } = useParams<{ receiver: string }>()
+  const history = useHistory()
 
   const {
     status,
@@ -76,7 +84,7 @@ export default function RecordPage(): JSX.Element {
         status={status}
         startRecording={startRecording}
         stopRecording={stopRecording}
-        sendVideo={() => sendVideo(videoBlob, focusedUser)}
+        sendVideo={() => sendVideo(videoBlob, Number(receiver), history)}
       />
     </Grid>
   )
