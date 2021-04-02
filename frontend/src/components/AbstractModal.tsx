@@ -43,8 +43,8 @@ const useStyles = makeStyles((theme) => ({
 export default function AbstractModal({
   title,
   description,
-  confirmText,
-  cancelText,
+  confirmText = "YES",
+  cancelText = "NO",
   isModalOpen,
   handleConfirm,
   handleCancel,
