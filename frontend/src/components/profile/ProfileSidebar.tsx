@@ -15,7 +15,7 @@ type ProfileSidebarProps = {
   componentStateSetters: ProfileComponentSetters
 }
 
-// Aitem listed in the sidebar.
+// An item listed in the sidebar.
 type SidebarItem = {
   icon: JSX.Element
   title: string

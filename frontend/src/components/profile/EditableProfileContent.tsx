@@ -60,7 +60,6 @@ const useStyles = makeStyles({
     justifyContent: "center",
   },
   image: {
-    // color: "transparent",
     width: "inherit",
     height: "inherit",
     objectFit: "cover",
