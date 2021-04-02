@@ -123,42 +123,37 @@ export default function Profile(): JSX.Element {
 
   // Component state hooks.
   const { componentStates, componentSetters } = useProfileComponents()
-  const {
-    isProfileActive,
-    isPrivacyActive,
-  } = componentStates
+  const { isProfileActive, isPrivacyActive } = componentStates
 
   return (
-    <div>
-      <Grid container className={classes.root}>
-        <Grid item className={classes.sideBar} xs={3}>
-          <ProfileSidebar
-            firstName={readonlyContent.first_name}
-            lastName={readonlyContent.last_name}
-            componentStateSetters={componentSetters}
-          />
-        </Grid>
-        <Grid item className={classes.section} xs={9}>
-          {isProfileActive && (
-            <EditableProfileContent
-              readonlyContent={readonlyContent}
-              editableContent={editableContent}
-              contentSetters={contentSetters}
-              setProfileContent={setProfileContent}
-              userId={userId}
-            />
-          )}
-          {isPrivacyActive && (
-            <PrivacySettings
-              readonlySettings={readonlySettings}
-              editableSettings={editableSettings}
-              privacySetters={privacySetters}
-              setPrivacySettings={setPrivacySettings}
-              userId={userId}
-            />
-          )}
-        </Grid>
+    <Grid container className={classes.root}>
+      <Grid item className={classes.sideBar} xs={3}>
+        <ProfileSidebar
+          firstName={readonlyContent.first_name}
+          lastName={readonlyContent.last_name}
+          componentStateSetters={componentSetters}
+        />
       </Grid>
-    </div>
+      <Grid item className={classes.section} xs={9}>
+        {isProfileActive && (
+          <EditableProfileContent
+            readonlyContent={readonlyContent}
+            editableContent={editableContent}
+            contentSetters={contentSetters}
+            setProfileContent={setProfileContent}
+            userId={userId}
+          />
+        )}
+        {isPrivacyActive && (
+          <PrivacySettings
+            readonlySettings={readonlySettings}
+            editableSettings={editableSettings}
+            privacySetters={privacySetters}
+            setPrivacySettings={setPrivacySettings}
+            userId={userId}
+          />
+        )}
+      </Grid>
+    </Grid>
   )
 }
