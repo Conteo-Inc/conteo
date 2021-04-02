@@ -1,40 +1,61 @@
 import * as React from "react"
 import { makeStyles } from "@material-ui/core/styles"
-import { Grid, Avatar, Typography } from "@material-ui/core"
+import type { ProfileContentSetters } from "../utils/profile"
+import {
+  Grid,
+  Avatar,
+  Typography,
+  TextField,
+  Button,
+  Paper,
+  TextFieldProps,
+} from "@material-ui/core"
+import { Nullable } from "../utils/context"
+import { Colors } from "../utils/colors"
+import { Link } from "react-router-dom"
+
+type ProfileContentProps = {
+  readonlyContent: ProfileContentType
+  setters: ProfileContentSetters
+  isEditMode: boolean
+  errMessage: string
+  handleEditFields: () => void
+  handleCancelEdit: () => void
+  handleSaveFields: (event: React.FormEvent<HTMLFormElement>) => void
+}
 
 // This is what the ProfileContent component expects to receive from storage.
-type ProfileContentProps = {
-  username: string
-  name: string
-  profileImg: string
+export type ProfileContentType = {
+  first_name: string
+  last_name: string
+  birth_date: Date
   gender: string
-  religion: string
-  location: string
-  occupations: string[]
-  age: number | string
-  interests: string[]
+  interests: string
+  video: Nullable<string>
+  id: number
 }
 
 // A field listed in the content.
 type ProfileField = {
   title: string
   value: string
+  privacy_level: "Public" | "Private" | "Hidden"
+  textFieldProps: TextFieldProps
 }
 
 const useStyles = makeStyles({
   profileHeader: {
-    padding: "0 50",
+    padding: "0px 50px",
+    marginBottom: 25,
   },
   profileAvatar: {
     height: 200,
     width: 200,
   },
   introVideo: {
-    height: 200,
-    width: 400,
-    backgroundColor: "#bdbdbd",
     color: "white",
     textAlign: "center",
+    marginBottom: "1rem",
   },
   fieldsContainer: {
     position: "relative",
@@ -51,78 +72,234 @@ const useStyles = makeStyles({
     padding: 5,
     paddingRight: 10,
   },
+  bottomRight: {
+    position: "absolute",
+    bottom: "0",
+    right: "0",
+    transform: "translate(-10%, -10%)",
+  },
+  bottomRight2: {
+    position: "absolute",
+    bottom: "0",
+    right: "0",
+    transform: "translate(-100%, -10%)",
+  },
+  recordButton: {
+    backgroundColor: Colors.DEEP_BLUE,
+    color: "white",
+    "&:hover": {
+      backgroundColor: Colors.DEEP_RED,
+    },
+  },
 })
 
-export default function ProfileContent(
-  props: ProfileContentProps
-): JSX.Element {
+export default function ProfileContent({
+  readonlyContent,
+  setters,
+  isEditMode,
+  errMessage,
+  handleEditFields,
+  handleCancelEdit,
+  handleSaveFields,
+}: ProfileContentProps): JSX.Element {
   const classes = useStyles()
 
-  // Add user profile values to list.
-  const profileFields: ProfileField[] = [
+  // User profile field list. Field values are assigned to readonly content.
+  const fields: ProfileField[] = [
     {
-      title: "Full Name",
-      value: props.name,
+      title: "First Name",
+      value: readonlyContent.first_name,
+      privacy_level: "Public",
+      textFieldProps: {
+        required: true,
+        disabled: false,
+        onChange: (e) => {
+          setters.setFirstName(e.currentTarget.value)
+        },
+        inputProps: {
+          maxLength: 50,
+        },
+      },
     },
     {
-      title: "Username",
-      value: props.username,
+      title: "Last Name",
+      value: readonlyContent.last_name,
+      privacy_level: "Private",
+      textFieldProps: {
+        required: true,
+        disabled: false,
+        onChange: (e) => {
+          setters.setLastName(e.currentTarget.value)
+        },
+        inputProps: {
+          maxLength: 50,
+        },
+      },
     },
     {
-      title: "Age",
-      value: props.age.toString(),
+      title: "Birthday",
+      value: readonlyContent.birth_date.toLocaleDateString(),
+      privacy_level: "Private",
+      textFieldProps: {
+        required: true,
+        disabled: true,
+        onChange: (e) => {
+          setters.setBirthDate(new Date(e.currentTarget.value))
+        },
+      },
     },
     {
       title: "Gender",
-      value: props.gender,
-    },
-    {
-      title: "Occupations",
-      value: props.occupations.join(", "),
-    },
-    {
-      title: "Location",
-      value: props.location,
+      value: readonlyContent.gender,
+      privacy_level: "Hidden",
+      textFieldProps: {
+        required: false,
+        disabled: false,
+        onChange: (e) => {
+          setters.setGender(e.currentTarget.value)
+        },
+      },
     },
     {
       title: "Interests",
-      value: props.interests.join(", "),
-    },
-    {
-      title: "Religion",
-      value: props.religion,
+      value: readonlyContent.interests,
+      privacy_level: "Public",
+      textFieldProps: {
+        required: false,
+        disabled: false,
+        onChange: (e) => {
+          setters.setInterests(e.currentTarget.value)
+        },
+      },
     },
   ]
 
   return (
-    <>
-      <Grid container item className={classes.profileHeader} xs={12}>
-        <Grid container item alignItems="center" justify="center" xs={6}>
-          <Avatar
-            alt={props.name}
-            src={props.profileImg}
-            className={classes.profileAvatar}
-          />
-        </Grid>
-        <Grid container item alignItems="center" justify="center" xs={6}>
-          <div className={classes.introVideo}>Intro Video</div>
-        </Grid>
-      </Grid>
-      <Grid
-        container
-        item
-        alignItems="center"
-        className={classes.fieldsContainer}
-        xs={12}
-      >
-        {profileFields.map(({ title, value }: ProfileField) => (
-          <Grid key={title} item className={classes.field} sm={12} md={6}>
-            <Typography>
-              {title}: {value}
-            </Typography>
+    <Grid container spacing={2}>
+      <Grid item className={classes.profileHeader} xs={12}>
+        <Grid container justify="center" spacing={2}>
+          <Grid item xs={12} sm={6}>
+            <Avatar src={""} className={classes.profileAvatar} />
           </Grid>
-        ))}
+          <Grid
+            item
+            xs={12}
+            sm={6}
+            container
+            alignItems="center"
+            justify="center"
+            className={classes.introVideo}
+          >
+            {readonlyContent.video ? (
+              <video
+                controls
+                src={readonlyContent.video}
+                width={"100%"}
+                height={"100%"}
+              />
+            ) : (
+              <Button
+                className={classes.recordButton}
+                size="large"
+                component={Link}
+                to={`/record/${readonlyContent.id}`}
+              >
+                <Typography variant="h6">Record Intro Video</Typography>
+              </Button>
+            )}
+          </Grid>
+        </Grid>
       </Grid>
-    </>
+      {!isEditMode && (
+        <Grid item xs={12}>
+          <Paper>
+            <Grid container spacing={2}>
+              {fields.map(({ title, value, privacy_level }: ProfileField) => (
+                <Grid
+                  key={`readonlyField-${title}`}
+                  container
+                  item
+                  justify="flex-end"
+                  className={classes.field}
+                  sm={12}
+                  md={6}
+                >
+                  <Grid item xs={9}>
+                    <Typography>
+                      {`${title}: ${value} (${privacy_level})`}
+                    </Typography>
+                  </Grid>
+                </Grid>
+              ))}
+              <Grid container item justify="center" xs={12}>
+                <Grid item>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    style={{ margin: 5 }}
+                    onClick={handleEditFields}
+                  >
+                    Edit
+                  </Button>
+                </Grid>
+              </Grid>
+            </Grid>
+          </Paper>
+        </Grid>
+      )}
+      {isEditMode && (
+        <Grid item xs={12}>
+          <Paper>
+            <form onSubmit={handleSaveFields}>
+              <Grid container spacing={2}>
+                {fields.map(
+                  ({ title, value, textFieldProps }: ProfileField) => (
+                    <Grid
+                      key={`editableField-${title}`}
+                      container
+                      item
+                      justify="flex-end"
+                      className={classes.field}
+                      sm={12}
+                      md={6}
+                    >
+                      <Grid item xs={9}>
+                        <TextField
+                          label={title}
+                          defaultValue={value}
+                          {...textFieldProps}
+                        />
+                      </Grid>
+                    </Grid>
+                  )
+                )}
+                <Grid container item justify="center" xs={12}>
+                  <Grid item>
+                    <Button
+                      variant="contained"
+                      type="submit"
+                      color="primary"
+                      style={{ margin: 5 }}
+                    >
+                      Save
+                    </Button>
+                    <Button
+                      variant="contained"
+                      style={{ margin: 5 }}
+                      onClick={handleCancelEdit}
+                    >
+                      Cancel
+                    </Button>
+                  </Grid>
+                </Grid>
+              </Grid>
+              <br />
+              <span>{errMessage}</span>
+              <br />
+            </form>
+          </Paper>
+        </Grid>
+      )}
+    </Grid>
   )
 }

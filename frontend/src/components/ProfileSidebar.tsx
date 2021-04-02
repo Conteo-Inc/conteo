@@ -9,8 +9,8 @@ import LockIcon from "@material-ui/icons/Lock"
 
 // ProfileSidebar props.
 type ProfileSidebarProps = {
-  name: string
-  profileImg: string
+  firstName: string
+  lastName: string
 }
 
 // Aitem listed in the sidebar.
@@ -43,9 +43,10 @@ const useStyles = makeStyles({
   },
 })
 
-export default function ProfileSidebar(
-  props: ProfileSidebarProps
-): JSX.Element {
+export default function ProfileSidebar({
+  firstName,
+  lastName,
+}: ProfileSidebarProps): JSX.Element {
   const classes = useStyles()
 
   // Add sidebar items to list.
@@ -76,15 +77,11 @@ export default function ProfileSidebar(
     <>
       <Grid container item className={classes.tab} xs={12}>
         <Grid container item alignItems="center" justify="center" xs={3}>
-          <Avatar
-            alt={props.name}
-            src={props.profileImg}
-            className={classes.headerAvatar}
-          />
+          <Avatar alt={firstName} src={""} className={classes.headerAvatar} />
         </Grid>
         <Grid container item alignItems="center" xs={9}>
           <Typography className={`${classes.headerName} ${classes.tabTitle}`}>
-            {props.name}
+            {firstName} {lastName}
           </Typography>
         </Grid>
       </Grid>
