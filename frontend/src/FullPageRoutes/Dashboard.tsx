@@ -77,6 +77,14 @@ function Drawer(): JSX.Element {
           <ListItemText primary={"Tutorials"} />
         </ListItem>
       </Link>
+      <Link to="/contact" className={classes.link}>
+        <ListItem button>
+          <ListItemIcon>
+            <Info />
+          </ListItemIcon>
+          <ListItemText primary={"Contact Us"} />
+        </ListItem>
+      </Link>
     </>
   )
 }

@@ -37,15 +37,15 @@ export default function Help(): JSX.Element {
   const classes = useStyles()
   const pages: helpBtns[] = [
     {
-      href: "ContactUs",
+      href: "/contact",
       value: "Contact Us",
     },
     {
-      href: "FAQs",
+      href: "/faqs",
       value: "FAQs",
     },
     {
-      href: "Tutorials",
+      href: "/tutorials",
       value: "Tutorials",
     },
   ]
