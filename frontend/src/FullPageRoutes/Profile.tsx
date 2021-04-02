@@ -38,7 +38,7 @@ function parseBirthday(birth_date: Nullable<Date>): Nullable<Date> {
   let birthday = null
   if (birth_date !== null) {
     birthday = new Date(birth_date)
-    // Typescript removes a day.
+    // Typescript is zero indexed but django is not.
     birthday.setDate(birthday.getDate() + 1)
   }
 
@@ -126,9 +126,6 @@ export default function Profile(): JSX.Element {
   const {
     isProfileActive,
     isPrivacyActive,
-    // isNotificationsActive,
-    // isSettingsActive,
-    // isContactUsActive,
   } = componentStates
 
   return (
@@ -160,17 +157,6 @@ export default function Profile(): JSX.Element {
               userId={userId}
             />
           )}
-          {/*
-            {isNotificationsActive && (
-              // Add notifications component here
-            )}
-            {isSettingsActive && (
-              // Add settings component here
-            )}
-            {isContactUsActive && (
-              // Add contact us component here
-            )}
-          */}
         </Grid>
       </Grid>
     </div>
