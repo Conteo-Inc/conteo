@@ -34,6 +34,7 @@ export const GENDER_CHOICES: GenderChoice = {
 export type Interest = {
   category: string
   title: string
+  id: number
 }
 
 // A field listed in the content.

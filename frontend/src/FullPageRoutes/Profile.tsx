@@ -81,8 +81,8 @@ export default function Profile(): JSX.Element {
   React.useEffect(() => {
     request<UserProfile>({ path: "/api/profile/", method: "get" })
       .then((res) => {
-        const { profile_content, privacy_settings } = res.parsedBody
-        setUserId(res.parsedBody.userId)
+        const { profile_content, privacy_settings, userId } = res.parsedBody
+        setUserId(userId)
 
         const birthday = parseBirthday(profile_content.birth_date)
         const profileContent: ProfileContentType = {

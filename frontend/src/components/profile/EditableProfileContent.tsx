@@ -20,8 +20,7 @@ import {
 } from "@material-ui/pickers"
 import Autocomplete from "@material-ui/lab/Autocomplete"
 import ProfileContent, { GENDER_CHOICES } from "./ProfileContent"
-import type { ProfileContentType, GenderKey } from "./ProfileContent"
-import INTEREST_DATA from "./interests.json"
+import type { ProfileContentType, GenderKey, Interest } from "./ProfileContent"
 import { Colors } from "../../utils/colors"
 import { request } from "../../utils/fetch"
 import {
@@ -35,11 +34,6 @@ type EditableProfileContentProps = {
   contentSetters: ProfileContentSetters
   setProfileContent: React.Dispatch<React.SetStateAction<ProfileContentType>>
   userId: number
-}
-
-type Interest = {
-  category: string
-  title: string
 }
 
 const MAX_FIRST_NAME_LENGTH = 50
@@ -116,10 +110,22 @@ export default function EditableProfileContent({
   const [isEditMode, toggleEditMode] = React.useState<boolean>(false)
   const [errorMessage, setErrorMessage] = React.useState<string>("")
   const [interestInputValue, setInterestInputValue] = React.useState<string>("")
+  const [interestOptions, setInterestOptions] = React.useState<Interest[]>([])
 
-  const INTEREST_OPTIONS: Interest[] = INTEREST_DATA.predefined_interests
-    .sort((a: Interest, b: Interest) => -b.title.localeCompare(a.title))
-    .sort((a: Interest, b: Interest) => -b.category.localeCompare(a.category))
+  React.useEffect(() => {
+    request<Interest[]>({ path: "/api/interests/", method: "get" })
+      .then((res) => {
+        const options: Interest[] = res.parsedBody
+          .sort((a: Interest, b: Interest) => -b.title.localeCompare(a.title))
+          .sort(
+            (a: Interest, b: Interest) => -b.category.localeCompare(a.category)
+          )
+        setInterestOptions(options)
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+  }, [])
 
   const isInterestEqual = (a: Interest, b: Interest): boolean => {
     return a.category === b.category && a.title === b.title
@@ -199,7 +205,7 @@ export default function EditableProfileContent({
       multiple
       clearOnBlur
       className={classes.textField}
-      options={INTEREST_OPTIONS}
+      options={interestOptions}
       groupBy={(interest) => interest.category}
       getOptionLabel={(interest) => interest.title}
       getOptionSelected={isInterestEqual}

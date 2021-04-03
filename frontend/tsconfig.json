@@ -8,9 +8,7 @@
         "noImplicitThis": true,
         "isolatedModules": true,
         "allowJs": true,
-        "moduleResolution": "node",
-        "resolveJsonModule": true,
-        "esModuleInterop": true
+        "moduleResolution": "node"
     },
     "include": ["src/"]
 }
