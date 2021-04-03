@@ -10,7 +10,6 @@ import {
 } from "@material-ui/core"
 import CloseIcon from "@material-ui/icons/Close"
 import * as React from "react"
-import { SetStateDispatch } from "../utils/context"
 
 type ModalType = {
   title: string
@@ -18,7 +17,6 @@ type ModalType = {
   confirmText?: string
   cancelText?: string
   isOpen: boolean
-  setisOpen: SetStateDispatch<boolean>
   handleConfirm: any
   handleCancel: any
 }

@@ -54,7 +54,7 @@ export default function AccountsPage(): JSX.Element {
   const [editMode, editModeOn] = useState(false)
   const [value, setValues] = useState("")
   const [btnText, setBtnText] = useState("Delete or Deactivate Account")
-  const [open, setOpen] = useState(false)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   const [accountData, setAccountData] = useState<UserAccounts>({
     first_name: "",
@@ -86,18 +86,18 @@ export default function AccountsPage(): JSX.Element {
 
     if (value === "Deactivating Account") {
       setBtnText("Deactivate Account")
-      setOpen(true)
+      setIsModalOpen(true)
     } else if (value === "Delete Account") {
       setBtnText("Delete Account")
-      setOpen(true)
+      setIsModalOpen(true)
     } else {
       setBtnText("Delete or Deactivate Account")
-      setOpen(false)
+      setIsModalOpen(false)
     }
   }
 
   const handleClose = () => {
-    setOpen(false)
+    setIsModalOpen(false)
   }
 
   useEffect(() => {
@@ -278,7 +278,7 @@ export default function AccountsPage(): JSX.Element {
                 {btnText}
               </Button>
               <AbstractModal
-                isOpen={open}
+                isOpen={isModalOpen}
                 handleConfirm={handleClose}
                 handleCancel={handleClose}
                 title="Confirmation"
