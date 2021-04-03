@@ -101,7 +101,7 @@ export default function AccountsPage(): JSX.Element {
   }
 
   useEffect(() => {
-    request({ path: "/api/account/", method: "get" }).then((res) => {
+    request({ path: "/api/accounts/", method: "get" }).then((res) => {
       const account: any = res.parsedBody
       const content: UserAccounts = {
         first_name: account.first_name,

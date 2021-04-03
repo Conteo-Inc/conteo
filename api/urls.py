@@ -17,6 +17,6 @@ urlpatterns = [
     # multiple endpoints - Michael
     path("mail/", views.MailListView.as_view()),
     path("reports/", views.Reports.as_view()),
-    path("account/", views.Accounts.as_view()),
+    path("accounts/", views.Accounts.as_view()),
     path("user/", views.UserAuthView.as_view()),
 ]
