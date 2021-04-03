@@ -134,7 +134,6 @@ class ProfileRetrieveUpdateView(generics.RetrieveUpdateAPIView):
             profile.interest_set.set(idList)
 
 
-
 class PrivacyRetrieveUpdateView(generics.RetrieveUpdateAPIView):
     serializer_class = PrivacySerializer
     queryset = Privacy.objects.all()
