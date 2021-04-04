@@ -12,6 +12,8 @@ import AppFooter from "./components/AppFooter"
 import { ProtectedRoute } from "./components/ProtectedRoute"
 import Dashboard from "./FullPageRoutes/Dashboard"
 import VideoViewPage from "./FullPageRoutes/VideoViewPage"
+import Help from "./FullPageRoutes/Help"
+import ContactUs from "./FullPageRoutes/ContactUs"
 
 const useStyles = makeStyles({
   app: {
@@ -52,6 +54,12 @@ export default function App(): JSX.Element {
             </ProtectedRoute>
             <ProtectedRoute path="/watch">
               <VideoViewPage />
+            </ProtectedRoute>
+            <ProtectedRoute path="/help">
+              <Help />
+            </ProtectedRoute>
+            <ProtectedRoute path="/contact">
+              <ContactUs />
             </ProtectedRoute>
             <ProtectedRoute path="/">
               <Dashboard />
