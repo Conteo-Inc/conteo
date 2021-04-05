@@ -100,49 +100,39 @@ export default function ProfileSidebar({
   }
 
   return (
-    <div>
-      <Grid container>
-        <Grid item xs={12}>
-          <Grid container className={classes.tab} alignItems="center">
-            <Grid item xs={3}>
-              <Avatar
-                alt={firstName}
-                src={""}
-                className={classes.headerAvatar}
-              />
-            </Grid>
-            <Grid item xs={9}>
-              <Typography
-                className={`${classes.headerName} ${classes.tabTitle}`}
-              >
-                {firstName} {lastName}
-              </Typography>
-            </Grid>
+    <Grid container>
+      <Grid item xs={12}>
+        <Grid container className={classes.tab} alignItems="center">
+          <Grid item xs={3}>
+            <Avatar alt={firstName} src={""} className={classes.headerAvatar} />
+          </Grid>
+          <Grid item xs={9}>
+            <Typography className={`${classes.headerName} ${classes.tabTitle}`}>
+              {firstName} {lastName}
+            </Typography>
           </Grid>
         </Grid>
-        {items.map(({ icon, title, setIsActive }: SidebarItem) => (
-          <Grid key={title} item xs={12}>
-            <Grid container className={classes.tab}>
-              <Link
-                className={classes.componentLink}
-                onClick={() => handleItemSelected(setIsActive)}
-                color="inherit"
-              >
-                <Grid container alignItems="center" justify="flex-end">
-                  <Grid item xs={2}>
-                    {icon}
-                  </Grid>
-                  <Grid item xs={9}>
-                    <Typography className={classes.tabTitle}>
-                      {title}
-                    </Typography>
-                  </Grid>
-                </Grid>
-              </Link>
-            </Grid>
-          </Grid>
-        ))}
       </Grid>
-    </div>
+      {items.map(({ icon, title, setIsActive }: SidebarItem) => (
+        <Grid key={title} item xs={12}>
+          <Grid container className={classes.tab}>
+            <Link
+              className={classes.componentLink}
+              onClick={() => handleItemSelected(setIsActive)}
+              color="inherit"
+            >
+              <Grid container alignItems="center" justify="flex-end">
+                <Grid item xs={2}>
+                  {icon}
+                </Grid>
+                <Grid item xs={9}>
+                  <Typography className={classes.tabTitle}>{title}</Typography>
+                </Grid>
+              </Grid>
+            </Link>
+          </Grid>
+        </Grid>
+      ))}
+    </Grid>
   )
 }
