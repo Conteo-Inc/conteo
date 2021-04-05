@@ -60,8 +60,8 @@ export default function FAQ(): JSX.Element {
                 <AccordionDetails>
                   <Typography>
                     To sign up, go to our homepage and select the sign up
-                    options. You would then be asked to provide your email and
-                    password.
+                    options. You will then be asked to provide an email address
+                    and to create a password.
                   </Typography>
                 </AccordionDetails>
               </Accordion>
@@ -70,11 +70,16 @@ export default function FAQ(): JSX.Element {
                   expandIcon={<ExpandMoreIcon />}
                   aria-controls="panel1a-content"
                 >
-                  <Typography>Who are penpals?</Typography>
+                  <Typography>Who and what are penpals?</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                   <Typography>
-                    Penpals are anyone you are matched to.
+                    Penpals are other users that are in your penpal list. You
+                    can send video letters to them and they can send video
+                    letters to you. You can only be penpals with people that you
+                    approved in your match list, and who approved you. You can
+                    remove a penpal from your list if you do not want to
+                    correspond with them anymore.
                   </Typography>
                 </AccordionDetails>
               </Accordion>
@@ -84,12 +89,12 @@ export default function FAQ(): JSX.Element {
                   aria-controls="panel1a-content"
                 >
                   <Typography>
-                    How many video message can be sent per day?
+                    How many video messages can I send in a day?
                   </Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                   <Typography>
-                    One (1) video messages be per day can be sent.
+                    You can send one video a day to each penpal.
                   </Typography>
                 </AccordionDetails>
               </Accordion>
@@ -118,10 +123,17 @@ export default function FAQ(): JSX.Element {
                 </AccordionSummary>
                 <AccordionDetails>
                   <Typography>
-                    The privacy settings are public, private and hidden. Public
-                    allows for everyone to see your information. Private allows
-                    for just my penpals to see your information. Hidden allows
-                    for no one to see your information.
+                    The privacy settings let you control what information is
+                    shared with other users. Public allows anyone that you match
+                    with to see that information. For instance, if you set your
+                    age public, anyone you match with will see your age. Private
+                    allows only your penpals to see the information. If you set
+                    your age to private, only your penpals can see your age.
+                    Hidden means no one but you can see the information. If you
+                    set something hidden, that means it cannot be used to match
+                    you with other users. For instance, if you are 33, and you
+                    set your age to hidden, another user looking for penpals who
+                    are 30-40 years old will not be matched to you.
                   </Typography>
                 </AccordionDetails>
               </Accordion>
@@ -133,7 +145,11 @@ export default function FAQ(): JSX.Element {
                   <Typography>Can I decline a penpal?</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <Typography>Yes.</Typography>
+                  <Typography>
+                    You can decline as many penpals as you want. When a
+                    potential penpal on appears on your matching list, you would
+                    be given the option to either accept or decline the penpal.
+                  </Typography>
                 </AccordionDetails>
               </Accordion>
               <Accordion>
@@ -146,7 +162,13 @@ export default function FAQ(): JSX.Element {
                   </Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <Typography>No.</Typography>
+                  <Typography>
+                    You can accept as many penpals as you want in a day.
+                    However, consider carefully how many different videos you
+                    want to record. We recommend you start out with a small
+                    number and add more penpals over time as you get more
+                    comfortable with the service.
+                  </Typography>
                 </AccordionDetails>
               </Accordion>
               <Accordion>
@@ -157,7 +179,10 @@ export default function FAQ(): JSX.Element {
                   <Typography>Can you edit videos?</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <Typography>Yes.</Typography>
+                  <Typography>
+                    Yes, there are tools available to edit videos in the video
+                    recording part of the site.
+                  </Typography>
                 </AccordionDetails>
               </Accordion>
             </Grid>
