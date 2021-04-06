@@ -140,14 +140,9 @@ class PrivacyRetrieveUpdateView(generics.RetrieveUpdateAPIView):
     queryset = Privacy.objects.all()
 
 
-class InterestRetrieveView(generics.RetrieveAPIView):
+class InterestRetrieveView(generics.ListAPIView):
     serializer_class = InterestSerializer
     queryset = Interest.objects.all()
-
-    def get(self, request):
-        allInterests = self.get_queryset()
-        data = self.serializer_class(allInterests, many=True).data
-        return response.Response(data=data, status=status.HTTP_200_OK)
 
 
 class MailListView(generics.ListAPIView):
