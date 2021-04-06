@@ -5,6 +5,7 @@ import Controls from "../components/video/Controls"
 import { parseIdentity, request } from "../utils/fetch"
 import { useHistory, useParams } from "react-router-dom"
 import { Nullable, NullableId } from "../utils/context"
+import ConfirmationModal from "../components/AbstractModal"
 import { History } from "history"
 
 const useStyles = makeStyles({
