@@ -14,10 +14,15 @@ import ViewVideo from "../components/video/ViewVideo"
 const useStyles = makeStyles({
   root: {
     height: "100%",
+    backgroundColor: "#ede8db",
   },
   card: {
-    border: "1px solid blue",
+    marginTop: 25,
+    border: "1px solid grey",
     minHeight: "25rem",
+  },
+  button: {
+    margin: "10px 20px",
   },
 })
 
@@ -28,26 +33,56 @@ type MatchControlsType = {
   onReport: (matchId: number) => void
 }
 
+type MatchControlButton = {
+  title: string
+  color: "primary" | "secondary" | "default"
+  onClick: (matchId: number) => void
+  icon: JSX.Element
+}
+
 function MatchControls({
   matchId,
   onAccept,
   onReject,
   onReport,
 }: MatchControlsType): JSX.Element {
+  const classes = useStyles()
+
+  const controls: MatchControlButton[] = [
+    {
+      title: "Accept",
+      color: "primary",
+      onClick: onAccept,
+      icon: <Check />,
+    },
+    {
+      title: "Reject",
+      color: "default",
+      onClick: onReject,
+      icon: <Block />,
+    },
+    {
+      title: "Report",
+      color: "secondary",
+      onClick: onReport,
+      icon: <Flag />,
+    },
+  ]
+
   return (
-    <Grid item container direction="row" justify="space-around">
-      <Button onClick={() => onAccept(matchId)}>
-        <Check />
-        Accept
-      </Button>
-      <Button onClick={() => onReject(matchId)}>
-        <Block />
-        Reject
-      </Button>
-      <Button onClick={() => onReport(matchId)}>
-        <Flag />
-        Report
-      </Button>
+    <Grid item container direction="row" justify="center" alignItems="center">
+      {controls.map(({ title, color, onClick, icon }: MatchControlButton) => (
+        <Button
+          key={`matchControlButton-${title}`}
+          variant="contained"
+          color={color}
+          className={classes.button}
+          onClick={() => onClick(matchId)}
+        >
+          {icon}
+          {title}
+        </Button>
+      ))}
     </Grid>
   )
 }
@@ -130,57 +165,60 @@ export default function MatchingPage(): JSX.Element {
       className={classes.root}
     >
       {match ? (
-        <Grid
-          container
-          direction="column"
-          justify="space-between"
-          alignItems="center"
-          item
-          xs={4}
-          className={classes.card}
-        >
+        <Grid item>
           <Grid
-            item
             container
-            justify="center"
-            alignItems="center"
             direction="column"
+            justify="space-between"
+            alignItems="center"
+            className={classes.card}
           >
-            <Typography>{`${match.first_name} ${match.last_name}`}</Typography>
-            <Avatar />
+            <Grid
+              item
+              container
+              justify="center"
+              alignItems="center"
+              direction="column"
+            >
+              <Typography>{`${match.first_name} ${match.last_name}`}</Typography>
+              <Avatar />
+            </Grid>
+            <Grid item container direction="row" justify="space-around">
+              {/* TODO: Replace with forEach and don't include empty */}
+              <Typography>{`Gender: ${match.gender}`}</Typography>
+              <Typography>{`Birthday: ${match.birth_date}`}</Typography>
+              <Typography>{`Email: ${match.email}`}</Typography>
+            </Grid>
+            <Grid item container direction="row" justify="center">
+              <Typography>{`Interests: ${match.interests}`}</Typography>
+            </Grid>
+            <Grid item>
+              {match.has_intro ? (
+                <>
+                  <IconButton onClick={() => setVisible(true)}>
+                    <PlayCircleFilled fontSize="large" />
+                  </IconButton>
+                  <ViewVideo
+                    isOpen={introVisible}
+                    senderId={match.id}
+                    handleClose={() => setVisible(false)}
+                    intro
+                  />
+                </>
+              ) : (
+                <></>
+              )}
+            </Grid>
           </Grid>
-          <Grid item container direction="row" justify="space-around">
-            {/* TODO: Replace with forEach and don't include empty */}
-            <Typography>{`Gender: ${match.gender}`}</Typography>
-            <Typography>{`Birthday: ${match.birth_date}`}</Typography>
-            <Typography>{`Email: ${match.email}`}</Typography>
+
+          <Grid item container justify="center" alignItems="center">
+            <MatchControls
+              matchId={match.id}
+              onAccept={onAccept}
+              onReject={onReject}
+              onReport={onReport}
+            />
           </Grid>
-          <Grid item container direction="row" justify="center">
-            <Typography>{`Interests: ${match.interests}`}</Typography>
-          </Grid>
-          <Grid item>
-            {match.has_intro ? (
-              <>
-                <IconButton onClick={() => setVisible(true)}>
-                  <PlayCircleFilled fontSize="large" />
-                </IconButton>
-                <ViewVideo
-                  isOpen={introVisible}
-                  senderId={match.id}
-                  handleClose={() => setVisible(false)}
-                  intro
-                />
-              </>
-            ) : (
-              <></>
-            )}
-          </Grid>
-          <MatchControls
-            matchId={match.id}
-            onAccept={onAccept}
-            onReject={onReject}
-            onReport={onReport}
-          />
         </Grid>
       ) : (
         <></>
