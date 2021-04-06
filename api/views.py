@@ -144,7 +144,7 @@ class InterestRetrieveView(generics.RetrieveAPIView):
     queryset = Interest.objects.all()
 
     def get(self, request):
-        allInterests = Interest.objects.all()
+        allInterests = self.get_queryset()
         data = self.serializer_class(allInterests, many=True).data
         return response.Response(data=data, status=status.HTTP_200_OK)
 
