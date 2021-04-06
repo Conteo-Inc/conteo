@@ -16,6 +16,7 @@ from rest_framework import (
 
 from .models import MatchStatus, Profile, Video
 from .serializers import (
+    AccountSerializer,
     MailListSerializer,
     MatchStatusSerializer,
     ProfileFromUserSerializer,
@@ -253,3 +254,9 @@ class Reports(generics.CreateAPIView):
     def post(self, request, *args, **kwargs):
         request.data["reporter"] = request.user.id
         return self.create(request, *args, **kwargs)
+
+
+class Accounts(generics.RetrieveAPIView):
+    def get(self, request):
+        serializer = AccountSerializer(request.user)
+        return response.Response(serializer.data, status=status.HTTP_200_OK)
