@@ -21,6 +21,7 @@ import {
 import Autocomplete from "@material-ui/lab/Autocomplete"
 import ProfileContent, { GENDER_CHOICES } from "./ProfileContent"
 import type { ProfileContentType, GenderKey, Interest } from "./ProfileContent"
+import Video from "../video/Video"
 import { Colors } from "../../utils/colors"
 import { request } from "../../utils/fetch"
 import {
@@ -264,7 +265,7 @@ export default function EditableProfileContent({
   }
 
   return (
-    <div>
+    <>
       {isEditMode ? (
         <Grid container justify="center" spacing={2}>
           <Grid item xs={12}>
@@ -279,8 +280,7 @@ export default function EditableProfileContent({
               </Grid>
               <Grid item>
                 {editableContent.video ? (
-                  <video
-                    controls
+                  <Video
                     src={editableContent.video}
                     className={classes.introVideo}
                   />
@@ -372,6 +372,6 @@ export default function EditableProfileContent({
           </Grid>
         </Grid>
       )}
-    </div>
+    </>
   )
 }

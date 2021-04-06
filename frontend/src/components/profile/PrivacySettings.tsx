@@ -148,7 +148,7 @@ export default function PrivacySettings({
   }
 
   return (
-    <div>
+    <>
       <Grid container justify="center" spacing={2}>
         <Grid item xs={12}>
           <Grid container alignItems="baseline" justify="flex-start">
@@ -267,6 +267,6 @@ export default function PrivacySettings({
           </Grid>
         )}
       </Grid>
-    </div>
+    </>
   )
 }

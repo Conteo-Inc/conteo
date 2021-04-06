@@ -1,6 +1,7 @@
 import * as React from "react"
 import { Grid, Avatar, Typography, Paper } from "@material-ui/core"
 import { makeStyles } from "@material-ui/core/styles"
+import Video from "../video/Video"
 import { Colors } from "../../utils/colors"
 import { Nullable } from "../../utils/context"
 
@@ -119,7 +120,7 @@ export default function ProfileContent({
           </Grid>
           {video && (
             <Grid item>
-              <video controls src={video} className={classes.introVideo} />
+              <Video src={video} className={classes.introVideo} />
             </Grid>
           )}
         </Grid>
