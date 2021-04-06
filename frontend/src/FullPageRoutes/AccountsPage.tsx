@@ -135,7 +135,7 @@ export default function AccountsPage(): JSX.Element {
                   name="firstName"
                   label="First Name"
                   variant="outlined"
-                  value={accountData.first_name || "Jane"}
+                  value={accountData.first_name}
                   InputProps={{
                     readOnly: true,
                   }}
@@ -145,7 +145,7 @@ export default function AccountsPage(): JSX.Element {
                   name="username"
                   label="Username"
                   variant="outlined"
-                  value={accountData.username || "test1"}
+                  value={accountData.username}
                   InputProps={{
                     readOnly: true,
                   }}
@@ -174,7 +174,7 @@ export default function AccountsPage(): JSX.Element {
                   name="lastName"
                   label="Last Name"
                   variant="outlined"
-                  value={accountData.last_name || "Doe"}
+                  value={accountData.last_name}
                   InputProps={{
                     readOnly: true,
                   }}
@@ -184,7 +184,7 @@ export default function AccountsPage(): JSX.Element {
                   name="password"
                   label="Password"
                   type="password"
-                  value={accountData.password || "janedoe"}
+                  value={accountData.password}
                   autoComplete="current-password"
                   variant="outlined"
                   InputProps={{
@@ -203,7 +203,7 @@ export default function AccountsPage(): JSX.Element {
                   label="Account Successor Email"
                   variant="outlined"
                   type="email"
-                  value={accountData.successor || "johndoe@gmail.com"}
+                  value={accountData.successor}
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">
