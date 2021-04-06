@@ -10,17 +10,15 @@ import {
 } from "@material-ui/core"
 import CloseIcon from "@material-ui/icons/Close"
 import * as React from "react"
-import { SetStateDispatch } from "../utils/context"
 
 type ModalType = {
   title: string
   description: string
   confirmText?: string
   cancelText?: string
-  isOpen: boolean
-  setisOpen: SetStateDispatch<boolean>
-  handleConfirm: any
-  handleCancel: any
+  isModalOpen: boolean
+  handleConfirm: () => void
+  handleCancel: () => void
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -42,34 +40,34 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-export default function AbstractModal(props: ModalType): JSX.Element {
+export default function AbstractModal({
+  title,
+  description,
+  confirmText = "YES",
+  cancelText = "NO",
+  isModalOpen,
+  handleConfirm,
+  handleCancel,
+}: ModalType): JSX.Element {
   const classes = useStyles()
 
   return (
-    <Dialog open={props.isOpen} classes={{ paper: classes.modal }}>
+    <Dialog open={isModalOpen} classes={{ paper: classes.modal }}>
       <DialogTitle>
-        <IconButton className={classes.modalTitle} onClick={props.handleCancel}>
+        <IconButton className={classes.modalTitle} onClick={handleCancel}>
           <CloseIcon />
         </IconButton>
       </DialogTitle>
       <DialogContent className={classes.modalContent}>
-        <Typography variant="h6">{props.title}</Typography>
-        <Typography variant="subtitle2">{props.description}</Typography>
+        <Typography variant="h6">{title}</Typography>
+        <Typography variant="subtitle2">{description}</Typography>
       </DialogContent>
       <DialogActions className={classes.modalAction}>
-        <Button
-          variant="contained"
-          onClick={props.handleCancel}
-          color="secondary"
-        >
-          {props.cancelText || "NO"}
+        <Button variant="contained" onClick={handleCancel} color="secondary">
+          {cancelText || "NO"}
         </Button>
-        <Button
-          variant="contained"
-          onClick={props.handleConfirm}
-          color="default"
-        >
-          {props.confirmText || "YES"}
+        <Button variant="contained" onClick={handleConfirm} color="default">
+          {confirmText || "YES"}
         </Button>
       </DialogActions>
     </Dialog>
