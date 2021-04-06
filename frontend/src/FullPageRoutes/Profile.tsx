@@ -23,6 +23,8 @@ export type UserProfile = {
 const useStyles = makeStyles({
   root: {
     flexGrow: 1,
+    paddingBottom: 100,
+    backgroundColor: "rgb(234, 232, 224)",
   },
   sideBar: {
     padding: 10,
@@ -30,7 +32,6 @@ const useStyles = makeStyles({
   },
   section: {
     padding: 50,
-    backgroundColor: "rgb(234, 232, 224)",
   },
 })
 
