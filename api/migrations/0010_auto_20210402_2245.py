@@ -19,9 +19,8 @@ def add_interests(apps, schema_editor):
                 title = interestData["title"]
                 interest = Interest(category=category, title=title)
                 interest.save()
-            except KeyError:
-                # Interest does not follow category/title structure.
-                pass
+            except KeyError as e:
+                print(f"KeyError reading interests.json: {e}")
 
 
 class Migration(migrations.Migration):
