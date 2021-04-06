@@ -16,8 +16,8 @@ from rest_framework import (
 
 from .models import Interest, MatchStatus, Privacy, Profile, Video
 from .serializers import (
-    InterestSerializer,
     AccountSerializer,
+    InterestSerializer,
     MailListSerializer,
     MatchStatusSerializer,
     PrivacySerializer,
@@ -97,7 +97,7 @@ class ProfileRetrieveUpdateView(generics.RetrieveUpdateAPIView):
         userId = profileData.pop("id")
 
         # Add user interests to profile content.
-        interestObjects = Interest.objects.filter(profiles__id=profile.id)
+        interestObjects = profile.interest_set.all()
         interestData = InterestSerializer(interestObjects, many=True).data
         profileData["interests"] = interestData
 
