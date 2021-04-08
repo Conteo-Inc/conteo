@@ -1,124 +1,161 @@
 import * as React from "react"
-import { request } from "../utils/fetch"
-import { getUpdates, useProfile } from "../utils/profile"
-import ProfileSidebar from "../components/ProfileSidebar"
-import ProfileContent from "../components/ProfileContent"
-import type { ProfileContentType } from "../components/ProfileContent"
-import { makeStyles } from "@material-ui/core/styles"
 import { Grid } from "@material-ui/core"
+import { makeStyles } from "@material-ui/core/styles"
+import ProfileSidebar from "../components/profile/ProfileSidebar"
+import type { ProfileContentType } from "../components/profile/ProfileContent"
+import EditableProfileContent from "../components/profile/EditableProfileContent"
+import type { PrivacySettingsType } from "../components/profile/PrivacySettings"
+import PrivacySettings from "../components/profile/PrivacySettings"
+import { request } from "../utils/fetch"
+import {
+  useProfileComponents,
+  useProfileContent,
+  usePrivacySettings,
+} from "../utils/profile"
 import { Nullable } from "../utils/context"
 
 export type UserProfile = {
-  first_name: string
-  last_name: string
-  phone_number: string
-  birth_date: string
-  gender: string
-  interests: string
-  video: Nullable<string>
-  id: number
+  profile_content: ProfileContentType
+  privacy_settings: PrivacySettingsType
+  userId: number
 }
 
 const useStyles = makeStyles({
   root: {
     flexGrow: 1,
+    paddingBottom: "100px",
+    backgroundColor: "rgb(234, 232, 224)",
   },
   sideBar: {
-    padding: 10,
+    padding: "10px",
     backgroundColor: "rgb(238, 235, 228)",
   },
   section: {
-    padding: 50,
-    backgroundColor: "rgb(234, 232, 224)",
+    padding: "50px",
   },
 })
 
-export default function Profile(): JSX.Element {
-  const [isEditMode, toggleEditMode] = React.useState<boolean>(false)
-  const [errMessage, seterrMessage] = React.useState<string>("")
-  const classes = useStyles()
+function parseBirthday(birth_date: Nullable<Date>): Nullable<Date> {
+  let birthday = null
+  if (birth_date !== null) {
+    birthday = new Date(birth_date)
+    // We have Django configured to store dates using local time.
+    // Date objects assume the date is UTC when parsing so we add 1
+    // to correct for the EST/EDT - UTC timezone difference
+    birthday.setDate(birthday.getDate() + 1)
+  }
 
-  const [readonlyContent, setProfile] = React.useState<ProfileContentType>({
+  return birthday
+}
+
+export default function Profile(): JSX.Element {
+  const classes = useStyles()
+  const [userId, setUserId] = React.useState<number>(-1)
+
+  // Profile content hooks.
+  const [
+    readonlyContent,
+    setProfileContent,
+  ] = React.useState<ProfileContentType>({
     first_name: "",
     last_name: "",
-    birth_date: new Date(),
-    gender: "",
-    interests: "",
-    video: "",
-    id: -1,
+    birth_date: null,
+    gender: null,
+    interests: [],
+    video: null,
   })
-  const { editableContent, setters } = useProfile(readonlyContent)
+  const { editableContent, contentSetters } = useProfileContent(readonlyContent)
+
+  // Privacy settings hooks.
+  const [
+    readonlySettings,
+    setPrivacySettings,
+  ] = React.useState<PrivacySettingsType>({
+    first_name_privacy: "",
+    last_name_privacy: "",
+    birth_date_privacy: "",
+    gender_privacy: "",
+    interests_privacy: "",
+  })
+  const { editableSettings, privacySetters } = usePrivacySettings(
+    readonlySettings
+  )
 
   React.useEffect(() => {
     request<UserProfile>({ path: "/api/profile/", method: "get" })
       .then((res) => {
-        const profile: UserProfile = res.parsedBody
-        const content: ProfileContentType = {
-          first_name: profile.first_name,
-          last_name: profile.last_name,
-          birth_date: new Date(profile.birth_date),
-          gender: profile.gender,
-          interests: profile.interests,
-          video: profile.video,
-          id: profile.id,
+        const { profile_content, privacy_settings, userId } = res.parsedBody
+        setUserId(userId)
+
+        const birthday = parseBirthday(profile_content.birth_date)
+        const profileContent: ProfileContentType = {
+          first_name: profile_content.first_name,
+          last_name: profile_content.last_name,
+          birth_date: birthday,
+          gender: profile_content.gender,
+          interests: profile_content.interests,
+          video: profile_content.video,
         }
-        setProfile(content)
-        setters.setFirstName(content.first_name)
-        setters.setLastName(content.last_name)
-        setters.setGender(content.gender)
-        setters.setBirthDate(content.birth_date)
+
+        setProfileContent(profileContent)
+        contentSetters.setFirstName(profileContent.first_name)
+        contentSetters.setLastName(profileContent.last_name)
+        contentSetters.setGender(profileContent.gender)
+        contentSetters.setBirthDate(profileContent.birth_date)
+        contentSetters.setInterests(profileContent.interests)
+
+        const privacySettings: PrivacySettingsType = {
+          first_name_privacy: privacy_settings.first_name_privacy,
+          last_name_privacy: privacy_settings.last_name_privacy,
+          birth_date_privacy: privacy_settings.birth_date_privacy,
+          gender_privacy: privacy_settings.gender_privacy,
+          interests_privacy: privacy_settings.interests_privacy,
+        }
+
+        setPrivacySettings(privacySettings)
+        privacySetters.setFirstNamePrivacy(privacySettings.first_name_privacy)
+        privacySetters.setLastNamePrivacy(privacySettings.last_name_privacy)
+        privacySetters.setBirthDatePrivacy(privacySettings.birth_date_privacy)
+        privacySetters.setGenderPrivacy(privacySettings.gender_privacy)
+        privacySetters.setInterestsPrivacy(privacySettings.interests_privacy)
       })
-      .catch((err) => {
-        console.log(err)
+      .catch((error) => {
+        console.log(error)
       })
   }, [])
 
-  const handleEditFields = () => {
-    toggleEditMode(true)
-  }
-
-  const handleCancelEdit = () => {
-    seterrMessage("")
-    toggleEditMode(false)
-  }
-
-  const handleSaveFields = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    request({
-      path: "/api/profile/",
-      method: "post",
-      body: getUpdates(readonlyContent, editableContent),
-    })
-      .then(() => {
-        setProfile(editableContent)
-        toggleEditMode(false)
-      })
-      .catch((err) => {
-        seterrMessage(err)
-      })
-  }
+  // Component state hooks.
+  const { componentStates, componentSetters } = useProfileComponents()
+  const { isProfileActive, isPrivacyActive } = componentStates
 
   return (
     <Grid container className={classes.root}>
-      <Grid container item className={classes.sideBar} xs={3}>
+      <Grid item className={classes.sideBar} xs={3}>
         <ProfileSidebar
           firstName={readonlyContent.first_name}
           lastName={readonlyContent.last_name}
+          componentStateSetters={componentSetters}
         />
       </Grid>
-      <Grid container item className={classes.section} xs={9}>
-        <ProfileContent
-          isEditMode={isEditMode}
-          setters={setters}
-          readonlyContent={readonlyContent}
-          handleEditFields={handleEditFields}
-          handleCancelEdit={handleCancelEdit}
-          handleSaveFields={handleSaveFields}
-          errMessage={errMessage}
-        />
-        {/* Other components (e.g. Notifications, Settings, and Privacy) will be
-        added here to be rendered when the respective component is selected from
-        sidebar. */}
+      <Grid item className={classes.section} xs={9}>
+        {isProfileActive && (
+          <EditableProfileContent
+            readonlyContent={readonlyContent}
+            editableContent={editableContent}
+            contentSetters={contentSetters}
+            setProfileContent={setProfileContent}
+            userId={userId}
+          />
+        )}
+        {isPrivacyActive && (
+          <PrivacySettings
+            readonlySettings={readonlySettings}
+            editableSettings={editableSettings}
+            privacySetters={privacySetters}
+            setPrivacySettings={setPrivacySettings}
+            userId={userId}
+          />
+        )}
       </Grid>
     </Grid>
   )

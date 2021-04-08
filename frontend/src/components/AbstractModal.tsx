@@ -64,10 +64,10 @@ export default function AbstractModal({
       </DialogContent>
       <DialogActions className={classes.modalAction}>
         <Button variant="contained" onClick={handleCancel} color="secondary">
-          {cancelText || "NO"}
+          {cancelText}
         </Button>
         <Button variant="contained" onClick={handleConfirm} color="default">
-          {confirmText || "YES"}
+          {confirmText}
         </Button>
       </DialogActions>
     </Dialog>

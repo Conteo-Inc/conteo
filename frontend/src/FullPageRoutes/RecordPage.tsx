@@ -6,6 +6,7 @@ import { parseIdentity, request } from "../utils/fetch"
 import { useHistory, useParams } from "react-router-dom"
 import { Nullable, NullableId } from "../utils/context"
 import ConfirmationModal from "../components/AbstractModal"
+import Video from "../components/video/Video"
 import { History } from "history"
 
 const useStyles = makeStyles({
@@ -86,7 +87,7 @@ export default function RecordPage(): JSX.Element {
     <Grid container direction="column" wrap="nowrap" alignItems="center">
       <Grid item xs={6}>
         {mediaBlobUrl ? (
-          <video src={mediaBlobUrl} controls className={classes.video_root} />
+          <Video src={mediaBlobUrl} className={classes.video_root} />
         ) : (
           <Preview stream={previewStream} />
         )}

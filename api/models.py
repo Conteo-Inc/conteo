@@ -12,7 +12,41 @@ class Profile(models.Model):
     phone_number = models.CharField(max_length=10, unique=True, null=True)
     birth_date = models.DateField(null=True)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True)
-    interests = models.CharField(max_length=200, blank=True)
+
+
+class Privacy(models.Model):
+    class Setting(models.TextChoices):
+        PUBLIC = "PU"
+        PRIVATE = "PR"
+        HIDDEN = "HI"
+
+    profile = models.OneToOneField(
+        Profile,
+        on_delete=models.CASCADE,
+        primary_key=True,
+        verbose_name="related profile",
+    )
+    first_name_privacy = models.CharField(
+        max_length=2, choices=Setting.choices, default=Setting.PUBLIC
+    )
+    last_name_privacy = models.CharField(
+        max_length=2, choices=Setting.choices, default=Setting.PUBLIC
+    )
+    birth_date_privacy = models.CharField(
+        max_length=2, choices=Setting.choices, default=Setting.PRIVATE
+    )
+    gender_privacy = models.CharField(
+        max_length=2, choices=Setting.choices, default=Setting.PRIVATE
+    )
+    interests_privacy = models.CharField(
+        max_length=2, choices=Setting.choices, default=Setting.PUBLIC
+    )
+
+
+class Interest(models.Model):
+    profiles = models.ManyToManyField(Profile)
+    category = models.CharField(max_length=30, blank=True)
+    title = models.CharField(max_length=30)
 
 
 class Video(models.Model):
