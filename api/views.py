@@ -14,11 +14,13 @@ from rest_framework import (
     viewsets,
 )
 
-from .models import MatchStatus, Profile, Video
+from .models import Interest, MatchStatus, Privacy, Profile, Video
 from .serializers import (
     AccountSerializer,
+    InterestSerializer,
     MailListSerializer,
     MatchStatusSerializer,
+    PrivacySerializer,
     ProfileFromUserSerializer,
     ProfileSerializer,
     ReportSerializer,
@@ -83,20 +85,64 @@ class UserLogoutView(generics.GenericAPIView):
         return response.Response(status=status.HTTP_200_OK)
 
 
-class ProfileView(generics.RetrieveUpdateAPIView):
+class ProfileRetrieveUpdateView(generics.RetrieveUpdateAPIView):
     serializer_class = ProfileSerializer
 
     def get_object(self):
         return self.request.user.profile
 
     def get(self, request):
-        user = request.user
-        return response.Response(
-            data=ProfileSerializer(user.profile).data, status=status.HTTP_200_OK
-        )
+        profile = request.user.profile
+        profileData = self.serializer_class(profile).data
+        userId = profileData.pop("id")
 
-    def post(self, request):
+        # Add user interests to profile content.
+        interestObjects = profile.interest_set.all()
+        interestData = InterestSerializer(interestObjects, many=True).data
+        profileData["interests"] = interestData
+
+        # Get privacy object related to user profile.
+        privacyObjects = Privacy.objects.get(profile=profile)
+        privacyData = PrivacySerializer(privacyObjects).data
+
+        data = {
+            "profile_content": profileData,
+            "privacy_settings": privacyData,
+            "userId": userId,
+        }
+
+        return response.Response(data=data, status=status.HTTP_200_OK)
+
+    def put(self, request):
+        self.updateInterests(request)
         return self.update(request=request)
+
+    def updateInterests(self, request):
+        newInterests = None
+        try:
+            newInterests = request.data["interests"]
+        except KeyError:
+            # User did not updates their interests.
+            pass
+
+        if newInterests is not None:
+            # Get IDs from new interests.
+            idList = [interest["id"] for interest in newInterests if "id" in interest]
+            profile = request.user.profile
+
+            # Update user interests.
+            profile.interest_set.clear()
+            profile.interest_set.set(idList)
+
+
+class PrivacyRetrieveUpdateView(generics.RetrieveUpdateAPIView):
+    serializer_class = PrivacySerializer
+    queryset = Privacy.objects.all()
+
+
+class InterestRetrieveView(generics.ListAPIView):
+    serializer_class = InterestSerializer
+    queryset = Interest.objects.all()
 
 
 class MailListView(generics.ListAPIView):
