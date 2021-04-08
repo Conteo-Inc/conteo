@@ -24,12 +24,12 @@ type SidebarItem = {
 
 const useStyles = makeStyles({
   tab: {
-    padding: 15,
+    padding: "15px",
     borderBottom: "2px solid black",
   },
   headerAvatar: {
-    height: 60,
-    width: 60,
+    height: "60px",
+    width: "60px",
   },
   headerName: {
     fontSize: "2rem",

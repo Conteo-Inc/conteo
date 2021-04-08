@@ -46,19 +46,19 @@ type ProfileField = {
 
 const useStyles = makeStyles({
   profileAvatar: {
-    height: 200,
-    width: 200,
+    height: "200px",
+    width: "200px",
   },
   introVideo: {
-    maxHeight: 200,
+    maxHeight: "200px",
   },
   fieldsContainer: {
-    paddingTop: 40,
-    paddingBottom: 10,
+    paddingTop: "40px",
+    paddingBottom: "10px",
   },
   field: {
-    minHeight: 50,
-    marginBottom: 15,
+    minHeight: "50px",
+    marginBottom: "15px",
     fontSize: "2rem",
   },
   recordButton: {

@@ -42,12 +42,12 @@ const MAX_LAST_NAME_LENGTH = 50
 
 const useStyles = makeStyles({
   profileAvatar: {
-    height: 200,
-    width: 200,
+    height: "200px",
+    width: "200px",
   },
   circle: {
-    height: 200,
-    width: 200,
+    height: "200px",
+    width: "200px",
     display: "flex",
     overflow: "hidden",
     alignItems: "center",
@@ -65,7 +65,7 @@ const useStyles = makeStyles({
     backgroundColor: "grey",
   },
   introVideo: {
-    maxHeight: 200,
+    maxHeight: "200px",
   },
   fieldsContainer: {
     paddingTop: 40,

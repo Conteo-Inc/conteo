@@ -23,15 +23,15 @@ export type UserProfile = {
 const useStyles = makeStyles({
   root: {
     flexGrow: 1,
-    paddingBottom: 100,
+    paddingBottom: "100px",
     backgroundColor: "rgb(234, 232, 224)",
   },
   sideBar: {
-    padding: 10,
+    padding: "10px",
     backgroundColor: "rgb(238, 235, 228)",
   },
   section: {
-    padding: 50,
+    padding: "50px",
   },
 })
 

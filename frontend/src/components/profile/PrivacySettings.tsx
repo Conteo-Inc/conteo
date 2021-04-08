@@ -52,14 +52,14 @@ const useStyles = makeStyles({
     fontWeight: "bold",
   },
   fieldsContainer: {
-    paddingTop: 40,
-    paddingBottom: 10,
+    paddingTop: "40px",
+    paddingBottom: "10px",
   },
   field: {
-    marginBottom: 15,
+    marginBottom: "15px",
   },
   button: {
-    margin: 5,
+    margin: "5px",
   },
   error: {
     color: "red",
