@@ -5,6 +5,8 @@ import Controls from "../components/video/Controls"
 import { parseIdentity, request } from "../utils/fetch"
 import { useHistory, useParams } from "react-router-dom"
 import { Nullable, NullableId } from "../utils/context"
+import ConfirmationModal from "../components/AbstractModal"
+import Video from "../components/video/Video"
 import { History } from "history"
 
 const useStyles = makeStyles({
@@ -79,6 +81,7 @@ export default function RecordPage(): JSX.Element {
   const { receiver, type } = useParams<RecordPageParams>()
   const history = useHistory()
   const route = type ? VIDEO_CHOICES[type] : DEFAULT_ROUTE
+  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false)
 
   const {
     status,
@@ -91,6 +94,15 @@ export default function RecordPage(): JSX.Element {
     onStop: (_, blob) => setVideoBlob(blob),
   })
 
+  const handleConfirm = () => {
+    setIsModalOpen(false)
+    sendVideo(videoBlob, Number(receiver), history, route)
+  }
+
+  const handleCancel = () => {
+    setIsModalOpen(false)
+  }
+
   const classes = useStyles()
   return (
     <Grid container direction="column" wrap="nowrap" alignItems="center">
@@ -101,7 +113,7 @@ export default function RecordPage(): JSX.Element {
       </Grid>
       <Grid item xs={6}>
         {mediaBlobUrl ? (
-          <video src={mediaBlobUrl} controls className={classes.video_root} />
+          <Video src={mediaBlobUrl} className={classes.video_root} />
         ) : (
           <Preview stream={previewStream} />
         )}
@@ -110,7 +122,16 @@ export default function RecordPage(): JSX.Element {
         status={status}
         startRecording={startRecording}
         stopRecording={stopRecording}
-        sendVideo={() => sendVideo(videoBlob, Number(receiver), history, route)}
+        sendVideo={() => setIsModalOpen(true)}
+      />
+      <ConfirmationModal
+        title={"Confirm"}
+        description={"Would you like to send your video?"}
+        confirmText={"Send"}
+        cancelText={"Cancel"}
+        isModalOpen={isModalOpen}
+        handleConfirm={handleConfirm}
+        handleCancel={handleCancel}
       />
     </Grid>
   )

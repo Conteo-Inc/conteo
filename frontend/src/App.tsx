@@ -14,10 +14,11 @@ import Dashboard from "./FullPageRoutes/Dashboard"
 import VideoViewPage from "./FullPageRoutes/VideoViewPage"
 import Help from "./FullPageRoutes/Help"
 import ContactUs from "./FullPageRoutes/ContactUs"
+import AccountsPage from "./FullPageRoutes/AccountsPage"
 
 const useStyles = makeStyles({
   app: {
-    height: "40rem",
+    minHeight: "40rem",
     display: "flex",
     flexDirection: "column",
     paddingTop: "50px",
@@ -60,6 +61,9 @@ export default function App(): JSX.Element {
             </ProtectedRoute>
             <ProtectedRoute path="/contact">
               <ContactUs />
+            </ProtectedRoute>
+            <ProtectedRoute path="/accounts">
+              <AccountsPage />
             </ProtectedRoute>
             <ProtectedRoute path="/">
               <Dashboard />

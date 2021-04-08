@@ -13,10 +13,12 @@ urlpatterns = [
     path("matches/", views.Matches.as_view({"get": "list", "put": "partial_update"})),
     path("profile/", views.ProfileRetrieveUpdateView.as_view()),
     path("privacy/<int:pk>/", views.PrivacyRetrieveUpdateView.as_view()),
+    path("interests/", views.InterestRetrieveView.as_view()),
     # When we get into matching with real data,
     # let's discuss if this needs to be broken into
     # multiple endpoints - Michael
     path("mail/", views.MailListView.as_view()),
     path("reports/", views.Reports.as_view()),
+    path("accounts/", views.Accounts.as_view()),
     path("user/", views.UserAuthView.as_view()),
 ]

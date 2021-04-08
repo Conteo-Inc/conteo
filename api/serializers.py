@@ -222,3 +222,16 @@ class MatchStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = MatchStatus
         fields = ("user_lo_response", "user_hi_response")
+
+
+class AccountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ("email",)
+
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        profile = Profile.objects.get(Q(user__email=instance.email))
+        rep["first_name"] = profile.first_name
+        rep["last_name"] = profile.last_name
+        return rep

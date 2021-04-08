@@ -54,8 +54,8 @@ const useStyles = makeStyles({
 export default function AbstractModal({
   title,
   description,
-  confirmText,
-  cancelText,
+  confirmText = "YES",
+  cancelText = "NO",
   isModalOpen,
   handleConfirm,
   handleCancel,
@@ -81,10 +81,10 @@ export default function AbstractModal({
       <DialogContent className={classes.modalContent}>{children}</DialogContent>
       <DialogActions className={classes.modalAction}>
         <Button variant="contained" onClick={handleCancel} color="secondary">
-          {cancelText || "NO"}
+          {cancelText}
         </Button>
         <Button variant="contained" onClick={handleConfirm} color="default">
-          {confirmText || "YES"}
+          {confirmText}
         </Button>
       </DialogActions>
     </Dialog>

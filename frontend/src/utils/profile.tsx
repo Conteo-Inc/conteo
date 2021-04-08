@@ -8,7 +8,7 @@ import type {
   PrivacySettingsType,
   PrivacyKey,
 } from "../components/profile/PrivacySettings"
-import { SetStateDispatch, Nullable } from "./context"
+import type { SetStateDispatch, Nullable } from "./context"
 
 export type ProfileComponentStates = {
   isProfileActive: boolean

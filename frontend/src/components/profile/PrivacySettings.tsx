@@ -52,14 +52,14 @@ const useStyles = makeStyles({
     fontWeight: "bold",
   },
   fieldsContainer: {
-    paddingTop: 40,
-    paddingBottom: 10,
+    paddingTop: "40px",
+    paddingBottom: "10px",
   },
   field: {
-    marginBottom: 15,
+    marginBottom: "15px",
   },
   button: {
-    margin: 5,
+    margin: "5px",
   },
   error: {
     color: "red",
@@ -148,7 +148,7 @@ export default function PrivacySettings({
   }
 
   return (
-    <div>
+    <>
       <Grid container justify="center" spacing={2}>
         <Grid item xs={12}>
           <Grid container alignItems="baseline" justify="flex-start">
@@ -267,6 +267,6 @@ export default function PrivacySettings({
           </Grid>
         )}
       </Grid>
-    </div>
+    </>
   )
 }

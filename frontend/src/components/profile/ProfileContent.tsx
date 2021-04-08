@@ -1,6 +1,7 @@
 import * as React from "react"
 import { Grid, Avatar, Typography, Paper } from "@material-ui/core"
 import { makeStyles } from "@material-ui/core/styles"
+import Video from "../video/Video"
 import { Colors } from "../../utils/colors"
 import { Nullable } from "../../utils/context"
 
@@ -35,6 +36,7 @@ export const GENDER_CHOICES: GenderChoice = {
 export type Interest = {
   category: string
   title: string
+  id: number
 }
 
 // A field listed in the content.
@@ -45,19 +47,19 @@ type ProfileField = {
 
 const useStyles = makeStyles({
   profileAvatar: {
-    height: 200,
-    width: 200,
+    height: "200px",
+    width: "200px",
   },
   introVideo: {
-    maxHeight: 200,
+    maxHeight: "200px",
   },
   fieldsContainer: {
-    paddingTop: 40,
-    paddingBottom: 10,
+    paddingTop: "40px",
+    paddingBottom: "10px",
   },
   field: {
-    minHeight: 50,
-    marginBottom: 15,
+    minHeight: "50px",
+    marginBottom: "15px",
     fontSize: "2rem",
   },
   recordButton: {
@@ -112,57 +114,47 @@ export default function ProfileContent({
   ]
 
   return (
-    <div>
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <Grid
-            container
-            alignItems="center"
-            justify="space-evenly"
-            spacing={2}
-          >
-            <Grid item>
-              <Avatar
-                src={image_file ? image_file : ""}
-                className={classes.profileAvatar}
-              />
-            </Grid>
-            {video && (
-              <Grid item>
-                <video controls src={video} className={classes.introVideo} />
-              </Grid>
-            )}
+    <Grid container spacing={2}>
+      <Grid item xs={12}>
+        <Grid container alignItems="center" justify="space-evenly" spacing={2}>
+          <Grid item>
+            <Avatar src={image_file ? image_file : ""} className={classes.profileAvatar} />
           </Grid>
-        </Grid>
-        <Grid item xs={12}>
-          <Paper className={classes.fieldsContainer}>
-            <Grid container justify="center">
-              <Grid item xs={10}>
-                <Grid container justify="space-between">
-                  {fields.map(({ title, value }: ProfileField) => (
-                    <Grid
-                      key={`readonlyField-${title}`}
-                      item
-                      container
-                      className={classes.field}
-                      justify="space-between"
-                      sm={10}
-                      md={5}
-                    >
-                      <Grid item xs={3}>
-                        <Typography>{title}:</Typography>
-                      </Grid>
-                      <Grid item xs={8}>
-                        <Typography>{value}</Typography>
-                      </Grid>
-                    </Grid>
-                  ))}
-                </Grid>
-              </Grid>
+          {video && (
+            <Grid item>
+              <Video src={video} className={classes.introVideo} />
             </Grid>
-          </Paper>
+          )}
         </Grid>
       </Grid>
-    </div>
+      <Grid item xs={12}>
+        <Paper className={classes.fieldsContainer}>
+          <Grid container justify="center">
+            <Grid item xs={10}>
+              <Grid container justify="space-between">
+                {fields.map(({ title, value }: ProfileField) => (
+                  <Grid
+                    key={`readonlyField-${title}`}
+                    item
+                    container
+                    className={classes.field}
+                    justify="space-between"
+                    sm={10}
+                    md={5}
+                  >
+                    <Grid item xs={3}>
+                      <Typography>{title}:</Typography>
+                    </Grid>
+                    <Grid item xs={8}>
+                      <Typography>{value}</Typography>
+                    </Grid>
+                  </Grid>
+                ))}
+              </Grid>
+            </Grid>
+          </Grid>
+        </Paper>
+      </Grid>
+    </Grid>
   )
 }

@@ -22,9 +22,9 @@ import Autocomplete from "@material-ui/lab/Autocomplete"
 import CameraAltIcon from "@material-ui/icons/CameraAlt"
 import VideocamIcon from "@material-ui/icons/Videocam"
 import ProfileContent, { GENDER_CHOICES } from "./ProfileContent"
-import type { ProfileContentType, GenderKey } from "./ProfileContent"
+import type { ProfileContentType, GenderKey, Interest } from "./ProfileContent"
 import UploadImageModal from "./UploadImageModal"
-import INTEREST_DATA from "./interests.json"
+import Video from "../video/Video"
 import { Colors } from "../../utils/colors"
 import { Nullable } from "../../utils/context"
 import { request } from "../../utils/fetch"
@@ -41,17 +41,21 @@ type EditableProfileContentProps = {
   userId: number
 }
 
-type Interest = {
-  category: string
-  title: string
-}
-
 const MAX_FIRST_NAME_LENGTH = 50
 const MAX_LAST_NAME_LENGTH = 50
 
 const pictureSize = 200
 const useStyles = makeStyles({
+  profileAvatar: {
+    height: "200px",
+    width: "200px",
+  },
   circle: {
+    height: "200px",
+    width: "200px",
+    display: "flex",
+    overflow: "hidden",
+    alignItems: "center",
     borderRadius: "50%",
   },
   overlay: {
@@ -183,10 +187,22 @@ export default function EditableProfileContent({
     ""
   )
   const [interestInputValue, setInterestInputValue] = React.useState<string>("")
+  const [interestOptions, setInterestOptions] = React.useState<Interest[]>([])
 
-  const INTEREST_OPTIONS: Interest[] = INTEREST_DATA.predefined_interests
-    .sort((a: Interest, b: Interest) => -b.title.localeCompare(a.title))
-    .sort((a: Interest, b: Interest) => -b.category.localeCompare(a.category))
+  React.useEffect(() => {
+    request<Interest[]>({ path: "/api/interests/", method: "get" })
+      .then((res) => {
+        const options: Interest[] = res.parsedBody
+          .sort((a: Interest, b: Interest) => -b.title.localeCompare(a.title))
+          .sort(
+            (a: Interest, b: Interest) => -b.category.localeCompare(a.category)
+          )
+        setInterestOptions(options)
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+  }, [])
 
   const isInterestEqual = (a: Interest, b: Interest): boolean => {
     return a.category === b.category && a.title === b.title
@@ -266,7 +282,7 @@ export default function EditableProfileContent({
       multiple
       clearOnBlur
       className={classes.textField}
-      options={INTEREST_OPTIONS}
+      options={interestOptions}
       groupBy={(interest) => interest.category}
       getOptionLabel={(interest) => interest.title}
       getOptionSelected={isInterestEqual}
@@ -334,7 +350,7 @@ export default function EditableProfileContent({
   }
 
   return (
-    <div>
+    <>
       {isEditMode ? (
         <Grid container justify="center" spacing={2}>
           <Grid item xs={12}>
@@ -371,7 +387,7 @@ export default function EditableProfileContent({
                   component={Link}
                   to={`/record/${userId}`}
                 >
-                  <video
+                  <Video
                     src={editableContent.video}
                     className={classes.video}
                   />
@@ -397,7 +413,7 @@ export default function EditableProfileContent({
                     className={classes.recordButton}
                     size="large"
                     component={Link}
-                    to={`/record/${userId}`}
+                    to={`/record/${userId}/intro`}
                   >
                     <Typography variant="h6">Record Intro Video</Typography>
                   </Button>
@@ -485,6 +501,6 @@ export default function EditableProfileContent({
         toggleModal={toggleUploadImageModal}
         updateProfilePicture={updateProfilePicture}
       />
-    </div>
+    </>
   )
 }

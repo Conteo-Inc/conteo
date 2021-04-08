@@ -23,14 +23,15 @@ export type UserProfile = {
 const useStyles = makeStyles({
   root: {
     flexGrow: 1,
+    paddingBottom: "100px",
+    backgroundColor: "rgb(234, 232, 224)",
   },
   sideBar: {
-    padding: 10,
+    padding: "10px",
     backgroundColor: "rgb(238, 235, 228)",
   },
   section: {
-    padding: 50,
-    backgroundColor: "rgb(234, 232, 224)",
+    padding: "50px",
   },
 })
 
@@ -38,7 +39,9 @@ function parseBirthday(birth_date: Nullable<Date>): Nullable<Date> {
   let birthday = null
   if (birth_date !== null) {
     birthday = new Date(birth_date)
-    // Typescript removes a day.
+    // We have Django configured to store dates using local time.
+    // Date objects assume the date is UTC when parsing so we add 1
+    // to correct for the EST/EDT - UTC timezone difference
     birthday.setDate(birthday.getDate() + 1)
   }
 
@@ -82,8 +85,8 @@ export default function Profile(): JSX.Element {
   React.useEffect(() => {
     request<UserProfile>({ path: "/api/profile/", method: "get" })
       .then((res) => {
-        const { profile_content, privacy_settings } = res.parsedBody
-        setUserId(res.parsedBody.userId)
+        const { profile_content, privacy_settings, userId } = res.parsedBody
+        setUserId(userId)
 
         const birthday = parseBirthday(profile_content.birth_date)
         const profileContent: ProfileContentType = {
@@ -127,57 +130,38 @@ export default function Profile(): JSX.Element {
 
   // Component state hooks.
   const { componentStates, componentSetters } = useProfileComponents()
-  const {
-    isProfileActive,
-    isPrivacyActive,
-    // isNotificationsActive,
-    // isSettingsActive,
-    // isContactUsActive,
-  } = componentStates
+  const { isProfileActive, isPrivacyActive } = componentStates
 
   return (
-    <div>
-      <Grid container className={classes.root}>
-        <Grid item className={classes.sideBar} xs={3}>
-          <ProfileSidebar
-            firstName={readonlyContent.first_name}
-            lastName={readonlyContent.last_name}
-            image={readonlyContent.image_file}
-            componentStateSetters={componentSetters}
-          />
-        </Grid>
-        <Grid item className={classes.section} xs={9}>
-          {isProfileActive && (
-            <EditableProfileContent
-              readonlyContent={readonlyContent}
-              editableContent={editableContent}
-              contentSetters={contentSetters}
-              setProfileContent={setProfileContent}
-              userId={userId}
-            />
-          )}
-          {isPrivacyActive && (
-            <PrivacySettings
-              readonlySettings={readonlySettings}
-              editableSettings={editableSettings}
-              privacySetters={privacySetters}
-              setPrivacySettings={setPrivacySettings}
-              userId={userId}
-            />
-          )}
-          {/*
-            {isNotificationsActive && (
-              // Add notifications component here
-            )}
-            {isSettingsActive && (
-              // Add settings component here
-            )}
-            {isContactUsActive && (
-              // Add contact us component here
-            )}
-          */}
-        </Grid>
+    <Grid container className={classes.root}>
+      <Grid item className={classes.sideBar} xs={3}>
+        <ProfileSidebar
+          firstName={readonlyContent.first_name}
+          lastName={readonlyContent.last_name}
+          image={readonlyContent.image_file}
+          componentStateSetters={componentSetters}
+        />
       </Grid>
-    </div>
+      <Grid item className={classes.section} xs={9}>
+        {isProfileActive && (
+          <EditableProfileContent
+            readonlyContent={readonlyContent}
+            editableContent={editableContent}
+            contentSetters={contentSetters}
+            setProfileContent={setProfileContent}
+            userId={userId}
+          />
+        )}
+        {isPrivacyActive && (
+          <PrivacySettings
+            readonlySettings={readonlySettings}
+            editableSettings={editableSettings}
+            privacySetters={privacySetters}
+            setPrivacySettings={setPrivacySettings}
+            userId={userId}
+          />
+        )}
+      </Grid>
+    </Grid>
   )
 }

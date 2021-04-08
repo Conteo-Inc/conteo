@@ -17,7 +17,7 @@ type ProfileSidebarProps = {
   componentStateSetters: ProfileComponentSetters
 }
 
-// Aitem listed in the sidebar.
+// An item listed in the sidebar.
 type SidebarItem = {
   icon: JSX.Element
   title: string
@@ -26,12 +26,12 @@ type SidebarItem = {
 
 const useStyles = makeStyles({
   tab: {
-    padding: 15,
+    padding: "15px",
     borderBottom: "2px solid black",
   },
   headerAvatar: {
-    height: 60,
-    width: 60,
+    height: "60px",
+    width: "60px",
   },
   headerName: {
     fontSize: "2rem",
@@ -103,48 +103,39 @@ export default function ProfileSidebar({
   }
 
   return (
-    <div>
-      <Grid container>
-        <Grid item xs={12}>
-          <Grid container className={classes.tab} alignItems="center">
-            <Grid item xs={3}>
-              <Avatar
-                src={image ? image : ""}
-                className={classes.headerAvatar}
-              />
-            </Grid>
-            <Grid item xs={9}>
-              <Typography
-                className={`${classes.headerName} ${classes.tabTitle}`}
-              >
-                {firstName} {lastName}
-              </Typography>
-            </Grid>
+    <Grid container>
+      <Grid item xs={12}>
+        <Grid container className={classes.tab} alignItems="center">
+          <Grid item xs={3}>
+            <Avatar src={image ? image : ""} className={classes.headerAvatar} />
+          </Grid>
+          <Grid item xs={9}>
+            <Typography className={`${classes.headerName} ${classes.tabTitle}`}>
+              {firstName} {lastName}
+            </Typography>
           </Grid>
         </Grid>
-        {items.map(({ icon, title, setIsActive }: SidebarItem) => (
-          <Grid key={title} item xs={12}>
-            <Grid container className={classes.tab}>
-              <Link
-                className={classes.componentLink}
-                onClick={() => handleItemSelected(setIsActive)}
-                color="inherit"
-              >
-                <Grid container alignItems="center" justify="flex-end">
-                  <Grid item xs={2}>
-                    {icon}
-                  </Grid>
-                  <Grid item xs={9}>
-                    <Typography className={classes.tabTitle}>
-                      {title}
-                    </Typography>
-                  </Grid>
-                </Grid>
-              </Link>
-            </Grid>
-          </Grid>
-        ))}
       </Grid>
-    </div>
+      {items.map(({ icon, title, setIsActive }: SidebarItem) => (
+        <Grid key={title} item xs={12}>
+          <Grid container className={classes.tab}>
+            <Link
+              className={classes.componentLink}
+              onClick={() => handleItemSelected(setIsActive)}
+              color="inherit"
+            >
+              <Grid container alignItems="center" justify="flex-end">
+                <Grid item xs={2}>
+                  {icon}
+                </Grid>
+                <Grid item xs={9}>
+                  <Typography className={classes.tabTitle}>{title}</Typography>
+                </Grid>
+              </Grid>
+            </Link>
+          </Grid>
+        </Grid>
+      ))}
+    </Grid>
   )
 }

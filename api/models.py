@@ -47,9 +47,7 @@ class Privacy(models.Model):
 
 
 class Interest(models.Model):
-    profile = models.ForeignKey(
-        Profile, on_delete=models.CASCADE, verbose_name="related profile"
-    )
+    profiles = models.ManyToManyField(Profile)
     category = models.CharField(max_length=30, blank=True)
     title = models.CharField(max_length=30)
 
