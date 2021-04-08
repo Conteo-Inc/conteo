@@ -20,7 +20,7 @@ def add_interests(apps, schema_editor):
                 interest = Interest(category=category, title=title)
                 interest.save()
             except KeyError as e:
-                print(f"KeyError reading interests.json: {e}")
+                print(f"KeyError reading interests.json {e} on data {interestData}")
 
 
 class Migration(migrations.Migration):
