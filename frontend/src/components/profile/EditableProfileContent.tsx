@@ -166,50 +166,31 @@ const useStyles = makeStyles({
   },
 })
 
-export default function EditableProfileContent({
-  readonlyContent,
-  editableContent,
+type EditableElementListProps = {
+  editableContent: ProfileContentType
+  contentSetters: ProfileContentSetters
+  interestOptions: Interest[]
+}
+
+function buildEditableElementList({
+  editableContent: { first_name, last_name, birth_date, gender, interests },
   contentSetters: {
     setFirstName,
     setLastName,
     setBirthDate,
     setGender,
     setInterests,
-    setImage,
   },
-  setProfileContent,
-  userId,
-}: EditableProfileContentProps): JSX.Element {
+  interestOptions,
+}: EditableElementListProps): JSX.Element[] {
   const classes = useStyles()
-
-  const [isEditMode, toggleEditMode] = React.useState<boolean>(false)
-  const [contentErrorMessage, setContentErrorMessage] = React.useState<string>(
-    ""
-  )
   const [interestInputValue, setInterestInputValue] = React.useState<string>("")
-  const [interestOptions, setInterestOptions] = React.useState<Interest[]>([])
-
-  React.useEffect(() => {
-    request<Interest[]>({ path: "/api/interests/", method: "get" })
-      .then((res) => {
-        const options: Interest[] = res.parsedBody
-          .sort((a: Interest, b: Interest) => -b.title.localeCompare(a.title))
-          .sort(
-            (a: Interest, b: Interest) => -b.category.localeCompare(a.category)
-          )
-        setInterestOptions(options)
-      })
-      .catch((error) => {
-        console.log(error)
-      })
-  }, [])
 
   const isInterestEqual = (a: Interest, b: Interest): boolean => {
     return a.category === b.category && a.title === b.title
   }
 
-  // Editable user profile element list.
-  const editableElements: JSX.Element[] = [
+  return [
     // FIRST NAME
     <TextField
       key={"editableContent-firstName"}
@@ -217,7 +198,7 @@ export default function EditableProfileContent({
       className={classes.textField}
       variant="outlined"
       label="First Name"
-      value={editableContent.first_name}
+      value={first_name}
       onChange={(e) => setFirstName(e.currentTarget.value)}
       inputProps={{ maxLength: MAX_FIRST_NAME_LENGTH }}
     />,
@@ -229,7 +210,7 @@ export default function EditableProfileContent({
       className={classes.textField}
       variant="outlined"
       label="Last Name"
-      value={editableContent.last_name}
+      value={last_name}
       onChange={(e) => setLastName(e.currentTarget.value)}
       inputProps={{ maxLength: MAX_LAST_NAME_LENGTH }}
     />,
@@ -248,7 +229,7 @@ export default function EditableProfileContent({
         margin="none"
         label="Birthday"
         format="MM/dd/yyyy"
-        value={editableContent.birth_date}
+        value={birth_date}
         onChange={setBirthDate}
         KeyboardButtonProps={{ "aria-label": "change date" }}
       />
@@ -264,7 +245,7 @@ export default function EditableProfileContent({
       <Select
         native
         label="Gender"
-        value={editableContent.gender ? editableContent.gender : ""}
+        value={gender ? gender : ""}
         onChange={(e) => setGender(e.currentTarget.value as GenderKey)}
       >
         <option aria-label="None" value="" />
@@ -286,7 +267,7 @@ export default function EditableProfileContent({
       groupBy={(interest) => interest.category}
       getOptionLabel={(interest) => interest.title}
       getOptionSelected={isInterestEqual}
-      value={editableContent.interests}
+      value={interests}
       onChange={(e, interests: Interest[]) => setInterests(interests)}
       inputValue={interestInputValue}
       onInputChange={(e, value: string) => setInterestInputValue(value)}
@@ -306,6 +287,44 @@ export default function EditableProfileContent({
       )}
     />,
   ]
+}
+
+export default function EditableProfileContent({
+  readonlyContent,
+  editableContent,
+  contentSetters,
+  setProfileContent,
+  userId,
+}: EditableProfileContentProps): JSX.Element {
+  const classes = useStyles()
+
+  const [isEditMode, toggleEditMode] = React.useState<boolean>(false)
+  const [contentErrorMessage, setContentErrorMessage] = React.useState<string>(
+    ""
+  )
+  const [interestOptions, setInterestOptions] = React.useState<Interest[]>([])
+
+  React.useEffect(() => {
+    request<Interest[]>({ path: "/api/interests/", method: "get" })
+      .then((res) => {
+        const options: Interest[] = res.parsedBody
+          .sort((a: Interest, b: Interest) => -b.title.localeCompare(a.title))
+          .sort(
+            (a: Interest, b: Interest) => -b.category.localeCompare(a.category)
+          )
+        setInterestOptions(options)
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+  }, [])
+
+  // Editable user profile element list.
+  const editableElements: JSX.Element[] = buildEditableElementList({
+    editableContent,
+    contentSetters,
+    interestOptions,
+  })
 
   const handleSaveContent = () => {
     const updates = getProfileContentUpdates(readonlyContent, editableContent)
@@ -333,11 +352,11 @@ export default function EditableProfileContent({
     toggleEditMode(false)
 
     // Reset editable content values.
-    setFirstName(readonlyContent.first_name)
-    setLastName(readonlyContent.last_name)
-    setBirthDate(readonlyContent.birth_date)
-    setGender(readonlyContent.gender)
-    setInterests(readonlyContent.interests)
+    contentSetters.setFirstName(readonlyContent.first_name)
+    contentSetters.setLastName(readonlyContent.last_name)
+    contentSetters.setBirthDate(readonlyContent.birth_date)
+    contentSetters.setGender(readonlyContent.gender)
+    contentSetters.setInterests(readonlyContent.interests)
   }
   const [
     isUploadImageModalOpen,
@@ -345,7 +364,7 @@ export default function EditableProfileContent({
   ] = React.useState<boolean>(false)
 
   const updateProfilePicture = (filePath: Nullable<string>) => {
-    setImage(filePath)
+    contentSetters.setImage(filePath)
     setProfileContent(editableContent)
   }
 
@@ -413,7 +432,7 @@ export default function EditableProfileContent({
                     className={classes.recordButton}
                     size="large"
                     component={Link}
-                    to={`/record/${userId}/intro`}
+                    to={`/record/${userId}`}
                   >
                     <Typography variant="h6">Record Intro Video</Typography>
                   </Button>
