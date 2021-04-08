@@ -278,7 +278,7 @@ export default function AccountsPage(): JSX.Element {
                 {btnText}
               </Button>
               <AbstractModal
-                isOpen={isModalOpen}
+                isModalOpen={isModalOpen}
                 handleConfirm={handleClose}
                 handleCancel={handleClose}
                 title="Confirmation"
