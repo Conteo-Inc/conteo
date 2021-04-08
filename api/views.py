@@ -58,6 +58,22 @@ class UserAccountDeleteView(views.APIView):
         return response.Response(status=status.HTTP_200_OK)
 
 
+# send email..
+class UserForgotPassword(views.APIView):
+    permission_classes = (permissions.AllowAny,)
+
+    def get(self, request):
+        return response.Response(status=status.HTTP_200_OK)
+
+
+# Update new password
+class UserResetPassword(views.APIView):
+    permission_classes = (permissions.AllowAny,)
+
+    def get(self, request):
+        return response.Response(status=status.HTTP_200_OK)
+
+
 class UserLoginView(views.APIView):
     permission_classes = (permissions.AllowAny,)
 

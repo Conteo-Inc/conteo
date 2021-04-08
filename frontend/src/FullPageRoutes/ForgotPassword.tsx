@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as React from "react"
 import {
   Grid,
@@ -8,10 +7,10 @@ import {
   TextField,
 } from "@material-ui/core"
 import { useState } from "react"
-import { request } from "../utils/fetch"
 import Notification from "../components/Notification"
 import { NotificationType } from "../components/Notification"
 import { Nullable } from "../utils/context"
+import { useHistory } from "react-router-dom"
 
 export type UserAccounts = {
   first_name: string
@@ -47,35 +46,21 @@ export default function ForgotPassword(): JSX.Element {
   const classes = useStyles()
   const [isOpen, setIsOpen] = useState(false)
   const [email, setEmail] = React.useState<Nullable<string>>(null)
-  const [type, setType] = useState<NotificationType["type"]>("success")
-  const [message, setMessage] = useState(
-    "A verication code has been sent to your email"
-  )
+  //   const [nextPg, setNextPg] = React.useState<Nullable<boolean>>(false)
+  const [type, setType] = useState<NotificationType["type"]>("error")
+  const [message, setMessage] = useState("Email does not exist")
+  const history = useHistory()
 
   const handleSave = () => {
-    // editModeOn(false)
+    setIsOpen(true)
+    setType("error")
   }
 
   const handleClose = () => {
-    // editModeOn(false)
+    setIsOpen(false)
+    setMessage("")
+    history.push("/resetpassword")
   }
-
-  //   const handleClose = () => {
-  //     setIsModalOpen(false)
-  //   }
-
-  // request({ path: "/api/accounts/", method: "get" }).then((res) => {
-  //   const account: any = res.parsedBody
-  //   const content: UserAccounts = {
-  //     first_name: account.first_name,
-  //     last_name: account.last_name,
-  //     username: account.username,
-  //     password: account.password,
-  //     email: account.email,
-  //     successor: account.successor,
-  //   }
-  //   setAccountData(content)
-  // })
 
   return (
     <>
@@ -86,7 +71,13 @@ export default function ForgotPassword(): JSX.Element {
         className={classes.topBar}
       >
         <Typography variant="h5">Find your Conteo account</Typography>
-        <form className={classes.root} onSubmit={handleSave}>
+        <form
+          className={classes.root}
+          onSubmit={(e) => {
+            e.preventDefault()
+            handleSave()
+          }}
+        >
           <Grid container className={classes.pageContent} spacing={5}>
             <Grid item xs={6}>
               <TextField
@@ -110,14 +101,14 @@ export default function ForgotPassword(): JSX.Element {
             </Grid>
           </Grid>
         </form>
-        <Notification
-          isOpen={isOpen}
-          type={type}
-          message={message}
-          setisOpen={setIsOpen}
-          handleClose={handleClose}
-        />
       </Grid>
+      <Notification
+        isOpen={isOpen}
+        type={type}
+        message={message}
+        setisOpen={setIsOpen}
+        handleClose={handleClose}
+      />
     </>
   )
 }

@@ -19,4 +19,6 @@ urlpatterns = [
     path("reports/", views.Reports.as_view()),
     path("accounts/", views.Accounts.as_view()),
     path("user/", views.UserAuthView.as_view()),
+    path("forgotpassword/", views.UserForgotPassword.as_view()),
+    path("resetpassword/", views.UserResetPassword.as_view()),
 ]

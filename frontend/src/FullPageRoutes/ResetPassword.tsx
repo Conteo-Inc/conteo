@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as React from "react"
 import { Nullable } from "../utils/context"
 import {
@@ -11,6 +10,7 @@ import {
 import Notification from "../components/Notification"
 import { NotificationType } from "../components/Notification"
 import { useState } from "react"
+import { useHistory } from "react-router-dom"
 
 const useStyles = makeStyles({
   root: {
@@ -56,16 +56,23 @@ export default function ResetPassword(): JSX.Element {
   const [isOpen, setIsOpen] = useState(false)
   const [type, setType] = useState<NotificationType["type"]>("success")
   const [message, setMessage] = useState(
-    "A verication code has been sent to your email"
+    "Your password has been successfully changed"
   )
   const classes = useStyles()
+  const history = useHistory()
+
+  React.useEffect(() => {
+    setIsOpen(true)
+    setType("info")
+    setMessage("A verication code has been sent to your email")
+  }, [])
 
   const handleSave = () => {
-    //
+    history.push("/")
   }
 
   const handleClose = () => {
-    //
+    setIsOpen(false)
   }
 
   return (
@@ -73,7 +80,13 @@ export default function ResetPassword(): JSX.Element {
       <Grid container>
         <Grid item className={classes.pageContent}>
           <Typography variant="h5">Reset your password</Typography>
-          <form className={classes.root} onSubmit={handleSave}>
+          <form
+            className={classes.root}
+            onSubmit={(e) => {
+              e.preventDefault()
+              handleSave()
+            }}
+          >
             <Grid container spacing={2} direction="column" justify="center">
               <Grid item xs={12}>
                 <TextField
@@ -84,7 +97,7 @@ export default function ResetPassword(): JSX.Element {
                   required
                 />
                 <TextField
-                  label="NewPassword"
+                  label="New Password"
                   type="password"
                   placeholder="Enter new password"
                   value={newPassword || ""}
@@ -93,7 +106,7 @@ export default function ResetPassword(): JSX.Element {
                   required
                 />
                 <TextField
-                  label="Password"
+                  label="Retype New Password"
                   type="password"
                   placeholder="Re-enter new password"
                   value={secondNewPassword || ""}
