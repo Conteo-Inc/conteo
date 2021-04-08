@@ -73,12 +73,6 @@ export default function App(): JSX.Element {
             <ProtectedRoute path="/accounts">
               <AccountsPage />
             </ProtectedRoute>
-            {/* <ProtectedRoute path="/forgotpassword">
-              <ForgotPassword />
-            </ProtectedRoute>
-            <ProtectedRoute path="/resetpassword">
-              <ResetPassword />
-            </ProtectedRoute> */}
             <ProtectedRoute path="/">
               <Dashboard />
             </ProtectedRoute>
