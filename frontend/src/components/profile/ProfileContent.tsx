@@ -5,6 +5,10 @@ import Video from "../video/Video"
 import { Colors } from "../../utils/colors"
 import { Nullable } from "../../utils/context"
 
+type PropfileContentProps = {
+  readonlyContent: ProfileContentType
+}
+
 export type ProfileContentType = {
   first_name: string
   last_name: string
@@ -103,9 +107,9 @@ function buildProfileFieldList({
   ]
 }
 
-export default function ProfileContent(
-  readonlyContent: ProfileContentType
-): JSX.Element {
+export default function ProfileContent({
+  readonlyContent,
+}: PropfileContentProps): JSX.Element {
   const classes = useStyles()
 
   // User profile field list. Field values are assigned to readonly content.
