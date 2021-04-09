@@ -168,7 +168,7 @@ export default function MatchingPage(): JSX.Element {
                   isOpen={introVisible}
                   senderId={match.id}
                   handleClose={() => setVisible(false)}
-                  intro
+                  intro={true}
                 />
               </>
             ) : (

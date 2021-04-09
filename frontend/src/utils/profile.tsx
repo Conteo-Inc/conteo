@@ -8,8 +8,7 @@ import type {
   PrivacySettingsType,
   PrivacyKey,
 } from "../components/profile/PrivacySettings"
-import { SetStateDispatch } from "./context"
-import type { Nullable } from "./context"
+import type { SetStateDispatch, Nullable } from "./context"
 
 export type ProfileComponentStates = {
   isProfileActive: boolean
@@ -67,6 +66,8 @@ export type ProfileContentSetters = {
   setBirthDate: SetStateDispatch<Nullable<Date>>
   setGender: SetStateDispatch<Nullable<GenderKey>>
   setInterests: SetStateDispatch<Interest[]>
+  setImage: SetStateDispatch<Nullable<string>>
+  setVideo: SetStateDispatch<Nullable<string>>
 }
 
 // Custom profile content hook. This separates saved profile content
@@ -82,6 +83,8 @@ export function useProfileContent(
   const [birthDate, setBirthDate] = useState<Nullable<Date>>(content.birth_date)
   const [gender, setGender] = useState<Nullable<GenderKey>>(content.gender)
   const [interests, setInterests] = useState<Interest[]>(content.interests)
+  const [image, setImage] = useState<Nullable<string>>(content.image_file)
+  const [video, setVideo] = useState<Nullable<string>>(content.video)
 
   const editableContent: ProfileContentType = {
     first_name: firstName,
@@ -89,7 +92,8 @@ export function useProfileContent(
     birth_date: birthDate,
     gender: gender,
     interests: interests,
-    video: content.video,
+    image_file: image,
+    video: video,
   }
 
   const contentSetters: ProfileContentSetters = {
@@ -98,6 +102,8 @@ export function useProfileContent(
     setBirthDate: setBirthDate,
     setGender: setGender,
     setInterests: setInterests,
+    setImage: setImage,
+    setVideo: setVideo,
   }
 
   return { editableContent, contentSetters }
@@ -118,6 +124,7 @@ export function getProfileContentUpdates(
       gender: content.gender !== null ? content.gender : "",
       birth_date:
         content.birth_date !== null ? toDateString(content.birth_date) : "",
+      image_file: content.image_file !== null ? content.image_file : "",
       video: content.video !== null ? content.video : "",
     }
   }

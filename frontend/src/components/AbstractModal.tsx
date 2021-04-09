@@ -1,4 +1,5 @@
 import {
+  Grid,
   Dialog,
   DialogContent,
   DialogTitle,
@@ -13,32 +14,42 @@ import * as React from "react"
 
 type ModalType = {
   title: string
-  description: string
+  description?: string
   confirmText?: string
   cancelText?: string
   isModalOpen: boolean
   handleConfirm: () => void
   handleCancel: () => void
+  children?: JSX.Element
 }
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles({
   modal: {
     position: "absolute",
-    top: theme.spacing(5),
-    padding: theme.spacing(2),
+    top: 0,
+    left: "50%",
+    transform: "translate(-50%, 25%)",
+    margin: 0,
+  },
+  close: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+  },
+  title: {
+    margin: "25px 50px",
+    padding: 0,
   },
   modalContent: {
+    padding: 0,
     textAlign: "center",
   },
   modalAction: {
+    margin: "25px 50px",
+    padding: 0,
     justifyContent: "center",
   },
-  modalTitle: {
-    position: "absolute",
-    top: theme.spacing(2),
-    right: theme.spacing(0.5),
-  },
-}))
+})
 
 export default function AbstractModal({
   title,
@@ -48,20 +59,26 @@ export default function AbstractModal({
   isModalOpen,
   handleConfirm,
   handleCancel,
+  children,
 }: ModalType): JSX.Element {
   const classes = useStyles()
 
   return (
     <Dialog open={isModalOpen} classes={{ paper: classes.modal }}>
-      <DialogTitle>
-        <IconButton className={classes.modalTitle} onClick={handleCancel}>
-          <CloseIcon />
-        </IconButton>
+      <IconButton className={classes.close} onClick={handleCancel}>
+        <CloseIcon />
+      </IconButton>
+      <DialogTitle className={classes.title}>
+        <Grid container>
+          <Grid item container alignItems="center" justify="center" xs={12}>
+            <Typography variant="h6">{title}</Typography>
+          </Grid>
+          <Grid item container alignItems="center" justify="center" xs={12}>
+            <Typography variant="subtitle2">{description}</Typography>
+          </Grid>
+        </Grid>
       </DialogTitle>
-      <DialogContent className={classes.modalContent}>
-        <Typography variant="h6">{title}</Typography>
-        <Typography variant="subtitle2">{description}</Typography>
-      </DialogContent>
+      <DialogContent className={classes.modalContent}>{children}</DialogContent>
       <DialogActions className={classes.modalAction}>
         <Button variant="contained" onClick={handleCancel} color="secondary">
           {cancelText}

@@ -12,20 +12,44 @@ from .models import Interest, MatchStatus, Privacy, Profile, Report, Video
 class ProfileSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         rep = super().to_representation(instance)
-        # get video
-        video = None
-        try:
-            video = Video.objects.get(
-                Q(sender=instance.user) & Q(receiver=instance.user)
-            )
-            video = read_video(video.video_file)
-        finally:
-            rep["video"] = video
-            return rep
+
+        videoData = None
+        videoInstance = getVideoInstance(instance.user, instance.user)
+        if videoInstance is not None:
+            videoData = read_video(videoInstance.video_file)
+            # TODO: if videoData comes back none, then video file is lost,
+            # should we delete the video instance?
+
+        rep["video"] = videoData
+        return rep
 
     class Meta:
         model = Profile
         exclude = ("user",)
+
+
+def getVideoInstance(sender, receiver):
+    videoInstance = None
+    allVideoInstances = []
+
+    try:
+        # Get video instance.
+        allVideoInstances = Video.objects.filter(sender=sender, receiver=receiver)
+    except Exception as e:
+        # Video instance does not exist.
+        print(e)
+
+    # Test if there exists an instance.
+    numVideos = len(allVideoInstances)
+    if numVideos == 1:
+        videoInstance = allVideoInstances[0]
+    # Test if there exists more than one instance.
+    elif numVideos > 1:
+        # TODO: should we double check how many intro videos there are here
+        # or not bother but delete old intro videos as they are updated?
+        videoInstance = allVideoInstances[numVideos - 1]
+
+    return videoInstance
 
 
 class PrivacySerializer(serializers.ModelSerializer):
@@ -111,10 +135,16 @@ def read_video(video):
     @param video: A FieldFile representing the video.
     Commonly found on Video.video_file
     """
+
+    videoData = None
     try:
-        return video.read().decode()
+        videoData = video.read().decode()
+    except Exception as e:
+        print(e)
     finally:
         video.close()
+
+    return videoData
 
 
 class MailListSerializer(serializers.ModelSerializer):

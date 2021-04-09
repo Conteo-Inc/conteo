@@ -190,27 +190,75 @@ class VideoListCreate(generics.ListCreateAPIView):
         serializer = self.serializer_class(
             data=request.data, context={"data": data, "user": request.user}
         )
+
+        res = None
         if serializer.is_valid():
+            # Save new intro video.
             serializer.save()
-            return response.Response(serializer.data, status=status.HTTP_201_CREATED)
-        return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            res = response.Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            res = response.Response(
+                serializer.errors, status=status.HTTP_400_BAD_REQUEST
+            )
 
-    # def get(self, request):
-    #     queryset = self.filter_queryset(self.get_queryset())
-    #     serializer = self.list_serializer_class(queryset, many=True)
-    #     return response.Response(data=serializer.data, status=status.HTTP_200_OK)
+        return res
 
 
-class IntroVideoRetrieveView(views.APIView):
+class IntroVideoRetrieveUpdateView(generics.RetrieveUpdateAPIView):
     serializer_class = VideoSerializer
 
-    def get_object(self, profile_id):
-        return Video.objects.get(Q(sender=profile_id) & Q(receiver=profile_id))
+    def get_object(self, userId):
+        video = None
+        try:
+            video = Video.objects.get(sender=userId, receiver=userId)
+        except Exception:
+            # No pre-existing video.
+            pass
 
-    def get(self, request, profile_id):
-        video = self.get_object(profile_id=profile_id)
-        serializer = self.serializer_class(video)
-        return response.Response(serializer.data)
+        return video
+
+    def get(self, request, match):
+        video = self.get_object(match)
+
+        # Test if an intro video exists.
+        res = None
+        if video is not None:
+            print("video is not none")
+            print(video)
+            serializer = self.serializer_class(video)
+            res = response.Response(data=serializer.data, status=status.HTTP_200_OK)
+        else:
+            print("video is none")
+            res = response.Response(status=status.HTTP_404_NOT_FOUND)
+
+        return res
+
+    def post(self, request):
+        data = request.data.pop("data")
+        serializer = self.serializer_class(
+            data=request.data, context={"data": data, "user": request.user}
+        )
+
+        res = None
+        if serializer.is_valid():
+            oldVideo = self.get_object(request.user.id)
+
+            # Save new intro video.
+            serializer.save()
+
+            # Delete old intro video.
+            if oldVideo is not None:
+                oldVideo.delete()
+
+            res = response.Response(
+                data=serializer.data, status=status.HTTP_201_CREATED
+            )
+        else:
+            res = response.Response(
+                data=serializer.errors, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        return res
 
 
 class VideoRetrieveView(generics.RetrieveAPIView):

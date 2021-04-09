@@ -15,6 +15,7 @@ export type ProfileContentType = {
   birth_date: Nullable<Date>
   gender: Nullable<GenderKey>
   interests: Interest[]
+  image_file: Nullable<string>
   video: Nullable<string>
 }
 
@@ -73,20 +74,14 @@ const useStyles = makeStyles({
   },
 })
 
-export default function ProfileContent({
-  readonlyContent: {
-    first_name,
-    last_name,
-    birth_date,
-    gender,
-    interests,
-    video,
-  },
-}: ProfileContentProps): JSX.Element {
-  const classes = useStyles()
-
-  // User profile field list. Field values are assigned to readonly content.
-  const fields: ProfileField[] = [
+function buildProfileFieldList({
+  first_name,
+  last_name,
+  birth_date,
+  gender,
+  interests,
+}: ProfileContentType): ProfileField[] {
+  return [
     {
       title: "First Name",
       value: first_name,
@@ -110,17 +105,34 @@ export default function ProfileContent({
         .join(", "),
     },
   ]
+}
+
+export default function ProfileContent({
+  readonlyContent,
+}: ProfileContentProps): JSX.Element {
+  const classes = useStyles()
+
+  // User profile field list. Field values are assigned to readonly content.
+  const profileFieldList: ProfileField[] = buildProfileFieldList(
+    readonlyContent
+  )
 
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>
         <Grid container alignItems="center" justify="space-evenly" spacing={2}>
           <Grid item>
-            <Avatar src={""} className={classes.profileAvatar} />
+            <Avatar
+              src={readonlyContent.image_file ? readonlyContent.image_file : ""}
+              className={classes.profileAvatar}
+            />
           </Grid>
-          {video && (
+          {readonlyContent.video && (
             <Grid item>
-              <Video src={video} className={classes.introVideo} />
+              <Video
+                src={readonlyContent.video}
+                className={classes.introVideo}
+              />
             </Grid>
           )}
         </Grid>
@@ -130,7 +142,7 @@ export default function ProfileContent({
           <Grid container justify="center">
             <Grid item xs={10}>
               <Grid container justify="space-between">
-                {fields.map(({ title, value }: ProfileField) => (
+                {profileFieldList.map(({ title, value }: ProfileField) => (
                   <Grid
                     key={`readonlyField-${title}`}
                     item

@@ -12,6 +12,9 @@ class Profile(models.Model):
     phone_number = models.CharField(max_length=10, unique=True, null=True)
     birth_date = models.DateField(null=True)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True)
+    image_file = models.FileField(
+        upload_to="images/", null=True, verbose_name="profile picture"
+    )
 
 
 class Privacy(models.Model):
