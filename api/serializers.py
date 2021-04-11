@@ -67,7 +67,6 @@ class ProfileFromUserSerializer(serializers.ModelSerializer):
             return rep
 
     class Meta:
-        # TODO: Change to Profile
         model = User
         exclude = (
             "first_name",
