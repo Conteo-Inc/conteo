@@ -11,7 +11,7 @@ import {
   MenuItem,
 } from "@material-ui/core"
 import { Check, Block, Flag, PlayCircleFilled } from "@material-ui/icons"
-import { request } from "../utils/fetch"
+import { request, queryParams } from "../utils/fetch"
 import ViewVideo from "../components/video/ViewVideo"
 
 type EnqueueFunc<T> = (...newItems: T[]) => void
@@ -39,6 +39,13 @@ enum Gender {
   MALE = "M",
   FEMALE = "F",
   OTHER = "O",
+}
+
+const ageLimits = { min: 18, max: 130 }
+const initFilters = {
+  minAge: ageLimits.min,
+  maxAge: ageLimits.max,
+  genders: Object.values(Gender),
 }
 
 const useStyles = makeStyles({
@@ -75,17 +82,13 @@ function MatchControls({
   )
 }
 
-function MatchingFilters({ clearQ }: { clearQ: () => void }): JSX.Element {
-  const ageLimits = { min: 18, max: 130 }
-
-  const [minAge, setMinAge] = React.useState<number>(ageLimits.min)
-  const [maxAge, setMaxAge] = React.useState<number>(ageLimits.max)
-  const [genders, setGenders] = React.useState<Gender[]>([
-    Gender.MALE,
-    Gender.FEMALE,
-    Gender.OTHER,
-  ])
-
+function MatchingFilters({
+  filters,
+  dispatch,
+}: {
+  filters: typeof initFilters
+  dispatch: React.Dispatch<Partial<typeof initFilters>>
+}): JSX.Element {
   return (
     <Grid container justify={"center"} spacing={2}>
       <Grid item>
@@ -93,10 +96,9 @@ function MatchingFilters({ clearQ }: { clearQ: () => void }): JSX.Element {
           type="number"
           helperText="Min age"
           inputProps={ageLimits}
-          value={minAge}
+          value={filters.minAge}
           onChange={(e) => {
-            setMinAge(parseInt(e.currentTarget.value))
-            clearQ()
+            dispatch({ minAge: parseInt(e.currentTarget.value) })
           }}
         />
       </Grid>
@@ -105,22 +107,19 @@ function MatchingFilters({ clearQ }: { clearQ: () => void }): JSX.Element {
           type="number"
           helperText="Max age"
           inputProps={ageLimits}
-          value={maxAge}
-          onChange={(e) => {
-            setMaxAge(parseInt(e.currentTarget.value))
-            clearQ()
-          }}
+          value={filters.maxAge}
+          onChange={(e) =>
+            dispatch({ maxAge: parseInt(e.currentTarget.value) })
+          }
         />
       </Grid>
       <Grid item>
         <Select
           multiple
-          value={genders}
+          value={filters.genders}
           onChange={(e) => {
-            setGenders(e.target.value as Gender[])
-            clearQ()
+            dispatch({ genders: e.target.value as Gender[] })
           }}
-          placeholder="Gender"
         >
           <MenuItem value={Gender.MALE}>Male</MenuItem>
           <MenuItem value={Gender.FEMALE}>Female</MenuItem>
@@ -147,19 +146,27 @@ function useQueue<T>(): [T, () => void, EnqueueFunc<T>, () => void] {
 
 export default function MatchingPage(): JSX.Element {
   const [match, next, enqueue, clearQ] = useQueue<Match>()
+  const [filters, dispatch] = React.useReducer(
+    (state: typeof initFilters, action: Partial<typeof initFilters>) => {
+      clearQ()
+      return { ...state, ...action }
+    },
+    initFilters
+  )
   const [introVisible, setVisible] = React.useState<boolean>(false)
   const classes = useStyles()
 
-  // Having `match` in the dependency list will cause infinite requests
-  // if `/api/matches/` isn't idempotent.
   React.useEffect(() => {
     // TODO request more matches when match queue gets low
-    request<Match[]>({ path: "/api/matches/", method: "get" })
+    request<Match[]>({
+      path: "/api/matches/" + queryParams(filters),
+      method: "get",
+    })
       .then((resp) => {
         enqueue(...resp.parsedBody)
       })
       .catch((err) => console.error(`Failed to get matches: ${err}`))
-  }, [match])
+  }, [filters])
 
   const onAccept = (matchId: number) => {
     request({
@@ -201,7 +208,7 @@ export default function MatchingPage(): JSX.Element {
       alignItems="center"
       className={classes.root}
     >
-      <MatchingFilters clearQ={clearQ} />
+      <MatchingFilters filters={filters} dispatch={dispatch} />
       {match ? (
         <Grid
           container
