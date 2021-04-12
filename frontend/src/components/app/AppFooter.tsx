@@ -8,8 +8,8 @@ const useStyles = makeStyles({
     height: "3rem",
     padding: "0 1rem",
     position: "fixed",
-    left: 0,
-    bottom: 0,
+    left: "0px",
+    bottom: "0px",
   },
   bannerText: {
     color: "white",
