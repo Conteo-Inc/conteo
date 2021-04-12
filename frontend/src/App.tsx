@@ -13,6 +13,9 @@ import { ProtectedRoute } from "./components/ProtectedRoute"
 import AppSideBar from "./components/app/AppSidebar"
 import MailPage from "./FullPageRoutes/MailPage"
 import VideoViewPage from "./FullPageRoutes/VideoViewPage"
+import Help from "./FullPageRoutes/Help"
+import ContactUs from "./FullPageRoutes/ContactUs"
+import AccountsPage from "./FullPageRoutes/AccountsPage"
 
 const useStyles = makeStyles({
   app: {
@@ -58,6 +61,18 @@ export default function App(): JSX.Element {
     {
       path: "/watch/",
       pageJsx: <VideoViewPage />,
+    },
+    {
+      path: "/help/",
+      pageJsx: <Help />,
+    },
+    {
+      path: "/contact/",
+      pageJsx: <ContactUs />,
+    },
+    {
+      path: "/accounts/",
+      pageJsx: <AccountsPage />,
     },
     {
       path: "/",

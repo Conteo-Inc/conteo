@@ -6,7 +6,7 @@ from django.db.models.query_utils import Q
 from django.utils.timezone import now
 from rest_framework import serializers
 
-from .models import MatchStatus, Profile, Report, Video
+from .models import Interest, MatchStatus, Privacy, Profile, Report, Video
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -26,6 +26,18 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         exclude = ("user",)
+
+
+class PrivacySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Privacy
+        fields = "__all__"
+
+
+class InterestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Interest
+        fields = "__all__"
 
 
 class UserAuthSerializer(serializers.ModelSerializer):
@@ -82,6 +94,10 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         # in the profile model.
         user.profile = Profile(user.id)
         user.profile.save()
+
+        privacy = Privacy(profile=user.profile)
+        privacy.save()
+
         return user
 
     class Meta:
@@ -176,3 +192,16 @@ class MatchStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = MatchStatus
         fields = ("user_lo_response", "user_hi_response")
+
+
+class AccountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ("email",)
+
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        profile = Profile.objects.get(Q(user__email=instance.email))
+        rep["first_name"] = profile.first_name
+        rep["last_name"] = profile.last_name
+        return rep

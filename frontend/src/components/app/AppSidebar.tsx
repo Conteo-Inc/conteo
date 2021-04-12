@@ -51,6 +51,11 @@ const links: SidebarLink[] = [
     link: "/help",
     iconJsx: <Help />,
   },
+  {
+    title: "Contact Us",
+    link: "/contact",
+    iconJsx: <Info />,
+  },
 ]
 
 export default function AppSidebar(): JSX.Element {
