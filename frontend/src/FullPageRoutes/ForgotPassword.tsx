@@ -9,8 +9,7 @@ import {
 import { useState } from "react"
 import Notification from "../components/Notification"
 import { NotificationType } from "../components/Notification"
-import { Nullable } from "../utils/context"
-import { useHistory } from "react-router-dom"
+import { parseIdentity, request } from "../utils/fetch"
 
 export type UserAccounts = {
   first_name: string
@@ -45,21 +44,33 @@ const useStyles = makeStyles({
 export default function ForgotPassword(): JSX.Element {
   const classes = useStyles()
   const [isOpen, setIsOpen] = useState(false)
-  const [email, setEmail] = React.useState<Nullable<string>>(null)
-  //   const [nextPg, setNextPg] = React.useState<Nullable<boolean>>(false)
+  const [username, setUsername] = React.useState<string>("")
   const [type, setType] = useState<NotificationType["type"]>("error")
-  const [message, setMessage] = useState("Email does not exist")
-  const history = useHistory()
+  const [message, setMessage] = useState("")
 
-  const handleSave = () => {
-    setIsOpen(true)
-    setType("error")
+  const handleSave = (username: string) => {
+    request({
+      path: "/api/forgotpassword/",
+      method: "post",
+      body: {
+        username: username,
+      },
+      parser: parseIdentity,
+    })
+      .then(() => {
+        setType("success")
+        setIsOpen(true)
+        setMessage("Check your email for password reset link")
+      })
+      .catch(() => {
+        setType("error")
+        setIsOpen(true)
+        setMessage("Invalid email")
+      })
   }
 
   const handleClose = () => {
     setIsOpen(false)
-    setMessage("")
-    history.push("/resetpassword")
   }
 
   return (
@@ -75,7 +86,7 @@ export default function ForgotPassword(): JSX.Element {
           className={classes.root}
           onSubmit={(e) => {
             e.preventDefault()
-            handleSave()
+            handleSave(username)
           }}
         >
           <Grid container className={classes.pageContent} spacing={5}>
@@ -83,9 +94,9 @@ export default function ForgotPassword(): JSX.Element {
               <TextField
                 label="Email"
                 placeholder="Enter email"
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => setUsername(e.target.value)}
                 type="email"
-                value={email || ""}
+                value={username || ""}
                 fullWidth
                 required
               />

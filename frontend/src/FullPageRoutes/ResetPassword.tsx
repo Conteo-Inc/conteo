@@ -1,5 +1,4 @@
 import * as React from "react"
-import { Nullable } from "../utils/context"
 import {
   TextField,
   Grid,
@@ -10,7 +9,9 @@ import {
 import Notification from "../components/Notification"
 import { NotificationType } from "../components/Notification"
 import { useState } from "react"
-import { useHistory } from "react-router-dom"
+// import { useHistory } from "react-router-dom"
+import { parseIdentity, request } from "../utils/fetch"
+import { useParams } from "react-router-dom"
 
 const useStyles = makeStyles({
   root: {
@@ -45,34 +46,65 @@ const useStyles = makeStyles({
   },
 })
 
+export type HandlerArgs = {
+  newPassword: string | null
+  secondNewPassword: string | null
+  uidb64: string | null
+  token: string | null
+}
+
 export default function ResetPassword(): JSX.Element {
-  const [newPassword, setNewPassword] = React.useState<Nullable<string>>(null)
-  const [secondNewPassword, setSecondNewPassword] = React.useState<
-    Nullable<string>
-  >(null)
-  const [verificationCode, setVerificationCode] = React.useState<
-    Nullable<string>
-  >(null)
+  const [newPassword, setNewPassword] = React.useState<string>("")
+  const [secondNewPassword, setSecondNewPassword] = React.useState<string>("")
   const [isOpen, setIsOpen] = useState(false)
   const [type, setType] = useState<NotificationType["type"]>("success")
   const [message, setMessage] = useState(
     "Your password has been successfully changed"
   )
+  const { uidb64, token } = useParams<{ uidb64: string; token: string }>()
   const classes = useStyles()
-  const history = useHistory()
+  // const history = useHistory()
 
   React.useEffect(() => {
     setIsOpen(true)
     setType("info")
-    setMessage("A verication code has been sent to your email")
+    setMessage("Enter your new password")
   }, [])
 
-  const handleSave = () => {
-    history.push("/")
+  const handleSave = (curUser: HandlerArgs) => {
+    if (newPassword !== secondNewPassword) {
+      setType("error")
+      setIsOpen(true)
+      setMessage("Passwords do not match")
+      return
+    }
+    request({
+      path: "/api/changepassword/",
+      method: "post",
+      body: {
+        newPassword: curUser.newPassword,
+        secondNewPassword: curUser.secondNewPassword,
+        uidb64: curUser.uidb64,
+        token: curUser.token,
+      },
+      parser: parseIdentity,
+    })
+      .then(() => {
+        setType("success")
+        setIsOpen(true)
+        setMessage("Password changed successfully")
+      })
+      .catch((error: string) => {
+        setType("error")
+        setIsOpen(true)
+        setMessage("Something went wrong!")
+        console.log(error)
+      })
   }
 
   const handleClose = () => {
     setIsOpen(false)
+    // history.push("/")
   }
 
   return (
@@ -84,18 +116,11 @@ export default function ResetPassword(): JSX.Element {
             className={classes.root}
             onSubmit={(e) => {
               e.preventDefault()
-              handleSave()
+              handleSave({ newPassword, secondNewPassword, uidb64, token })
             }}
           >
             <Grid container spacing={2} direction="column" justify="center">
               <Grid item xs={12}>
-                <TextField
-                  label="Verification code"
-                  name="name"
-                  value={verificationCode || ""}
-                  onChange={(e) => setVerificationCode(e.target.value)}
-                  required
-                />
                 <TextField
                   label="New Password"
                   type="password"

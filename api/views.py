@@ -2,8 +2,15 @@ import random
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
+from django.contrib.sites.shortcuts import get_current_site
+from django.core.mail import send_mail
 from django.db.models import Q
 from django.db.models.query import QuerySet
+from django.shortcuts import redirect
+from django.urls import reverse
+from django.utils.encoding import force_bytes, force_text
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.views import View
 from rest_framework import (
     generics,
     permissions,
@@ -28,6 +35,7 @@ from .serializers import (
     UserRegistrationSerializer,
     VideoSerializer,
 )
+from .utils import account_activation_token
 
 
 class UserAuthView(generics.RetrieveAPIView):
@@ -64,15 +72,73 @@ class UserAccountDeleteView(views.APIView):
 class UserForgotPassword(views.APIView):
     permission_classes = (permissions.AllowAny,)
 
-    def get(self, request):
-        return response.Response(status=status.HTTP_200_OK)
+    def post(self, request):
+        username = request.data["username"]
+        # check if email exists
+        if User.objects.filter(username=username).exists():
+            # encode userId
+            currentUser = User.objects.get(username__exact=username)
+            uidb64 = urlsafe_base64_encode(
+                force_bytes(currentUser.pk)
+            )  # encoded userId
+            # get domain we are on
+            domain = get_current_site(request).domain
+            # relative url for verification
+            link = reverse(
+                "activate",
+                kwargs={
+                    "uidb64": uidb64,
+                    "token": account_activation_token.make_token(currentUser),
+                },
+            )
+            reset_url = "http://" + domain + link
+            try:
+                send_mail(
+                    "Password reset request",
+                    "Hi "
+                    + currentUser.username
+                    + " Please use this link to reset your account\n"
+                    + reset_url,
+                    "olawinridwan18@gmail.com",  # Need to change to a conteo email
+                    [username],
+                    fail_silently=False,
+                )
+                # currentUser.set_password("rao53") #Use newPassword her
+                # currentUser.save()
+            except OSError:
+                return response.Response(status=status.HTTP_400_BAD_REQUEST)
+            return response.Response(status=status.HTTP_200_OK)
+
+        return response.Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-# Update new password
-class UserResetPassword(views.APIView):
+# Used to render password reset page for user
+class UserVerificationCode(View):
     permission_classes = (permissions.AllowAny,)
 
-    def get(self, request):
+    def get(self, request, uidb64, token):
+        return redirect("/verification/" + uidb64 + "/" + token)
+
+
+class UserChangePassword(views.APIView):
+    permission_classes = (permissions.AllowAny,)
+
+    def post(self, request):
+        newPassword = request.data["newPassword"]
+        encodedUidb64 = request.data["uidb64"]
+        token = request.data["token"]
+        # update user password
+        try:
+            id_ = force_text(urlsafe_base64_decode(encodedUidb64))
+            user = User.objects.get(pk=id_)
+            if not account_activation_token.check_token(user, token):
+                print("Account token problem")
+                return response.Response(status=status.HTTP_400_BAD_REQUEST)
+            user.set_password(newPassword)  # Use newPassword her
+            user.save()
+        except Exception as ex:
+            print("Exc: " + str(ex))
+            return response.Response(status=status.HTTP_400_BAD_REQUEST)
         return response.Response(status=status.HTTP_200_OK)
 
 

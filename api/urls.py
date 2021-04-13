@@ -22,5 +22,10 @@ urlpatterns = [
     path("accounts/", views.Accounts.as_view()),
     path("user/", views.UserAuthView.as_view()),
     path("forgotpassword/", views.UserForgotPassword.as_view()),
-    path("resetpassword/", views.UserResetPassword.as_view()),
+    path("changepassword/", views.UserChangePassword.as_view()),
+    path(
+        "verification/<uidb64>/<token>",
+        views.UserVerificationCode.as_view(),
+        name="activate",
+    ),
 ]
