@@ -26,10 +26,10 @@ export default function AppHeader(): JSX.Element {
   const welcome = !logged_in
     ? "Welcome"
     : user
-      ? user.first_name === ""
-        ? `Hi ${user.email}`
-        : `Hi ${user.first_name}`
-      : ""
+    ? user.first_name === ""
+      ? `Hi ${user.email}`
+      : `Hi ${user.first_name}`
+    : ""
 
   return (
     <Grid

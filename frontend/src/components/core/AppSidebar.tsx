@@ -7,11 +7,7 @@ import {
   makeStyles,
 } from "@material-ui/core"
 import { Link } from "react-router-dom"
-import HomeIcon from "@material-ui/icons/Home"
-import Person from "@material-ui/icons/Person"
-import People from "@material-ui/icons/People"
-import Info from "@material-ui/icons/Info"
-import Help from "@material-ui/icons/Help"
+import { Home, Person, People, Info, Help } from "@material-ui/icons"
 
 const useStyles = makeStyles({
   link: {
@@ -29,7 +25,7 @@ const links: SidebarLink[] = [
   {
     title: "Home",
     link: "/",
-    iconJsx: <HomeIcon />,
+    iconJsx: <Home />,
   },
   {
     title: "My Profile",
