@@ -258,12 +258,10 @@ class Matches(viewsets.ModelViewSet):
             )
             # Users that have declined req_user
             | Q(
-                matchstatus_hi__user_lo=req_user,
-                matchstatus_hi__user_hi_response=False
+                matchstatus_hi__user_lo=req_user, matchstatus_hi__user_hi_response=False
             )
             | Q(
-                matchstatus_lo__user_hi=req_user,
-                matchstatus_lo__user_lo_response=False
+                matchstatus_lo__user_hi=req_user, matchstatus_lo__user_lo_response=False
             )
         )
         return User.objects.exclude(pk=req_user.pk).difference(q1)
