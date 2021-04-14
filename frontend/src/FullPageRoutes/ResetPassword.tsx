@@ -9,7 +9,7 @@ import {
 import Notification from "../components/Notification"
 import { NotificationType } from "../components/Notification"
 import { useState } from "react"
-// import { useHistory } from "react-router-dom"
+import { useHistory } from "react-router-dom"
 import { parseIdentity, request } from "../utils/fetch"
 import { useParams } from "react-router-dom"
 
@@ -63,7 +63,7 @@ export default function ResetPassword(): JSX.Element {
   )
   const { uidb64, token } = useParams<{ uidb64: string; token: string }>()
   const classes = useStyles()
-  // const history = useHistory()
+  const history = useHistory()
 
   React.useEffect(() => {
     setIsOpen(true)
@@ -93,6 +93,10 @@ export default function ResetPassword(): JSX.Element {
         setType("success")
         setIsOpen(true)
         setMessage("Password changed successfully")
+        setTimeout(function () {
+          console.log("I changed")
+          history.push("/")
+        }, 2000)
       })
       .catch((error: string) => {
         setType("error")
@@ -104,7 +108,6 @@ export default function ResetPassword(): JSX.Element {
 
   const handleClose = () => {
     setIsOpen(false)
-    // history.push("/")
   }
 
   return (
