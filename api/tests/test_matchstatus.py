@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.contrib.auth.models import User
 from rest_framework.test import APITestCase
 
@@ -8,7 +10,12 @@ class MatchesViewTestCase(APITestCase):
     def setUp(self):
         def make_user(name: str):
             user = User.objects.create_user(username=name, password="password")
-            Profile.objects.create(user=user, first_name=name)
+            Profile.objects.create(
+                user=user,
+                first_name=name,
+                gender=Profile.GENDER_CHOICES[0][0],
+                birth_date=date(1980, 1, 1),
+            )
             return user
 
         ale = make_user("ale")
@@ -137,3 +144,5 @@ class MatchesViewTestCase(APITestCase):
         self.assertEqual(res.status_code, 200)
         obj = MatchStatus.objects.get(user_lo_id=1, user_hi_id=2)
         self.assertEqual(obj.user_hi_response, True)
+
+    # TODO test cases for matching filters

@@ -1,4 +1,5 @@
 import random
+from datetime import date, timedelta
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
@@ -245,26 +246,41 @@ class Matches(viewsets.ModelViewSet):
         Return a QuerySet of Users that can be served to the request user
         as a match.
         """
-        req_user = self.request.user
-        q1 = User.objects.filter(
+        req = self.request  # type: request.Request
+        invalid_users = User.objects.filter(
             # Users req_user has responded to
             Q(
-                matchstatus_hi__user_lo=req_user,
+                matchstatus_hi__user_lo=req.user,
                 matchstatus_hi__user_lo_response__isnull=False,
             )
             | Q(
-                matchstatus_lo__user_hi=req_user,
+                matchstatus_lo__user_hi=req.user,
                 matchstatus_lo__user_hi_response__isnull=False,
             )
             # Users that have declined req_user
             | Q(
-                matchstatus_hi__user_lo=req_user, matchstatus_hi__user_hi_response=False
+                matchstatus_hi__user_lo=req.user, matchstatus_hi__user_hi_response=False
             )
             | Q(
-                matchstatus_lo__user_hi=req_user, matchstatus_lo__user_lo_response=False
+                matchstatus_lo__user_hi=req.user, matchstatus_lo__user_lo_response=False
             )
         )
-        return User.objects.exclude(pk=req_user.pk).difference(q1)
+
+        min_age = req.query_params.get("minAge", 18)
+        max_age = req.query_params.get("maxAge", 130)
+        genders = req.query_params.getlist(
+            "genders", (v for v, _ in Profile.GENDER_CHOICES)
+        )
+        hi_date = date.today() - timedelta(days=365.2425 * min_age)
+        lo_date = date.today() - timedelta(days=365.2425 * max_age)
+        return (
+            User.objects.filter(
+                profile__gender__in=genders,
+                profile__birth_date__range=(lo_date, hi_date),
+            )
+            .exclude(pk=req.user.pk)
+            .difference(invalid_users)
+        )
 
     def get_object(self):
         match_id = self.request.data["matchId"]
@@ -282,6 +298,18 @@ class Matches(viewsets.ModelViewSet):
         return obj
 
     def list(self, request: request.Request):
+        """Gets a list of matches
+
+        Query params:
+        amount
+          max amount of matches to return.
+        minAge
+          minimum age to match against.
+        maxAge
+          maxiumum age to match against.
+        genders
+          comma-separated list of genders to match against.
+        """
         max_amount = request.query_params.get("amount", 20)
         response = super().list(request)
         response.data = random.sample(
