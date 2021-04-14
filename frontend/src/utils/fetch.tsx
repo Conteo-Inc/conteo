@@ -88,9 +88,9 @@ export function queryParams(obj: Record<string, unknown>): string {
         break
       case "object":
         if (val instanceof Array) {
-          params.push(
-            encodeURIComponent(key) + "=" + encodeURIComponent(val.toString())
-          )
+          val.forEach((v) => {
+            params.push(encodeURIComponent(key) + "=" + encodeURIComponent(v))
+          })
         } else {
           throw new Error(`Failed to encode key/value pair: ${key}=${val}`)
         }
