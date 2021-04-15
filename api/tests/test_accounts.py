@@ -10,6 +10,7 @@ class AccountActivation(APITestCase):
             user = User.objects.create_user(username=name, password="password")
             Profile.objects.create(user=user, first_name=name)
             return user
+
         make_user("ale")
         boy = make_user("boy")
         boy.is_active = False
