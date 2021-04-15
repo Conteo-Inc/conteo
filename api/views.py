@@ -302,7 +302,8 @@ class Reports(generics.CreateAPIView):
         return self.create(request, *args, **kwargs)
 
 
-class Accounts(generics.RetrieveAPIView):
-    def get(self, request):
-        serializer = AccountSerializer(request.user)
-        return response.Response(serializer.data, status=status.HTTP_200_OK)
+class Accounts(generics.RetrieveUpdateAPIView):
+    serializer_class = AccountSerializer
+
+    def get_object(self):
+        return self.request.user

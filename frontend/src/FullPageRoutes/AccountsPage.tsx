@@ -71,6 +71,12 @@ export default function AccountsPage(): JSX.Element {
 
   const handleSave = () => {
     editModeOn(false)
+    setIsModalOpen(false)
+    request({
+      path: "/api/accounts/",
+      method: "put",
+      body: { is_active: value === "Deactivating Account" ? false : undefined },
+    })
   }
 
   const handleCancel = () => {
@@ -278,7 +284,7 @@ export default function AccountsPage(): JSX.Element {
             </Button>
             <AbstractModal
               isModalOpen={isModalOpen}
-              handleConfirm={handleClose}
+              handleConfirm={handleSave}
               handleCancel={handleClose}
               title="Confirmation"
               description={`Are you sure you want to ${btnText}?`}
