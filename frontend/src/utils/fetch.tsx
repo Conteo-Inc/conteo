@@ -69,9 +69,6 @@ export async function request<T>({
 /**
  * queryParams encodes an object into a string suitable for query parameters
  * in a URI.
- *
- * NOTE: If a value in the object is an array, no value in the array can contain
- * a comma.
  * @param obj object to turn into query parameters for a URI
  * @returns URI-encoded query parameters to be appended to a URI
  * @throws queryParams will throw an error if it can't encode a property
