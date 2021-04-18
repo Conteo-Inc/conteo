@@ -266,10 +266,13 @@ class Matches(viewsets.ModelViewSet):
             )
         )
 
-        min_age = req.query_params.get("minAge", 18)
-        max_age = req.query_params.get("maxAge", 130)
+        min_age = int(req.query_params.get("minAge", 18))
+        max_age = int(req.query_params.get("maxAge", 130))
         genders = req.query_params.getlist(
             "genders", (v for v, _ in Profile.GENDER_CHOICES)
+        )
+        interests = req.query_params.getlist(
+            "interests", Interest.objects.values_list("id", flat=True)
         )
         hi_date = date.today() - timedelta(days=365.2425 * min_age)
         lo_date = date.today() - timedelta(days=365.2425 * max_age)
@@ -277,6 +280,7 @@ class Matches(viewsets.ModelViewSet):
             User.objects.filter(
                 profile__gender__in=genders,
                 profile__birth_date__range=(lo_date, hi_date),
+                profile__interest__in=interests,
             )
             .exclude(pk=req.user.pk)
             .difference(invalid_users)
@@ -304,11 +308,13 @@ class Matches(viewsets.ModelViewSet):
         amount
           max amount of matches to return.
         minAge
-          minimum age to match against.
+          minimum age.
         maxAge
-          maxiumum age to match against.
+          maxiumum age.
         genders
-          comma-separated list of genders to match against.
+          list of genders.
+        interests
+          list of interest IDs.
         """
         max_amount = request.query_params.get("amount", 20)
         response = super().list(request)
