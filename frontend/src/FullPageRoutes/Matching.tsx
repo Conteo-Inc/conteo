@@ -33,7 +33,7 @@ type Match = {
   birth_date: string
   email: string
   phone_number: string
-  interests: string
+  interests: Interest[]
   has_intro: boolean
 }
 
@@ -199,6 +199,10 @@ function useQueue<T>(): [T, () => void, EnqueueFunc<T>, () => void] {
   return [items[0], nextItem, enqueueItems, clear]
 }
 
+function interestString(interest: Interest) {
+  return `${interest.category}::${interest.title}`
+}
+
 export default function MatchingPage(): JSX.Element {
   const [match, next, enqueue, clearQ] = useQueue<Match>()
   const [filters, dispatch] = React.useReducer(
@@ -296,7 +300,9 @@ export default function MatchingPage(): JSX.Element {
             <Typography>{`Email: ${match.email}`}</Typography>
           </Grid>
           <Grid item container direction="row" justify="center">
-            <Typography>{`Interests: ${match.interests}`}</Typography>
+            <Typography>
+              Interests: {match.interests.map(interestString).join(", ")}
+            </Typography>
           </Grid>
           <Grid item>
             {match.has_intro ? (
