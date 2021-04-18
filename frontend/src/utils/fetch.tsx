@@ -73,7 +73,7 @@ export async function request<T>({
  * @returns URI-encoded query parameters to be appended to a URI
  * @throws queryParams will throw an error if it can't encode a property
  */
-export function queryParams(obj: Record<string, unknown>): string {
+export function queryParams(obj: Record<PropertyKey, unknown>): string {
   const params: string[] = []
   for (const key of Object.keys(obj)) {
     const val = obj[key]
