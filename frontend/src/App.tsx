@@ -50,7 +50,6 @@ export default function App(): JSX.Element {
               <ForgotPassword />
             </Route>
             <Route path="/verification/:uidb64/:token">
-              {/* <Route path="/verification?uidb64=:uidb64&token=:token"> */}
               <ResetPassword />
             </Route>
             <ProtectedRoute path="/record/:receiver">
