@@ -11,15 +11,6 @@ import Notification from "../components/Notification"
 import { NotificationType } from "../components/Notification"
 import { parseIdentity, request } from "../utils/fetch"
 
-export type UserAccounts = {
-  first_name: string
-  last_name: string
-  username: string
-  password: string
-  email: string
-  successor: string
-}
-
 const useStyles = makeStyles({
   root: {
     "& .MuiFormControl-root": {
