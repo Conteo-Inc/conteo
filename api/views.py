@@ -99,12 +99,10 @@ class UserForgotPassword(views.APIView):
                     + currentUser.username
                     + " Please use this link to reset your account\n"
                     + reset_url,
-                    "olawinridwan18@gmail.com",  # Need to change to a conteo email
+                    "conteobot@gmail.com",
                     [username],
                     fail_silently=False,
                 )
-                # currentUser.set_password("rao53") #Use newPassword her
-                # currentUser.save()
             except OSError:
                 return response.Response(status=status.HTTP_400_BAD_REQUEST)
             return response.Response(status=status.HTTP_200_OK)
