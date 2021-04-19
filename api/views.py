@@ -1,4 +1,5 @@
 import random
+from datetime import date, timedelta
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
@@ -245,30 +246,45 @@ class Matches(viewsets.ModelViewSet):
         Return a QuerySet of Users that can be served to the request user
         as a match.
         """
-        req_user = self.request.user
-        # All users that have no matches i.e. not in the MatchStatus table
-        unmatched_users = User.objects.filter(
-            matchstatus_hi__isnull=True, matchstatus_lo__isnull=True
-        ).exclude(pk=req_user.pk)
-        # All users that aren't matched with req_user
-        q1 = User.objects.filter(
-            ~Q(matchstatus_hi__user_lo=req_user) & ~Q(matchstatus_lo__user_hi=req_user)
-        ).exclude(pk=req_user.pk)
-        # All users for which user_hi = req_user AND
-        # user_hi has not responded and user_lo has not declined
-        q2 = User.objects.filter(
-            Q(matchstatus_lo__user_hi=req_user)
-            & Q(matchstatus_lo__user_hi_response__isnull=True)
-            & ~Q(matchstatus_lo__user_lo_response=False)
-        ).exclude(pk=req_user.pk)
-        # All users for which user_lo = req_user AND
-        # user_lo has not responded and user_hi has not declined
-        q3 = User.objects.filter(
-            Q(matchstatus_hi__user_lo=req_user)
-            & Q(matchstatus_hi__user_lo_response__isnull=True)
-            & ~Q(matchstatus_hi__user_hi_response=False)
-        ).exclude(pk=req_user.pk)
-        return unmatched_users.union(q1, q2, q3)
+        req = self.request  # type: request.Request
+        invalid_users = User.objects.filter(
+            # Users req_user has responded to
+            Q(
+                matchstatus_hi__user_lo=req.user,
+                matchstatus_hi__user_lo_response__isnull=False,
+            )
+            | Q(
+                matchstatus_lo__user_hi=req.user,
+                matchstatus_lo__user_hi_response__isnull=False,
+            )
+            # Users that have declined req_user
+            | Q(
+                matchstatus_hi__user_lo=req.user, matchstatus_hi__user_hi_response=False
+            )
+            | Q(
+                matchstatus_lo__user_hi=req.user, matchstatus_lo__user_lo_response=False
+            )
+        )
+
+        min_age = int(req.query_params.get("minAge", 18))
+        max_age = int(req.query_params.get("maxAge", 130))
+        genders = req.query_params.getlist(
+            "genders", (v for v, _ in Profile.GENDER_CHOICES)
+        )
+        interests = req.query_params.getlist(
+            "interests", Interest.objects.values_list("id", flat=True)
+        )
+        hi_date = date.today() - timedelta(days=365.2425 * min_age)
+        lo_date = date.today() - timedelta(days=365.2425 * max_age)
+        return (
+            User.objects.filter(
+                profile__gender__in=genders,
+                profile__birth_date__range=(lo_date, hi_date),
+                profile__interest__in=interests,
+            )
+            .exclude(pk=req.user.pk)
+            .difference(invalid_users)
+        )
 
     def get_object(self):
         match_id = self.request.data["matchId"]
@@ -286,6 +302,20 @@ class Matches(viewsets.ModelViewSet):
         return obj
 
     def list(self, request: request.Request):
+        """Gets a list of matches
+
+        Query params:
+        amount
+          max amount of matches to return.
+        minAge
+          minimum age.
+        maxAge
+          maxiumum age.
+        genders
+          list of genders.
+        interests
+          list of interest IDs.
+        """
         max_amount = request.query_params.get("amount", 20)
         response = super().list(request)
         response.data = random.sample(
