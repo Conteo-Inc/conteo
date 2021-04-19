@@ -8,6 +8,8 @@ import {
   Grid,
   Button,
 } from "@material-ui/core"
+import { useHistory } from "react-router-dom"
+import { request } from "../utils/fetch"
 
 const useStyles = makeStyles({
   root: {
@@ -39,12 +41,22 @@ const feedBackValue = {
 export default function FeedbackPage(): JSX.Element {
   const [values, setValues] = useState(feedBackValue)
   const classes = useStyles()
+  const history = useHistory()
+
+  const handleSubmit = (e: any) => {
+    e.preventDefault().then(history.push("/help"))
+  }
 
   const setFeedbackValue = (e: any) => {
     const { name, value } = e.target
     setValues({
       ...values,
       [name]: value,
+    })
+    return request({
+      path: "/api/feedback/",
+      method: "post",
+      body: feedBackValue,
     })
   }
 
@@ -108,7 +120,7 @@ export default function FeedbackPage(): JSX.Element {
                   className={classes.submitButton}
                   size="large"
                   type="submit"
-                  href="#"
+                  onSubmit={handleSubmit}
                 >
                   Send Feedback
                 </Button>

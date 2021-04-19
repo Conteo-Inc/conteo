@@ -18,6 +18,7 @@ import EditIcon from "@material-ui/icons/Edit"
 import { useState, useEffect } from "react"
 import AbstractModal from "../components/AbstractModal"
 import { request } from "../utils/fetch"
+import { useHistory } from "react-router-dom"
 
 export type UserAccounts = {
   first_name: string
@@ -55,6 +56,7 @@ export default function AccountsPage(): JSX.Element {
   const [value, setValues] = useState("")
   const [btnText, setBtnText] = useState("Delete or Deactivate Account")
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const history = useHistory()
 
   const [accountData, setAccountData] = useState<UserAccounts>({
     first_name: "",
@@ -69,7 +71,8 @@ export default function AccountsPage(): JSX.Element {
     editModeOn(!editMode)
   }
 
-  const handleSave = () => {
+  const handleSave = (e: any) => {
+    e.preventDefault().then(history.push("/"))
     editModeOn(false)
   }
 

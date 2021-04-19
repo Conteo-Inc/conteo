@@ -7,6 +7,8 @@ import {
   Button,
   Typography,
 } from "@material-ui/core"
+import { useHistory } from "react-router-dom"
+import { request } from "../utils/fetch"
 
 const useStyles = makeStyles({
   root: {
@@ -50,12 +52,22 @@ const contactValue = {
 export default function ContactUs(): JSX.Element {
   const [values, setValues] = useState(contactValue)
   const classes = useStyles()
+  const history = useHistory()
+
+  const handleSubmit = (e: any) => {
+    e.preventDefault().then(history.push("/help"))
+  }
 
   const setContactValue = (e: any) => {
     const { name, value } = e.target
     setValues({
       ...values,
       [name]: value,
+    })
+    return request({
+      path: "/api/contact/",
+      method: "post",
+      body: contactValue,
     })
   }
 
@@ -125,7 +137,7 @@ export default function ContactUs(): JSX.Element {
                   className={classes.submitButton}
                   size="large"
                   type="submit"
-                  href="#"
+                  onSubmit={handleSubmit}
                 >
                   Submit
                 </Button>

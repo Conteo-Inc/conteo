@@ -137,3 +137,17 @@ class Report(models.Model):
         Video, on_delete=models.SET_NULL, null=True, help_text="The offending video"
     )
     submitted_on = models.DateTimeField(auto_now_add=True, editable=False)
+
+
+class ContactUs(models.Model):
+    email = models.CharField(max_length=50, blank=True)
+    name = models.CharField(max_length=50, blank=True)
+    message = models.CharField(max_length=2000, null=True)
+
+
+class Feedback(models.Model):
+    FEEDBACK_REASON = (("W", "Website"), ("Pp", "Penpal"), ("P", "Performance"))
+
+    reason = models.CharField(max_length=2, choices=FEEDBACK_REASON, null=True)
+    message = models.CharField(max_length=2000, blank=True)
+    email = models.CharField(max_length=50, blank=True)

@@ -6,7 +6,16 @@ from django.db.models.query_utils import Q
 from django.utils.timezone import now
 from rest_framework import serializers
 
-from .models import Interest, MatchStatus, Privacy, Profile, Report, Video
+from .models import (
+    ContactUs,
+    Feedback,
+    Interest,
+    MatchStatus,
+    Privacy,
+    Profile,
+    Report,
+    Video,
+)
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -205,3 +214,15 @@ class AccountSerializer(serializers.ModelSerializer):
         rep["first_name"] = profile.first_name
         rep["last_name"] = profile.last_name
         return rep
+
+
+class ContactUsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ContactUs
+        fields = ("email", "name", "message")
+
+
+class FeedbackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Feedback
+        fields = ("reason", "message", "email")
