@@ -133,10 +133,15 @@ class Report(models.Model):
         on_delete=models.SET_NULL,
         limit_choices_to={"is_staff": True},
         null=True,
+        blank=True,
         help_text="The admin handling the report",
         related_name="assigned_reports",
     )
     video = models.ForeignKey(
-        Video, on_delete=models.SET_NULL, null=True, help_text="The offending video"
+        Video,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        help_text="The offending video",
     )
     submitted_on = models.DateTimeField(auto_now_add=True, editable=False)
