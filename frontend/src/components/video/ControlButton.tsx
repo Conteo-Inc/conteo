@@ -7,16 +7,18 @@ import {
   TheatersRounded,
   CheckCircleRounded,
   CancelRounded,
+  RestorePageRounded,
 } from "@material-ui/icons"
 import * as React from "react"
 import { Colors, ColorsType } from "../../utils/colors"
+import { ActiveToolType } from "./editing/EditableVideo"
 
 type ControlType =
+  | ActiveToolType
   | "start"
   | "stop"
   | "send"
   | "loading"
-  | "trim"
   | "confirm"
   | "cancel"
 
@@ -45,6 +47,8 @@ function Button({
     <CheckCircleRounded fontSize={size} />
   ) : type === "cancel" ? (
     <CancelRounded fontSize={size} />
+  ) : type === "undo" ? (
+    <RestorePageRounded fontSize={size} />
   ) : (
     <Block fontSize={size} />
   )

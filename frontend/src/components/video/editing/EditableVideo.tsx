@@ -3,6 +3,8 @@ import * as React from "react"
 import vd from "vidar"
 import { Colors } from "../../../utils/colors"
 import { Nullable } from "../../../utils/context"
+import { onTrimConfirm, undoEdit, undoTrim } from "../../../utils/editing"
+import { MOVIE_TIME_PRECISION } from "../../../utils/movie"
 import ControlButton from "../ControlButton"
 import EditControls from "./EditControls"
 
@@ -10,7 +12,8 @@ function itoa(i: number): string {
   return `${i}`
 }
 
-export type ActiveToolType = "trim"
+export type ActiveToolType = "trim" | "undo"
+export type LimitedActiveToolType = Exclude<ActiveToolType, "undo">
 
 type EditableVideoProps = {
   src: string
@@ -22,10 +25,11 @@ export default function EditableVideo({
   const videoRef = React.useRef(document.createElement("video"))
   const progressRef = React.useRef(document.createElement("input"))
   const [movie, setMovie] = React.useState<Nullable<vd.Movie>>(null)
-  const [timeRange, setTimeRange] = React.useState<number | number[]>([0, 0])
+  const [timeRange, setTimeRange] = React.useState<number[]>([0, 0])
   const [activeTool, setActiveTool] = React.useState<Nullable<ActiveToolType>>(
     null
   )
+  const editHistoryRef = React.useRef<Nullable<ActiveToolType>[]>([])
 
   React.useEffect(() => {
     canvasRef.current.width = 600
@@ -78,10 +82,18 @@ export default function EditableVideo({
         alignItems="center"
       >
         <canvas ref={canvasRef} />
-        <input type="range" ref={progressRef} />
-        <Grid container direction="row" justify="space-between">
+        <input
+          type="range"
+          ref={progressRef}
+          step={MOVIE_TIME_PRECISION}
+          onInput={(e) => {
+            console.log(e.currentTarget.value)
+          }}
+        />
+        <Grid container direction="row" justify="center">
           <ControlButton
             type="start"
+            size="large"
             onClick={() => {
               if (movie) {
                 movie.play()
@@ -89,7 +101,11 @@ export default function EditableVideo({
               }
             }}
           />
-          <ControlButton type="stop" onClick={() => movie?.pause()} />
+          <ControlButton
+            size="large"
+            type="stop"
+            onClick={() => movie?.pause()}
+          />
         </Grid>
         {activeTool === "trim" && (
           <Box width={600}>
@@ -97,10 +113,12 @@ export default function EditableVideo({
               defaultValue={0}
               min={0}
               max={movie?.duration}
-              step={0.001}
+              step={MOVIE_TIME_PRECISION}
               value={timeRange}
               onChange={(e, value) => {
-                setTimeRange(value)
+                if (typeof value === "object") {
+                  setTimeRange(value as number[])
+                }
               }}
             />
           </Box>
@@ -112,12 +130,31 @@ export default function EditableVideo({
           size="large"
           disabled={activeTool === null}
           color={activeTool === null ? Colors.GREY : Colors.DEEP_RED}
+          onClick={() => {
+            if (movie) {
+              if (activeTool === "trim") {
+                onTrimConfirm(movie, timeRange)
+                editHistoryRef.current.push(activeTool)
+              } else if (activeTool === "undo") {
+                if (
+                  editHistoryRef.current[editHistoryRef.current.length - 1] ===
+                  "trim"
+                ) {
+                  undoTrim(movie, videoRef)
+                } else {
+                  undoEdit(movie)
+                }
+              }
+              setActiveTool(null)
+            }
+          }}
         />
         <ControlButton
           type="cancel"
           size="large"
           disabled={activeTool === null}
           color={activeTool === null ? Colors.GREY : Colors.DEEP_RED}
+          onClick={() => setActiveTool(null)}
         />
       </Grid>
     </Grid>

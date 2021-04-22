@@ -26,4 +26,6 @@ export function recordMovie(movie: vd.Movie, options: RecordOptions): void {
   })
 }
 
+export const MOVIE_TIME_PRECISION = 0.001
+
 export default {}
