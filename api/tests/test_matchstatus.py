@@ -1,23 +1,36 @@
+from datetime import date, timedelta
+
 from django.contrib.auth.models import User
 from rest_framework.test import APITestCase
 
-from api.models import MatchStatus, Profile
+from api.models import Interest, MatchStatus, Profile
+
+
+def firstnames(data):
+    for profile in data:
+        yield profile["first_name"]
 
 
 class MatchesViewTestCase(APITestCase):
     def setUp(self):
-        def make_user(name: str):
+        def make_user(name: str, age: int, gender=Profile.GENDER_CHOICES[0][0]) -> User:
             user = User.objects.create_user(username=name, password="password")
-            Profile.objects.create(user=user, first_name=name)
+            p = Profile.objects.create(
+                user=user,
+                first_name=name,
+                gender=gender,
+                birth_date=date.today() - timedelta(days=365.2425 * age),
+            )
+            p.interest_set.add(Interest.objects.get(pk=1))
             return user
 
-        ale = make_user("ale")
-        boy = make_user("boy")
-        cad = make_user("cad")
-        dig = make_user("dig")
-        eel = make_user("eel")
-        fog = make_user("fog")
-        make_user("gil")
+        ale = make_user("ale", 20)
+        boy = make_user("boy", 30)
+        cad = make_user("cad", 40)
+        dig = make_user("dig", 50)
+        eel = make_user("eel", 60, Profile.GENDER_CHOICES[1][0])
+        fog = make_user("fog", 70)
+        make_user("gil", 80)
         MatchStatus.objects.create(
             user_lo=ale, user_hi=boy, user_lo_response=True, user_hi_response=True
         )
@@ -55,10 +68,6 @@ class MatchesViewTestCase(APITestCase):
         user, users who have not declined the requesting user, and users
         for which the requesting user has not already made a decision for.
         """
-
-        def firstnames(data):
-            for profile in data:
-                yield profile["first_name"]
 
         endpoint = "/api/matches/"
 
@@ -137,3 +146,39 @@ class MatchesViewTestCase(APITestCase):
         self.assertEqual(res.status_code, 200)
         obj = MatchStatus.objects.get(user_lo_id=1, user_hi_id=2)
         self.assertEqual(obj.user_hi_response, True)
+
+    def test_matching_filters(self):
+        """
+        Check that the filters are used to narrow match results.
+        """
+        self.client.login(username="dig", password="password")
+        res = self.client.get(
+            "/api/matches/", {"minAge": 59, "maxAge": 71}, format="json"
+        )
+        self.assertEqual(res.status_code, 200)
+        self.assertCountEqual(firstnames(res.json()), ("eel", "fog"))
+
+        res = self.client.get(
+            "/api/matches/",
+            {
+                "minAge": 59,
+                "maxAge": 71,
+                "genders": [Profile.GENDER_CHOICES[0][0], Profile.GENDER_CHOICES[2][0]],
+            },
+            format="json",
+        )
+        self.assertEqual(res.status_code, 200)
+        self.assertCountEqual(firstnames(res.json()), ("fog",))
+
+        res = self.client.get(
+            "/api/matches/",
+            {
+                "minAge": 59,
+                "maxAge": 71,
+                "genders": [Profile.GENDER_CHOICES[0][0], Profile.GENDER_CHOICES[2][0]],
+                "interests": Interest.objects.filter(pk=2).values_list("id", flat=True),
+            },
+            format="json",
+        )
+        self.assertEqual(res.status_code, 200)
+        self.assertCountEqual(firstnames(res.json()), [])

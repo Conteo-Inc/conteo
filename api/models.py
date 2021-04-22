@@ -48,6 +48,9 @@ class Interest(models.Model):
     category = models.CharField(max_length=30, blank=True)
     title = models.CharField(max_length=30)
 
+    def __str__(self):
+        return f"{self.category}::{self.title}"
+
 
 class Video(models.Model):
     sender = models.ForeignKey(

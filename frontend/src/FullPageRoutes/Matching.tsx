@@ -6,10 +6,58 @@ import {
   makeStyles,
   Avatar,
   IconButton,
+  TextField,
+  Select,
+  MenuItem,
+  Chip,
 } from "@material-ui/core"
+import { Autocomplete } from "@material-ui/lab"
 import { Check, Block, Flag, PlayCircleFilled } from "@material-ui/icons"
-import { request } from "../utils/fetch"
+import { request, queryParams } from "../utils/fetch"
 import ViewVideo from "../components/video/ViewVideo"
+
+type EnqueueFunc<T> = (...newItems: T[]) => void
+
+type MatchControlsType = {
+  matchId: number
+  onAccept: (matchId: number) => void
+  onReject: (matchId: number) => void
+  onReport: (matchId: number) => void
+}
+
+type Match = {
+  id: number
+  first_name: string
+  last_name: string
+  gender: string
+  birth_date: string
+  email: string
+  phone_number: string
+  interests: Interest[]
+  has_intro: boolean
+}
+
+type InterestID = number
+
+type Interest = {
+  id: InterestID
+  category: string
+  title: string
+}
+
+enum Gender {
+  MALE = "M",
+  FEMALE = "F",
+  OTHER = "O",
+}
+
+class FilterState {
+  static readonly ageLimits = { min: 18, max: 130 }
+  readonly minAge = FilterState.ageLimits.min
+  readonly maxAge = FilterState.ageLimits.max
+  readonly genders = Object.values(Gender)
+  readonly interests: Interest[] = []
+}
 
 const useStyles = makeStyles({
   root: {
@@ -20,13 +68,6 @@ const useStyles = makeStyles({
     minHeight: "25rem",
   },
 })
-
-type MatchControlsType = {
-  matchId: number
-  onAccept: (matchId: number) => void
-  onReject: (matchId: number) => void
-  onReport: (matchId: number) => void
-}
 
 function MatchControls({
   matchId,
@@ -52,19 +93,99 @@ function MatchControls({
   )
 }
 
-type Match = {
-  id: number
-  first_name: string
-  last_name: string
-  gender: string
-  birth_date: string
-  email: string
-  phone_number: string
-  interests: string
-  has_intro: boolean
+function MatchingFilters({
+  filters,
+  dispatch,
+}: {
+  filters: FilterState
+  dispatch: React.Dispatch<Partial<FilterState>>
+}): JSX.Element {
+  const [loading, setLoading] = React.useState<boolean>(true)
+  const [interestOptions, setInterestOptions] = React.useState<Interest[]>([])
+  const [interestInputValue, setInterestInputValue] = React.useState<string>("")
+  React.useEffect(() => {
+    request<Interest[]>({ path: "/api/interests/", method: "get" })
+      .then((res) => {
+        setLoading(false)
+        setInterestOptions(
+          res.parsedBody
+            .sort((a, b) => a.title.localeCompare(b.title))
+            .sort((a, b) => a.category.localeCompare(b.category))
+        )
+      })
+      .catch((err) => console.log(`Failed to load interests: ${err}`))
+  }, [])
+  return (
+    <Grid container justify={"center"} spacing={2}>
+      <Grid item>
+        <TextField
+          type="number"
+          helperText="Min age"
+          inputProps={FilterState.ageLimits}
+          value={filters.minAge}
+          onChange={(e) => {
+            dispatch({ minAge: parseInt(e.currentTarget.value) })
+          }}
+        />
+      </Grid>
+      <Grid item>
+        <TextField
+          type="number"
+          helperText="Max age"
+          inputProps={FilterState.ageLimits}
+          value={filters.maxAge}
+          onChange={(e) =>
+            dispatch({ maxAge: parseInt(e.currentTarget.value) })
+          }
+        />
+      </Grid>
+      <Grid item>
+        <Select
+          multiple
+          value={filters.genders}
+          onChange={(e) => {
+            dispatch({ genders: e.target.value as Gender[] })
+          }}
+        >
+          <MenuItem value={Gender.MALE}>Male</MenuItem>
+          <MenuItem value={Gender.FEMALE}>Female</MenuItem>
+          <MenuItem value={Gender.OTHER}>Other</MenuItem>
+        </Select>
+      </Grid>
+      <Grid item>
+        <Autocomplete
+          multiple
+          clearOnBlur
+          loading={loading}
+          options={interestOptions}
+          groupBy={(interest) => interest.category}
+          getOptionLabel={(interest) => interest.title}
+          getOptionSelected={(opt, val) => opt.id === val.id}
+          value={filters.interests}
+          onChange={(_, interests) => dispatch({ interests })}
+          inputValue={interestInputValue}
+          onInputChange={(_, value) => setInterestInputValue(value)}
+          renderOption={(interest) => `${interest.category}: ${interest.title}`}
+          renderTags={(interest, getTagProps) =>
+            interest.map(({ category, title }, index) => (
+              <Chip
+                key={`interestChip-${index}`}
+                variant="outlined"
+                label={`${category}: ${title}`}
+                {...getTagProps({ index })}
+              />
+            ))
+          }
+          renderInput={(params) => (
+            <TextField {...params} variant="outlined" label="Interests" />
+          )}
+        />
+      </Grid>
+    </Grid>
+  )
 }
 
-function useQueue<T>(): [T, () => void, (...newItems: T[]) => void] {
+function useQueue<T>(): [T, () => void, EnqueueFunc<T>, () => void] {
   const [items, setItems] = React.useState<T[]>([])
   const enqueueItems = (...newItems: T[]) => {
     setItems((items) => items.concat(newItems))
@@ -72,22 +193,44 @@ function useQueue<T>(): [T, () => void, (...newItems: T[]) => void] {
   const nextItem = () => {
     setItems((items) => items.slice(1))
   }
-  return [items[0], nextItem, enqueueItems]
+  const clear = () => {
+    setItems([])
+  }
+  return [items[0], nextItem, enqueueItems, clear]
+}
+
+function interestString(interest: Interest) {
+  return `${interest.category}::${interest.title}`
 }
 
 export default function MatchingPage(): JSX.Element {
-  const [match, next, enqueue] = useQueue<Match>()
+  const [match, next, enqueue, clearQ] = useQueue<Match>()
+  const [filters, dispatch] = React.useReducer(
+    (state: FilterState, action: Partial<FilterState>) => {
+      clearQ()
+      return { ...state, ...action }
+    },
+    new FilterState()
+  )
   const [introVisible, setVisible] = React.useState<boolean>(false)
   const classes = useStyles()
 
   React.useEffect(() => {
     // TODO request more matches when match queue gets low
-    request<Match[]>({ path: "/api/matches/", method: "get" })
+    request<Match[]>({
+      path:
+        "/api/matches/" +
+        queryParams({
+          ...filters,
+          interests: filters.interests.map((v) => v.id),
+        }),
+      method: "get",
+    })
       .then((resp) => {
         enqueue(...resp.parsedBody)
       })
       .catch((err) => console.error(`Failed to get matches: ${err}`))
-  }, [])
+  }, [filters])
 
   const onAccept = (matchId: number) => {
     request({
@@ -129,6 +272,7 @@ export default function MatchingPage(): JSX.Element {
       alignItems="center"
       className={classes.root}
     >
+      <MatchingFilters filters={filters} dispatch={dispatch} />
       {match ? (
         <Grid
           container
@@ -156,7 +300,9 @@ export default function MatchingPage(): JSX.Element {
             <Typography>{`Email: ${match.email}`}</Typography>
           </Grid>
           <Grid item container direction="row" justify="center">
-            <Typography>{`Interests: ${match.interests}`}</Typography>
+            <Typography>
+              Interests: {match.interests.map(interestString).join(", ")}
+            </Typography>
           </Grid>
           <Grid item>
             {match.has_intro ? (
@@ -183,7 +329,7 @@ export default function MatchingPage(): JSX.Element {
           />
         </Grid>
       ) : (
-        <></>
+        <Typography>You have no matches</Typography>
       )}
     </Grid>
   )

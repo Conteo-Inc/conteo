@@ -8,31 +8,13 @@ import { Nullable, NullableId } from "../utils/context"
 import ConfirmationModal from "../components/AbstractModal"
 import { History } from "history"
 import EditableVideo from "../components/video/editing/EditableVideo"
+import Preview from "../components/video/Preview"
 
 const useStyles = makeStyles({
   video_root: {
     backgroundColor: "black",
   },
 })
-
-type PreviewProps = {
-  stream: MediaStream | null
-}
-function Preview({ stream }: PreviewProps) {
-  const ref = React.useRef<HTMLVideoElement>(null)
-  const classes = useStyles()
-
-  React.useEffect(() => {
-    if (ref.current && stream) {
-      ref.current.srcObject = stream
-    }
-  }, [stream])
-
-  if (!stream) {
-    return null
-  }
-  return <video ref={ref} className={classes.video_root} autoPlay />
-}
 
 function sendVideo(
   blob: Nullable<Blob>,
@@ -61,6 +43,7 @@ export default function RecordPage(): JSX.Element {
   const { receiver } = useParams<{ receiver: string }>()
   const history = useHistory()
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false)
+  const classes = useStyles()
 
   const {
     status,
@@ -87,7 +70,7 @@ export default function RecordPage(): JSX.Element {
       {mediaBlobUrl ? (
         <EditableVideo src={mediaBlobUrl} />
       ) : (
-        <Preview stream={previewStream} />
+        <Preview stream={previewStream} className={classes.video_root} />
       )}
       <Controls
         status={status}
