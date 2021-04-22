@@ -83,7 +83,10 @@ export default function EditableVideo({
           <ControlButton
             type="start"
             onClick={() => {
-              movie?.play()
+              if (movie) {
+                movie.play()
+                progressRef.current.max = itoa(movie.duration)
+              }
             }}
           />
           <ControlButton type="stop" onClick={() => movie?.pause()} />
