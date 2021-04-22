@@ -9,6 +9,7 @@ import ConfirmationModal from "../components/AbstractModal"
 import { History } from "history"
 import EditableVideo from "../components/video/editing/EditableVideo"
 import Preview from "../components/video/Preview"
+import vd from "vidar"
 
 const useStyles = makeStyles({
   video_root: {
@@ -16,33 +17,41 @@ const useStyles = makeStyles({
   },
 })
 
-function sendVideo(
-  blob: Nullable<Blob>,
+export function sendVideo(
+  movie: Nullable<vd.Movie>,
   receiver: NullableId,
   history: History
-) {
-  if (blob) {
-    const reader = new FileReader()
-    reader.readAsDataURL(blob)
-    reader.onload = () => {
-      request({
-        path: "/api/videos/",
-        method: "post",
-        body: {
-          receiver: receiver,
-          data: reader.result,
-        },
-        parser: parseIdentity,
-      }).then(() => history.goBack())
-    }
+): void {
+  if (movie) {
+    movie
+      .record({
+        frameRate: 60,
+      })
+      .then((blob) => {
+        const reader = new FileReader()
+        reader.readAsDataURL(blob)
+        reader.onload = () => {
+          request({
+            path: "/api/videos/",
+            method: "post",
+            body: {
+              receiver: receiver,
+              data: reader.result,
+            },
+            parser: parseIdentity,
+          }).then(() => history.goBack())
+        }
+      })
   }
 }
 
 export default function RecordPage(): JSX.Element {
-  const [videoBlob, setVideoBlob] = React.useState<Nullable<Blob>>(null)
+  const [, setVideoBlob] = React.useState<Nullable<Blob>>(null)
   const { receiver } = useParams<{ receiver: string }>()
   const history = useHistory()
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false)
+  const [movie, setMovie] = React.useState<Nullable<vd.Movie>>(null)
+
   const classes = useStyles()
 
   const {
@@ -58,7 +67,7 @@ export default function RecordPage(): JSX.Element {
 
   const handleConfirm = () => {
     setIsModalOpen(false)
-    sendVideo(videoBlob, Number(receiver), history)
+    sendVideo(movie, Number(receiver), history)
   }
 
   const handleCancel = () => {
@@ -68,7 +77,7 @@ export default function RecordPage(): JSX.Element {
   return (
     <Grid container direction="column" wrap="nowrap" alignItems="center">
       {mediaBlobUrl ? (
-        <EditableVideo src={mediaBlobUrl} />
+        <EditableVideo src={mediaBlobUrl} movie={movie} setMovie={setMovie} />
       ) : (
         <Preview stream={previewStream} className={classes.video_root} />
       )}

@@ -15,7 +15,6 @@ import VideoViewPage from "./FullPageRoutes/VideoViewPage"
 import Help from "./FullPageRoutes/Help"
 import ContactUs from "./FullPageRoutes/ContactUs"
 import AccountsPage from "./FullPageRoutes/AccountsPage"
-import EditableVideo from "./components/video/editing/EditableVideo"
 
 const useStyles = makeStyles({
   app: {
@@ -44,9 +43,6 @@ export default function App(): JSX.Element {
           <Switch>
             <Route path="/tokens">
               <TokenPage />
-            </Route>
-            <Route path="/experimental">
-              <EditableVideo src="" />
             </Route>
             <ProtectedRoute path="/record/:receiver">
               <RecordPage />

@@ -2,7 +2,7 @@ import { Box, Grid, Slider } from "@material-ui/core"
 import * as React from "react"
 import vd from "vidar"
 import { Colors } from "../../../utils/colors"
-import { Nullable } from "../../../utils/context"
+import { Nullable, SetStateDispatch } from "../../../utils/context"
 import { onTrimConfirm, undoEdit, undoTrim } from "../../../utils/editing"
 import { MOVIE_TIME_PRECISION } from "../../../utils/movie"
 import ControlButton from "../ControlButton"
@@ -17,14 +17,17 @@ export type LimitedActiveToolType = Exclude<ActiveToolType, "undo">
 
 type EditableVideoProps = {
   src: string
+  movie: Nullable<vd.Movie>
+  setMovie: SetStateDispatch<Nullable<vd.Movie>>
 }
 export default function EditableVideo({
   src,
+  movie,
+  setMovie,
 }: EditableVideoProps): JSX.Element {
   const canvasRef = React.useRef(document.createElement("canvas"))
   const videoRef = React.useRef(document.createElement("video"))
   const progressRef = React.useRef(document.createElement("input"))
-  const [movie, setMovie] = React.useState<Nullable<vd.Movie>>(null)
   const [timeRange, setTimeRange] = React.useState<number[]>([0, 0])
   const [activeTool, setActiveTool] = React.useState<Nullable<ActiveToolType>>(
     null
