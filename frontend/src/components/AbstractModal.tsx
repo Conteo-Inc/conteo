@@ -19,6 +19,7 @@ type ModalType = {
   isModalOpen: boolean
   handleConfirm: () => void
   handleCancel: () => void
+  children?: React.ReactNode
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -48,6 +49,7 @@ export default function AbstractModal({
   isModalOpen,
   handleConfirm,
   handleCancel,
+  children,
 }: ModalType): JSX.Element {
   const classes = useStyles()
 
@@ -61,6 +63,7 @@ export default function AbstractModal({
       <DialogContent className={classes.modalContent}>
         <Typography variant="h6">{title}</Typography>
         <Typography variant="subtitle2">{description}</Typography>
+        {children}
       </DialogContent>
       <DialogActions className={classes.modalAction}>
         <Button variant="contained" onClick={handleCancel} color="secondary">
