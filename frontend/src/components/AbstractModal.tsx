@@ -31,7 +31,6 @@ const useStyles = makeStyles((theme) => ({
     margin: "0px",
   },
   modalContent: {
-    padding: "0px",
     textAlign: "center",
   },
   modalAction: {
