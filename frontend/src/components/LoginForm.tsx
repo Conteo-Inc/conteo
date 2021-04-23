@@ -15,6 +15,8 @@ import LockOutlinedIcon from "@material-ui/icons/LockOutlined"
 import { red } from "@material-ui/core/colors"
 import { Nullable, useStatefulLocation, useUser } from "../utils/context"
 import { useHistory } from "react-router-dom"
+import Notification, { NotificationType } from "./Notification"
+import { useState } from "react"
 
 export type UserHandlerArgs = {
   e: React.FormEvent<HTMLFormElement>
@@ -60,8 +62,32 @@ export default function LoginForm({
   const history = useHistory()
 
   const { from } = location.state || { from: { pathname: "/" } }
+  const [isOpen, setOpen] = React.useState<boolean>(false)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [type, setType] = useState<NotificationType["type"]>("error")
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [message, setMessage] = useState(
+    "Email and/or password entered incorrectly"
+  )
 
   const classes = useStyles()
+
+  const handleClose = () => {
+    setOpen(false)
+  }
+
+  const handleSubmit = () => {
+    if (username && password) {
+      login({ username, password })
+        .then(() => {
+          history.replace(from)
+        })
+        .catch((error: string) => {
+          setOpen(true)
+          console.log(error)
+        })
+    }
+  }
 
   return (
     <Grid>
@@ -81,11 +107,7 @@ export default function LoginForm({
         <form
           onSubmit={(e) => {
             e.preventDefault()
-            if (username && password) {
-              login({ username, password }).then(() => {
-                history.replace(from)
-              })
-            }
+            handleSubmit()
           }}
         >
           <TextField
@@ -126,6 +148,13 @@ export default function LoginForm({
           <br />
         </form>
       </Paper>
+      <Notification
+        isOpen={isOpen}
+        setisOpen={setOpen}
+        handleClose={handleClose}
+        type={type}
+        message={message}
+      />
     </Grid>
   )
 }

@@ -3,7 +3,7 @@ import * as React from "react"
 import Alert from "@material-ui/lab/Alert"
 import { SetStateDispatch } from "../utils/context"
 
-type NotificationType = {
+export type NotificationType = {
   isOpen: boolean
   type: "error" | "info" | "success" | "warning"
   message: string

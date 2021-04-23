@@ -11,6 +11,7 @@ import {
 import AccountCircleIcon from "@material-ui/icons/AccountCircle"
 import { useHistory } from "react-router-dom"
 import { useStatefulLocation, useUser } from "../utils/context"
+import AbstractModal from "./AbstractModal"
 
 type SignupFormProps = {
   errorMessage: string | null
@@ -24,8 +25,22 @@ export default function SignupForm({
   const location = useStatefulLocation()
   const { register } = useUser()
   const { from } = location.state || { from: { pathname: "/" } }
+  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false)
 
   const classes = useStyles()
+
+  const handleConfirm = () => {
+    if (username && password) {
+      register({ username, password }).then(() => {
+        setIsModalOpen(false)
+        history.replace(from)
+      })
+    }
+  }
+
+  const handleClose = () => {
+    setIsModalOpen(false)
+  }
 
   return (
     <Grid>
@@ -45,11 +60,7 @@ export default function SignupForm({
         <form
           onSubmit={(e) => {
             e.preventDefault()
-            if (username && password) {
-              register({ username, password }).then(() => {
-                history.replace(from)
-              })
-            }
+            setIsModalOpen(true)
           }}
         >
           <TextField
@@ -87,6 +98,13 @@ export default function SignupForm({
           <br />
         </form>
       </Paper>
+      <AbstractModal
+        isModalOpen={isModalOpen}
+        handleConfirm={handleConfirm}
+        handleCancel={handleClose}
+        title="Confirmation"
+        description={`Are you sure you are 18+`}
+      />
     </Grid>
   )
 }
