@@ -11,6 +11,16 @@ from .models import Interest, MatchStatus, Privacy, Profile, Report, Video
 
 class ProfileSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
+        rep = super().to_representation(instance)
+
+        # Replace image file path with the file data.
+        image = instance.image
+        if image != "":
+            try:
+                rep["image"] = instance.image.read().decode()
+            finally:
+                image.close()
+
         # get video
         video = None
         try:

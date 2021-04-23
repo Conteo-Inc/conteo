@@ -83,7 +83,7 @@ export function useProfileContent(
   const [birthDate, setBirthDate] = useState<Nullable<Date>>(content.birth_date)
   const [gender, setGender] = useState<Nullable<GenderKey>>(content.gender)
   const [interests, setInterests] = useState<Interest[]>(content.interests)
-  const [image, setImage] = useState<Nullable<string>>(content.image_file)
+  const [image, setImage] = useState<Nullable<string>>(content.image)
   const [video, setVideo] = useState<Nullable<string>>(content.video)
 
   const editableContent: ProfileContentType = {
@@ -92,7 +92,7 @@ export function useProfileContent(
     birth_date: birthDate,
     gender: gender,
     interests: interests,
-    image_file: image,
+    image: image,
     video: video,
   }
 
@@ -124,7 +124,7 @@ export function getProfileContentUpdates(
       gender: content.gender !== null ? content.gender : "",
       birth_date:
         content.birth_date !== null ? toDateString(content.birth_date) : "",
-      image_file: content.image_file !== null ? content.image_file : "",
+      image: content.image !== null ? content.image : "",
       video: content.video !== null ? content.video : "",
     }
   }

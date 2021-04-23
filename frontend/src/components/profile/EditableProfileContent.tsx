@@ -25,7 +25,6 @@ import type { ProfileContentType, GenderKey, Interest } from "./ProfileContent"
 import UploadImageModal from "./UploadImageModal"
 import Video from "../video/Video"
 import { Colors } from "../../utils/colors"
-import { Nullable } from "../../utils/context"
 import { request } from "../../utils/fetch"
 import {
   ProfileContentSetters,
@@ -275,9 +274,7 @@ export default function EditableProfileContent({
   const classes = useStyles()
 
   const [isEditMode, toggleEditMode] = React.useState<boolean>(false)
-  const [errorMessage, setErrorMessage] = React.useState<string>(
-    ""
-  )
+  const [errorMessage, setErrorMessage] = React.useState<string>("")
   const [interestOptions, setInterestOptions] = React.useState<Interest[]>([])
 
   React.useEffect(() => {
@@ -339,11 +336,6 @@ export default function EditableProfileContent({
     toggleUploadImageModal,
   ] = React.useState<boolean>(false)
 
-  const updateProfilePicture = (filePath: Nullable<string>) => {
-    contentSetters.setImage(filePath)
-    setProfileContent(editableContent)
-  }
-
   return (
     <>
       {isEditMode ? (
@@ -357,9 +349,7 @@ export default function EditableProfileContent({
               >
                 <Avatar
                   src={
-                    editableContent.image_file !== null
-                      ? editableContent.image_file
-                      : ""
+                    editableContent.image !== null ? editableContent.image : ""
                   }
                   className={classes.picture}
                 />
@@ -472,7 +462,7 @@ export default function EditableProfileContent({
       <UploadImageModal
         isModalOpen={isUploadImageModalOpen}
         toggleModal={toggleUploadImageModal}
-        updateProfilePicture={updateProfilePicture}
+        updateProfilePicture={contentSetters.setImage}
       />
     </>
   )

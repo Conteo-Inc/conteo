@@ -19,7 +19,6 @@ type requestArgs<T> = {
   parser?: (res: Response) => Promise<T>
   headers?: RequestInit["headers"] & { "Content-Type": string }
   body?: any // eslint-disable-line
-  isFormData?: boolean
 }
 
 async function parseAsJson<T>(res: Response): Promise<T> {
@@ -40,8 +39,7 @@ const defaultRequestArgs = {
  * A generic, strongly typed `fetch` wrapper.
  * @param path: The path to the endpoint
  * @param method The request method
- * @param body: The data passed to the request. This is stringified when isFormData is false.
- * @param isFormData: Determines if the request is form data.
+ * @param body: The data passed to the request. This is always stringifieds
  * @param headers: By default, the headers includes a Content-Type of "application/json"
  * @param parser: The method by which `res.parsedBody` is generated.
  *    By default, the parser converts the response to json.
@@ -52,18 +50,17 @@ export async function request<T>({
   body,
   headers = defaultRequestArgs.headers,
   parser = defaultRequestArgs.parser,
-  isFormData = false,
 }: requestArgs<T>): Promise<HttpResponse<T>> {
   const csrfToken = Cookies.get("csrftoken")
   const args: RequestInit = {
     method: method,
     headers: {
-      ...(!isFormData && headers),
+      ...headers,
       //conditionally adds the X-CSRFToken property
       ...(csrfToken && { "X-CSRFToken": csrfToken }),
     },
     //conditionally adds the body
-    ...(body && isFormData ? { body: body } : { body: JSON.stringify(body) }),
+    ...(body && { body: JSON.stringify(body) }),
   }
   const res = await http(new Request(path, args))
   return { ...res, parsedBody: await parser(res) }

@@ -15,7 +15,7 @@ export type ProfileContentType = {
   birth_date: Nullable<Date>
   gender: Nullable<GenderKey>
   interests: Interest[]
-  image_file: Nullable<string>
+  image: Nullable<string>
   video: Nullable<string>
 }
 
@@ -123,7 +123,7 @@ export default function ProfileContent({
         <Grid container alignItems="center" justify="space-evenly" spacing={2}>
           <Grid item>
             <Avatar
-              src={readonlyContent.image_file ? readonlyContent.image_file : ""}
+              src={readonlyContent.image ? readonlyContent.image : ""}
               className={classes.profileAvatar}
             />
           </Grid>
