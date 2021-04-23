@@ -20,7 +20,6 @@ import {
 } from "@material-ui/pickers"
 import Autocomplete from "@material-ui/lab/Autocomplete"
 import CameraAltIcon from "@material-ui/icons/CameraAlt"
-import VideocamIcon from "@material-ui/icons/Videocam"
 import ProfileContent, { GENDER_CHOICES } from "./ProfileContent"
 import type { ProfileContentType, GenderKey, Interest } from "./ProfileContent"
 import UploadImageModal from "./UploadImageModal"
@@ -114,31 +113,8 @@ const useStyles = makeStyles({
     width: "100%",
     color: "white",
   },
-  videoItem: {
-    width: "auto",
-  },
-  video: {
-    height: pictureSize,
-  },
-  videoCamContainer: {
-    maxHeight: "auto",
-    width: "auto",
-    borderRadius: 16,
-  },
-  videoCamIconItem: {
-    height: 25,
-    width: 25,
-    margin: 5,
-  },
-  videoCamIcon: {
-    height: "100%",
-    width: "100%",
-    color: "white",
-  },
-  recordVideoText: {
-    margin: 5,
-    color: "white",
-    textShadow: "1px 1px 3px black",
+  introVideo: {
+    maxHeight: "200px",
   },
   fieldsContainer: {
     paddingTop: 40,
@@ -299,7 +275,7 @@ export default function EditableProfileContent({
   const classes = useStyles()
 
   const [isEditMode, toggleEditMode] = React.useState<boolean>(false)
-  const [contentErrorMessage, setContentErrorMessage] = React.useState<string>(
+  const [errorMessage, setErrorMessage] = React.useState<string>(
     ""
   )
   const [interestOptions, setInterestOptions] = React.useState<Interest[]>([])
@@ -339,7 +315,7 @@ export default function EditableProfileContent({
       })
       .catch((error) => {
         console.log(error)
-        setContentErrorMessage(error)
+        setErrorMessage(error)
       })
   }
 
@@ -348,7 +324,7 @@ export default function EditableProfileContent({
   }
 
   const handleCancelEdit = () => {
-    setContentErrorMessage("")
+    setErrorMessage("")
     toggleEditMode(false)
 
     // Reset editable content values.
@@ -400,32 +376,10 @@ export default function EditableProfileContent({
                 </Grid>
               </Grid>
               {editableContent.video ? (
-                <Grid
-                  item
-                  className={`${classes.item} ${classes.videoItem}`}
-                  component={Link}
-                  to={`/record/${userId}`}
-                >
-                  <Video
-                    src={editableContent.video}
-                    className={classes.video}
-                  />
-                  <div className={classes.blur}></div>
-                  <div className={classes.overlay}></div>
-                  <Grid
-                    container
-                    alignItems="center"
-                    justify="flex-end"
-                    className={`${classes.iconContainer} ${classes.videoCamContainer}`}
-                  >
-                    <Grid item className={classes.videoCamIconItem}>
-                      <VideocamIcon className={classes.videoCamIcon} />
-                    </Grid>
-                    <Grid item className={classes.recordVideoText}>
-                      <Typography>Record Intro Video</Typography>
-                    </Grid>
-                  </Grid>
-                </Grid>
+                <Video
+                  src={editableContent.video}
+                  className={classes.introVideo}
+                />
               ) : (
                 <Grid item>
                   <Button
@@ -471,7 +425,7 @@ export default function EditableProfileContent({
             <Grid container justify="center">
               <Grid item>
                 <Typography className={classes.error}>
-                  {contentErrorMessage}
+                  {errorMessage}
                 </Typography>
               </Grid>
             </Grid>

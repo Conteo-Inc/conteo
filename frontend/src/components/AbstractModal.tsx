@@ -20,36 +20,32 @@ type ModalType = {
   isModalOpen: boolean
   handleConfirm: () => void
   handleCancel: () => void
-  children?: JSX.Element
+  children?: React.ReactNode
 }
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   modal: {
     position: "absolute",
-    top: 0,
+    top: "0px",
     left: "50%",
     transform: "translate(-50%, 25%)",
-    margin: 0,
-  },
-  close: {
-    position: "absolute",
-    top: 0,
-    right: 0,
-  },
-  title: {
-    margin: "25px 50px",
-    padding: 0,
+    margin: "0px",
   },
   modalContent: {
-    padding: 0,
+    padding: "0px",
     textAlign: "center",
   },
   modalAction: {
     margin: "25px 50px",
-    padding: 0,
+    padding: "0px",
     justifyContent: "center",
   },
-})
+  modalTitle: {
+    position: "absolute",
+    top: theme.spacing(2),
+    right: theme.spacing(0.5),
+  },
+}))
 
 export default function AbstractModal({
   title,
@@ -65,20 +61,16 @@ export default function AbstractModal({
 
   return (
     <Dialog open={isModalOpen} classes={{ paper: classes.modal }}>
-      <IconButton className={classes.close} onClick={handleCancel}>
-        <CloseIcon />
-      </IconButton>
-      <DialogTitle className={classes.title}>
-        <Grid container>
-          <Grid item container alignItems="center" justify="center" xs={12}>
-            <Typography variant="h6">{title}</Typography>
-          </Grid>
-          <Grid item container alignItems="center" justify="center" xs={12}>
-            <Typography variant="subtitle2">{description}</Typography>
-          </Grid>
-        </Grid>
+      <DialogTitle>
+        <IconButton className={classes.modalTitle} onClick={handleCancel}>
+          <CloseIcon />
+        </IconButton>
       </DialogTitle>
-      <DialogContent className={classes.modalContent}>{children}</DialogContent>
+      <DialogContent className={classes.modalContent}>
+        <Typography variant="h6">{title}</Typography>
+        <Typography variant="subtitle2">{description}</Typography>
+        {children}
+      </DialogContent>
       <DialogActions className={classes.modalAction}>
         <Button variant="contained" onClick={handleCancel} color="secondary">
           {cancelText}
