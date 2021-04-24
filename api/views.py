@@ -136,7 +136,7 @@ class ProfileRetrieveUpdateView(generics.RetrieveUpdateAPIView):
 
             # Create the image content file.
             created_at = now()
-            fname = "%d_%s" % (request.user.id, created_at)
+            fname = f"{request.user.id}_{created_at}"
             cf = ContentFile(data_bytes, name=fname)
 
             # Save the profile image field.
