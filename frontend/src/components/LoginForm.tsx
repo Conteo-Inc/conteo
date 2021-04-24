@@ -82,9 +82,11 @@ export default function LoginForm({
           onSubmit={(e) => {
             e.preventDefault()
             if (username && password) {
-              login({ username, password }).then(() => {
-                history.replace(from)
-              })
+              login({ username, password })
+                .then(() => {
+                  history.replace(from)
+                })
+                .catch((err) => console.log("Login failed", err))
             }
           }}
         >

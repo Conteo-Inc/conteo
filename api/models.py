@@ -42,6 +42,9 @@ class Privacy(models.Model):
         max_length=2, choices=Setting.choices, default=Setting.PUBLIC
     )
 
+    class Meta:
+        verbose_name_plural = "Privacy"
+
 
 class Interest(models.Model):
     profiles = models.ManyToManyField(Profile)

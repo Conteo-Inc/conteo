@@ -15,17 +15,18 @@ import {
   FormHelperText,
 } from "@material-ui/core"
 import EditIcon from "@material-ui/icons/Edit"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useReducer } from "react"
 import AbstractModal from "../components/AbstractModal"
 import { request } from "../utils/fetch"
+import { useHistory } from "react-router-dom"
 
-export type UserAccounts = {
-  first_name: string
-  last_name: string
-  username: string
-  password: string
-  email: string
-  successor: string
+const initAccountData = {
+  first_name: "",
+  last_name: "",
+  username: "",
+  password: "",
+  email: "",
+  successor: "",
 }
 
 const useStyles = makeStyles({
@@ -55,15 +56,16 @@ export default function AccountsPage(): JSX.Element {
   const [value, setValues] = useState("")
   const [btnText, setBtnText] = useState("Delete or Deactivate Account")
   const [isModalOpen, setIsModalOpen] = useState(false)
-
-  const [accountData, setAccountData] = useState<UserAccounts>({
-    first_name: "",
-    last_name: "",
-    username: "",
-    password: "",
-    email: "",
-    successor: "",
-  })
+  const history = useHistory()
+  const [accountData, dispatch] = useReducer(
+    (
+      state: typeof initAccountData,
+      action: Partial<typeof initAccountData>
+    ) => {
+      return { ...state, ...action }
+    },
+    initAccountData
+  )
 
   const handleEdit = () => {
     editModeOn(!editMode)
@@ -72,11 +74,13 @@ export default function AccountsPage(): JSX.Element {
   const handleSave = () => {
     editModeOn(false)
     setIsModalOpen(false)
-    request({
-      path: "/api/accounts/",
-      method: "put",
-      body: { is_active: value === "Deactivating Account" ? false : undefined },
-    })
+    if (value === "Deactivating Account") {
+      request({
+        path: "/api/accounts/",
+        method: "patch",
+        body: { is_active: false },
+      }).then(() => history.push("/tokens"))
+    }
   }
 
   const handleCancel = () => {
@@ -107,17 +111,11 @@ export default function AccountsPage(): JSX.Element {
   }
 
   useEffect(() => {
-    request({ path: "/api/accounts/", method: "get" }).then((res) => {
-      const account: any = res.parsedBody
-      const content: UserAccounts = {
-        first_name: account.first_name,
-        last_name: account.last_name,
-        username: account.username,
-        password: account.password,
-        email: account.email,
-        successor: account.successor,
-      }
-      setAccountData(content)
+    request<typeof initAccountData>({
+      path: "/api/accounts/",
+      method: "get",
+    }).then((res) => {
+      dispatch(res.parsedBody)
     })
   }, [])
 
@@ -141,6 +139,9 @@ export default function AccountsPage(): JSX.Element {
                 label="First Name"
                 variant="outlined"
                 value={accountData.first_name}
+                onChange={(e) =>
+                  dispatch({ first_name: e.currentTarget.value })
+                }
                 InputProps={{
                   readOnly: true,
                 }}
@@ -151,6 +152,7 @@ export default function AccountsPage(): JSX.Element {
                 label="Username"
                 variant="outlined"
                 value={accountData.username}
+                onChange={(e) => dispatch({ username: e.currentTarget.value })}
                 InputProps={{
                   readOnly: true,
                 }}
@@ -162,6 +164,7 @@ export default function AccountsPage(): JSX.Element {
                 type="email"
                 variant="outlined"
                 value={accountData.email}
+                onChange={(e) => dispatch({ email: e.currentTarget.value })}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
@@ -180,6 +183,7 @@ export default function AccountsPage(): JSX.Element {
                 label="Last Name"
                 variant="outlined"
                 value={accountData.last_name}
+                onChange={(e) => dispatch({ last_name: e.currentTarget.value })}
                 InputProps={{
                   readOnly: true,
                 }}
@@ -190,6 +194,7 @@ export default function AccountsPage(): JSX.Element {
                 label="Password"
                 type="password"
                 value={accountData.password}
+                onChange={(e) => dispatch({ password: e.currentTarget.value })}
                 autoComplete="current-password"
                 variant="outlined"
                 InputProps={{
@@ -209,6 +214,7 @@ export default function AccountsPage(): JSX.Element {
                 variant="outlined"
                 type="email"
                 value={accountData.successor}
+                onChange={(e) => dispatch({ successor: e.currentTarget.value })}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
