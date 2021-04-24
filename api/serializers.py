@@ -15,7 +15,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
         # Replace image file path with the file data.
         image = instance.image
-        if image != "":
+        if hasattr(image, "file"):
             try:
                 rep["image"] = instance.image.read().decode()
             finally:
