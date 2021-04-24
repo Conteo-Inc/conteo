@@ -264,6 +264,7 @@ class Matches(viewsets.ModelViewSet):
             | Q(
                 matchstatus_lo__user_hi=req.user, matchstatus_lo__user_lo_response=False
             )
+            | Q(is_active=False)
         )
 
         min_age = int(req.query_params.get("minAge", 18))

@@ -31,6 +31,10 @@ class MatchesViewTestCase(APITestCase):
         eel = make_user("eel", 60, Profile.GENDER_CHOICES[1][0])
         fog = make_user("fog", 70)
         make_user("gil", 80)
+        hal = make_user("hal", 80)
+        hal.is_active = False
+        hal.save()
+
         MatchStatus.objects.create(
             user_lo=ale, user_hi=boy, user_lo_response=True, user_hi_response=True
         )
@@ -182,3 +186,14 @@ class MatchesViewTestCase(APITestCase):
         )
         self.assertEqual(res.status_code, 200)
         self.assertCountEqual(firstnames(res.json()), [])
+
+    def test_inactive_users(self):
+        """
+        Check that inactive users are not suggested as matches.
+        """
+        self.client.login(username="dig", password="password")
+        res = self.client.get(
+            "/api/matches/", {"minAge": 75, "maxAge": 85}, format="json"
+        )
+        self.assertEqual(res.status_code, 200)
+        self.assertCountEqual(firstnames(res.json()), ("gil",))
