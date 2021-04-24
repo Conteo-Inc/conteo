@@ -1,6 +1,7 @@
 import { Grid, IconButton, makeStyles, Typography } from "@material-ui/core"
 import {
   AccountCircle,
+  Delete,
   DraftsRounded,
   MailOutlineRounded,
   SendRounded,
@@ -24,6 +25,7 @@ export type MailListItem = {
   viewed_at: Nullable<string>
   created_at: string
   id: number
+  removePenpal: (id: number) => void
 }
 
 export default function MailItem({
@@ -32,6 +34,7 @@ export default function MailItem({
   viewed_at,
   created_at,
   id,
+  removePenpal,
 }: MailListItem): JSX.Element {
   const { mailItem } = useStyles()
   const [visible, setVisible] = React.useState<boolean>(false)
@@ -52,6 +55,9 @@ export default function MailItem({
       <Typography variant="h6">
         {created_at ? video_date.toLocaleDateString() : "No video"}
       </Typography>
+      <IconButton onClick={() => removePenpal(id)}>
+        <Delete fontSize="large" style={{ color: "#4b5282" }} />
+      </IconButton>
       <IconButton onClick={() => setVisible(true)} disabled={!created_at}>
         {viewed_at ? (
           <DraftsRounded fontSize="large" style={{ color: "#4b5e82" }} />
