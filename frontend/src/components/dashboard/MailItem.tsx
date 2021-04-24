@@ -10,6 +10,7 @@ import * as React from "react"
 import { Link } from "react-router-dom"
 import { Nullable } from "../../utils/context"
 import ViewVideo from "../video/ViewVideo"
+import AbstractModal from "../AbstractModal"
 
 const useStyles = makeStyles({
   mailItem: {
@@ -38,7 +39,17 @@ export default function MailItem({
 }: MailListItem): JSX.Element {
   const { mailItem } = useStyles()
   const [visible, setVisible] = React.useState<boolean>(false)
+  const [showConfirmRemove, setConfirmRemove] = React.useState<boolean>(false)
   const video_date = new Date(created_at)
+
+  const onConfirmRemove = () => {
+    setConfirmRemove(false)
+    removePenpal(id)
+  }
+
+  const onCancelRemove = () => {
+    setConfirmRemove(false)
+  }
 
   return (
     <Grid
@@ -48,6 +59,13 @@ export default function MailItem({
       alignItems="center"
       className={mailItem}
     >
+      <AbstractModal
+        title="Remove penpal"
+        description={`Are you sure you want to remove ${first_name} ${last_name}?`}
+        isModalOpen={showConfirmRemove}
+        handleConfirm={onConfirmRemove}
+        handleCancel={onCancelRemove}
+      />
       <Grid item container direction="row" xs={3} wrap="nowrap">
         <AccountCircle fontSize="large" style={{ color: "#4b5e82" }} />
         <Typography variant="h6">{`${first_name} ${last_name}`}</Typography>
@@ -55,7 +73,7 @@ export default function MailItem({
       <Typography variant="h6">
         {created_at ? video_date.toLocaleDateString() : "No video"}
       </Typography>
-      <IconButton onClick={() => removePenpal(id)}>
+      <IconButton onClick={() => setConfirmRemove(true)}>
         <Delete fontSize="large" style={{ color: "#4b5282" }} />
       </IconButton>
       <IconButton onClick={() => setVisible(true)} disabled={!created_at}>
