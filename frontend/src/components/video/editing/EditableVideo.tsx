@@ -32,7 +32,7 @@ export default function EditableVideo({
   const [activeTool, setActiveTool] = React.useState<Nullable<ActiveToolType>>(
     null
   )
-  const editHistoryRef = React.useRef<Nullable<ActiveToolType>[]>([])
+  const editHistoryRef = React.useRef<ActiveToolType[]>([])
 
   React.useEffect(() => {
     canvasRef.current.width = 600

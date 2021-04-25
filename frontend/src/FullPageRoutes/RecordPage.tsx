@@ -17,7 +17,7 @@ const useStyles = makeStyles({
   },
 })
 
-export function sendVideo(
+function sendVideo(
   movie: Nullable<vd.Movie>,
   receiver: NullableId,
   history: History
