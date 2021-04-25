@@ -56,8 +56,8 @@ const useStyles = makeStyles({
     boxShadow: "0 4px 8px 0 rgb(0 0 0 / 20%), 0 6px 20px 0 rgb(0 0 0 / 19%)",
   },
   avatar: {
-    height: pictureSize,
-    width: pictureSize,
+    height: `${pictureSize}px`,
+    width: `${pictureSize}px`,
     position: "relative",
     cursor: "pointer",
   },
@@ -79,8 +79,8 @@ const useStyles = makeStyles({
     },
   },
   cameraContainer: {
-    height: pictureSize / 4,
-    width: pictureSize / 4,
+    height: `${pictureSize / 4}px`,
+    width: `${pictureSize / 4}px`,
     borderRadius: "50%",
   },
   cameraIconItem: {
@@ -93,7 +93,7 @@ const useStyles = makeStyles({
     color: "white",
   },
   introVideo: {
-    maxHeight: pictureSize,
+    maxHeight: `${pictureSize}px`,
   },
   fieldsContainer: {
     paddingTop: "40px",
