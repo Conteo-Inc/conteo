@@ -44,34 +44,10 @@ const MAX_LAST_NAME_LENGTH = 50
 
 const pictureSize = 200
 const useStyles = makeStyles({
-  profileAvatar: {
-    height: "200px",
-    width: "200px",
-  },
-  circle: {
-    height: "200px",
-    width: "200px",
-    display: "flex",
-    overflow: "hidden",
-    alignItems: "center",
-    borderRadius: "50%",
-  },
-  overlay: {
-    height: "100%",
-    width: "100%",
-    position: "absolute",
-    top: 0,
-    right: 0,
-    backgroundColor: "white",
-    opacity: "0%",
-    "&:hover": {
-      opacity: "25%",
-    },
-  },
   iconContainer: {
     position: "absolute",
-    bottom: 3,
-    right: 3,
+    bottom: "3px",
+    right: "3px",
     backgroundColor: "rgba(255, 255, 255, 0.15)",
     "&:hover": {
       backgroundColor: "rgba(255, 255, 255, 0.25)",
@@ -79,16 +55,7 @@ const useStyles = makeStyles({
     cursor: "pointer",
     boxShadow: "0 4px 8px 0 rgb(0 0 0 / 20%), 0 6px 20px 0 rgb(0 0 0 / 19%)",
   },
-  blur: {
-    height: "25%",
-    width: "100%",
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    backgroundColor: "rgba(200, 200, 200, 0.5)",
-    filter: "blur(8px)",
-  },
-  item: {
+  avatar: {
     height: pictureSize,
     width: pictureSize,
     position: "relative",
@@ -97,6 +64,19 @@ const useStyles = makeStyles({
   picture: {
     height: "100%",
     width: "100%",
+    "&:after": {
+      content: "\"\"",
+      height: "100%",
+      width: "100%",
+      position: "absolute",
+      top: "0px",
+      right: "0px",
+      opacity: "0%",
+      backgroundColor: "white",
+    },
+    "&:hover:after": {
+      opacity: "25%",
+    },
   },
   cameraContainer: {
     height: pictureSize / 4,
@@ -113,15 +93,15 @@ const useStyles = makeStyles({
     color: "white",
   },
   introVideo: {
-    maxHeight: "200px",
+    maxHeight: pictureSize,
   },
   fieldsContainer: {
-    paddingTop: 40,
-    paddingBottom: 10,
+    paddingTop: "40px",
+    paddingBottom: "10px",
   },
   field: {
     fontSize: "2rem",
-    marginBottom: 15,
+    marginBottom: "15px",
   },
   recordButton: {
     color: "white",
@@ -134,7 +114,7 @@ const useStyles = makeStyles({
     width: "100%",
   },
   button: {
-    margin: 5,
+    margin: "5px",
   },
   error: {
     color: "red",
@@ -344,7 +324,7 @@ export default function EditableProfileContent({
             <Grid container alignItems="center" justify="space-evenly">
               <Grid
                 item
-                className={classes.item}
+                className={classes.avatar}
                 onClick={() => toggleUploadImageModal(true)}
               >
                 <Avatar
@@ -353,7 +333,6 @@ export default function EditableProfileContent({
                   }
                   className={classes.picture}
                 />
-                <div className={`${classes.overlay} ${classes.circle}`}></div>
                 <Grid
                   container
                   alignItems="center"
