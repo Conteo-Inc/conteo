@@ -63,12 +63,8 @@ export default function LoginForm({
 
   const { from } = location.state || { from: { pathname: "/" } }
   const [isOpen, setOpen] = React.useState<boolean>(false)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [type, setType] = useState<NotificationType["type"]>("error")
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [message, setMessage] = useState(
-    "Email and/or password entered incorrectly"
-  )
+  const [type] = useState<NotificationType["type"]>("error")
+  const [message] = useState("Email and/or password entered incorrectly")
 
   const classes = useStyles()
 

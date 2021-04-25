@@ -12,6 +12,7 @@ import AccountCircleIcon from "@material-ui/icons/AccountCircle"
 import { useHistory } from "react-router-dom"
 import { useStatefulLocation, useUser } from "../utils/context"
 import AbstractModal from "./AbstractModal"
+import Notification, { NotificationType } from "./Notification"
 
 type SignupFormProps = {
   errorMessage: string | null
@@ -26,20 +27,33 @@ export default function SignupForm({
   const { register } = useUser()
   const { from } = location.state || { from: { pathname: "/" } }
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false)
+  const [isNotifOpen, setNotifOpen] = React.useState<boolean>(false)
+  const [type] = React.useState<NotificationType["type"]>("error")
+  const [message] = React.useState("Something went wrong!")
 
   const classes = useStyles()
 
   const handleConfirm = () => {
     if (username && password) {
-      register({ username, password }).then(() => {
-        setIsModalOpen(false)
-        history.replace(from)
-      })
+      register({ username, password })
+        .then(() => {
+          setIsModalOpen(false)
+          history.replace(from)
+        })
+        .catch((error: string) => {
+          setIsModalOpen(false)
+          setNotifOpen(true)
+          console.log(error)
+        })
     }
   }
 
   const handleClose = () => {
     setIsModalOpen(false)
+  }
+
+  const handleNotifClose = () => {
+    setNotifOpen(false)
   }
 
   return (
@@ -104,6 +118,13 @@ export default function SignupForm({
         handleCancel={handleClose}
         title="Confirmation"
         description={`Are you sure you are 18+`}
+      />
+      <Notification
+        isOpen={isNotifOpen}
+        setisOpen={setNotifOpen}
+        handleClose={handleNotifClose}
+        type={type}
+        message={message}
       />
     </Grid>
   )
