@@ -8,9 +8,9 @@ import {
   Checkbox,
   Button,
   Typography,
-  Link,
 } from "@material-ui/core"
 import { withStyles, makeStyles } from "@material-ui/core/styles"
+import { Link } from "react-router-dom"
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined"
 import { red } from "@material-ui/core/colors"
 import { Nullable, useStatefulLocation, useUser } from "../utils/context"
@@ -141,7 +141,7 @@ export default function LoginForm({
             Sign In
           </ColorButton>
           <Typography>
-            <Link href="#">Forgot password</Link>
+            <Link to="/forgotpassword">forgot password</Link>
           </Typography>
           <br />
           <span>{errorMessage}</span>
