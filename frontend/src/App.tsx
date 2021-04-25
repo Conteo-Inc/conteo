@@ -16,6 +16,8 @@ import VideoViewPage from "./FullPageRoutes/VideoViewPage"
 import Help from "./FullPageRoutes/Help"
 import ContactUs from "./FullPageRoutes/ContactUs"
 import AccountsPage from "./FullPageRoutes/AccountsPage"
+import ForgotPassword from "./FullPageRoutes/ForgotPassword"
+import ResetPassword from "./FullPageRoutes/ResetPassword"
 
 const useStyles = makeStyles({
   app: {
@@ -88,6 +90,12 @@ export default function App(): JSX.Element {
           <Switch>
             <Route path="/tokens">
               <TokenPage />
+            </Route>
+            <Route path="/forgotpassword">
+              <ForgotPassword />
+            </Route>
+            <Route path="/verification/:uidb64/:token">
+              <ResetPassword />
             </Route>
             {pageList.map(({ path, pageJsx }: Page, index: number) => (
               <ProtectedRoute key={`page-${index}`} path={path}>
