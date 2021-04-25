@@ -368,7 +368,7 @@ export default function EditableProfileContent({
                 handleConfirm={handleConfirm}
                 handleCancel={handleClose}
                 title="Confirmation"
-                description={`You cant undo this action`}
+                description={`You can't undo this action`}
               />
             </Grid>
           </Grid>
