@@ -65,7 +65,7 @@ const useStyles = makeStyles({
     height: "100%",
     width: "100%",
     "&:after": {
-      content: "\"\"",
+      content: "''",
       height: "100%",
       width: "100%",
       position: "absolute",
