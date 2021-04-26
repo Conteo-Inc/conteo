@@ -138,7 +138,7 @@ class MailListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ("id", "first_name", "last_name")
+        fields = ("id", "first_name", "last_name", "paused")
 
 
 class VideoSerializer(serializers.ModelSerializer):
