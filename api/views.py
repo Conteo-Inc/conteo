@@ -326,11 +326,14 @@ class ContactUs(generics.CreateAPIView):
 class Feedback(generics.CreateAPIView):
     serializer_class = FeedbackSerializer
 
-    def post(self,request):
+    def post(self, request):
         reason = response.data["reason"]
         message = response.data["message"]
         email = response.data["email"]
+        user = User.objects.get(request.user)
         serializer = self.serializer_class(
-            context={"reason": reason, "message": message, "email": email }
+            context={"reason": reason, "message": message, "email": email, "user": request.user}
         )
-        return response.Response(serializer.data, status=status.HTTP_201_CREATED)
+        if serializer.is_valid:
+            return response.Response(serializer.data, status=status.HTTP_201_CREATED)
+        
