@@ -17,7 +17,7 @@ import {
 import EditIcon from "@material-ui/icons/Edit"
 import { useState, useEffect, useReducer } from "react"
 import AbstractModal from "../components/AbstractModal"
-import { request } from "../utils/fetch"
+import { request, parseIdentity } from "../utils/fetch"
 import { useHistory } from "react-router-dom"
 import { useUser } from "../utils/context"
 
@@ -28,6 +28,11 @@ const initAccountData = {
   password: "",
   email: "",
   successor: "",
+}
+
+enum Action {
+  DELETE = "delete",
+  DEACTIVATE = "deactivate",
 }
 
 const useStyles = makeStyles({
@@ -49,16 +54,20 @@ const useStyles = makeStyles({
   button: {
     margin: "5px",
   },
+  error: {
+    color: "red",
+  },
 })
 
 export default function AccountsPage(): JSX.Element {
   const classes = useStyles()
   const [editMode, editModeOn] = useState(false)
-  const [value, setValues] = useState("")
   const [btnText, setBtnText] = useState("Delete or Deactivate Account")
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const history = useHistory()
+  const [accountAction, setAccountAction] = useState<Action | null>(null)
+  const [errorMessage, setErrorMessage] = useState<string>("")
   const { logout } = useUser()
+  const history = useHistory()
   const [accountData, dispatch] = useReducer(
     (
       state: typeof initAccountData,
@@ -76,32 +85,19 @@ export default function AccountsPage(): JSX.Element {
   const handleSave = () => {
     editModeOn(false)
     setIsModalOpen(false)
-    if (value === "Deactivating Account") {
-      request({
-        path: "/api/profile/",
-        method: "patch",
-        body: { paused: true },
-      })
-        .then(logout)
-        .then(() => history.push("/tokens"))
-    }
   }
 
   const handleCancel = () => {
     editModeOn(false)
   }
 
-  const handleDeleteChanges = (event: any) => {
-    setValues(event.target.value)
-  }
-
   const handleAccountChanges = (event: any) => {
     event.preventDefault()
 
-    if (value === "Deactivating Account") {
+    if (accountAction === Action.DEACTIVATE) {
       setBtnText("Deactivate Account")
       setIsModalOpen(true)
-    } else if (value === "Delete Account") {
+    } else if (accountAction === Action.DELETE) {
       setBtnText("Delete Account")
       setIsModalOpen(true)
     } else {
@@ -112,6 +108,44 @@ export default function AccountsPage(): JSX.Element {
 
   const handleClose = () => {
     setIsModalOpen(false)
+    setAccountAction(null)
+  }
+
+  const handleConfirm = () => {
+    if (accountAction === Action.DELETE) {
+      deleteAccount()
+    } else if (accountAction === Action.DEACTIVATE) {
+      deactivateAccount()
+    } else {
+      setIsModalOpen(false)
+    }
+    setAccountAction(null)
+  }
+
+  const deleteAccount = () => {
+    request({
+      path: "/api/deleteaccount/",
+      method: "delete",
+      parser: parseIdentity,
+    })
+      .then(() => {
+        setIsModalOpen(false)
+        history.push("/tokens")
+      })
+      .catch((error) => {
+        console.log(error)
+        setErrorMessage("Error while deleting account.")
+      })
+  }
+
+  const deactivateAccount = () => {
+    request({
+      path: "/api/profile/",
+      method: "patch",
+      body: { paused: true },
+    })
+      .then(logout)
+      .then(() => history.push("/tokens"))
   }
 
   useEffect(() => {
@@ -261,11 +295,13 @@ export default function AccountsPage(): JSX.Element {
             <FormControl>
               <RadioGroup
                 name="accountDelete"
-                value={value}
-                onChange={handleDeleteChanges}
+                value={accountAction}
+                onChange={(e) =>
+                  setAccountAction(e.currentTarget.value as Action)
+                }
               >
                 <FormControlLabel
-                  value="Deactivating Account"
+                  value={Action.DEACTIVATE}
                   control={<Radio />}
                   label="Deactivate Account"
                 />
@@ -273,7 +309,7 @@ export default function AccountsPage(): JSX.Element {
                   Your account would be temporarily disabled.
                 </FormHelperText>
                 <FormControlLabel
-                  value="Delete Account"
+                  value={Action.DELETE}
                   control={<Radio />}
                   label="Delete Account"
                 />
@@ -288,17 +324,18 @@ export default function AccountsPage(): JSX.Element {
               type="submit"
               variant="contained"
               className={classes.button}
-              onClick={handleAccountChanges}
             >
               {btnText}
             </Button>
             <AbstractModal
               isModalOpen={isModalOpen}
-              handleConfirm={handleSave}
+              handleConfirm={handleConfirm}
               handleCancel={handleClose}
               title="Confirmation"
               description={`Are you sure you want to ${btnText}?`}
-            />
+            >
+              <Typography className={classes.error}>{errorMessage}</Typography>
+            </AbstractModal>
           </Grid>
         </form>
       </Grid>
