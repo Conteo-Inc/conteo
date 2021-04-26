@@ -41,17 +41,20 @@ export default function FeedbackPage(): JSX.Element {
   const [values, setValues] = useState(feedBackValue)
   const classes = useStyles()
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = () => {
+    return request({
+      path: "/api/feedback/",
+      method: "post",
+      body: feedBackValue,
+    })
+  }
+
+  const setFeedbackValue = (e: any) => {
     const { name, value } = e.target
     setValues({
       ...values,
       [name]: value,
     })
-    return request({
-      path: "/api/feedback/",
-      method: "post",
-      body: feedBackValue,
-    }).then(e.preventDefault())
   }
 
   return (
@@ -80,7 +83,7 @@ export default function FeedbackPage(): JSX.Element {
                   id="reasons"
                   name="reasons"
                   value={values.reason}
-                  onChange={handleSubmit}
+                  onChange={setFeedbackValue}
                 >
                   <option aria-label="None" value="" />
                   <option value={"website"}>Website</option>
@@ -97,14 +100,14 @@ export default function FeedbackPage(): JSX.Element {
                   multiline
                   rowsMax={6}
                   value={values.message}
-                  onChange={handleSubmit}
+                  onChange={setFeedbackValue}
                 />
                 <TextField
                   variant="outlined"
                   label="Your email"
                   name="email"
                   value={values.email}
-                  onChange={handleSubmit}
+                  onChange={setFeedbackValue}
                 />
               </Grid>
               <Grid item>

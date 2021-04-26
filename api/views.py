@@ -422,14 +422,10 @@ class Accounts(generics.RetrieveAPIView):
 
 class ContactUs(generics.CreateAPIView):
     serializer_class = ContactUsSerializer
+    permission_clsses = permissions.AllowAny
 
     def post(self, request):
-        email = request.data["email"]
-        name = request.data["name"]
-        message = request.data["message"]
-        serializer = self.serializer_class(
-            context={"email": email, "name": name, "message": message}
-        )
+        serializer = self.serializer_class(data=request.data)
         return response.Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
@@ -437,11 +433,5 @@ class Feedback(generics.CreateAPIView):
     serializer_class = FeedbackSerializer
 
     def post(self, request):
-        reason = response.data["reason"]
-        message = response.data["message"]
-        email = response.data["email"]
-        if User.objects.get(request.user):
-            serializer = self.serializer_class(
-                context={"reason": reason, "message": message, "email": email}
-            )
-            return response.Response(serializer.data, status=status.HTTP_201_CREATED)
+        serializer = self.serializer_class(data=request.data)
+        return response.Response(serializer.data, status=status.HTTP_201_CREATED)

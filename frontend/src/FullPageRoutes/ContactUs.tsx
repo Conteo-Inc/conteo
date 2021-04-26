@@ -52,17 +52,20 @@ export default function ContactUs(): JSX.Element {
   const [values, setValues] = useState(contactValue)
   const classes = useStyles()
 
-  const handleSubmit = (e: any) => {
+  const setContactValue = (e: any) => {
     const { name, value } = e.target
     setValues({
       ...values,
       [name]: value,
     })
+  }
+
+  const handleSubmit = () => {
     return request({
       path: "/api/contact/",
       method: "post",
       body: contactValue,
-    }).then(e.preventDefault())
+    })
   }
 
   return (
@@ -105,14 +108,14 @@ export default function ContactUs(): JSX.Element {
                   label="Your name"
                   name="name"
                   value={values.name}
-                  onChange={handleSubmit}
+                  onChange={setContactValue}
                 />
                 <TextField
                   variant="outlined"
                   label="Your email"
                   name="email"
                   value={values.email}
-                  onChange={handleSubmit}
+                  onChange={setContactValue}
                 />
                 <TextField
                   variant="outlined"
@@ -121,7 +124,7 @@ export default function ContactUs(): JSX.Element {
                   multiline
                   rowsMax={6}
                   value={values.message}
-                  onChange={handleSubmit}
+                  onChange={setContactValue}
                 />
               </Grid>
               <Grid item>
