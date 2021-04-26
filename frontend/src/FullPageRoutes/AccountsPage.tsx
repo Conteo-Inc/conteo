@@ -19,6 +19,7 @@ import { useState, useEffect, useReducer } from "react"
 import AbstractModal from "../components/AbstractModal"
 import { request } from "../utils/fetch"
 import { useHistory } from "react-router-dom"
+import { useUser } from "../utils/context"
 
 const initAccountData = {
   first_name: "",
@@ -57,6 +58,7 @@ export default function AccountsPage(): JSX.Element {
   const [btnText, setBtnText] = useState("Delete or Deactivate Account")
   const [isModalOpen, setIsModalOpen] = useState(false)
   const history = useHistory()
+  const { logout } = useUser()
   const [accountData, dispatch] = useReducer(
     (
       state: typeof initAccountData,
@@ -76,10 +78,12 @@ export default function AccountsPage(): JSX.Element {
     setIsModalOpen(false)
     if (value === "Deactivating Account") {
       request({
-        path: "/api/accounts/",
+        path: "/api/profile/",
         method: "patch",
-        body: { is_active: false },
-      }).then(() => history.push("/tokens"))
+        body: { paused: true },
+      })
+        .then(logout)
+        .then(() => history.push("/tokens"))
     }
   }
 

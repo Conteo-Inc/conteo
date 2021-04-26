@@ -24,6 +24,7 @@ export type MailListItem = {
   viewed_at: Nullable<string>
   created_at: string
   id: number
+  paused: boolean
 }
 
 export default function MailItem({
@@ -32,6 +33,7 @@ export default function MailItem({
   viewed_at,
   created_at,
   id,
+  paused,
 }: MailListItem): JSX.Element {
   const { mailItem } = useStyles()
   const [visible, setVisible] = React.useState<boolean>(false)
@@ -52,7 +54,10 @@ export default function MailItem({
       <Typography variant="h6">
         {created_at ? video_date.toLocaleDateString() : "No video"}
       </Typography>
-      <IconButton onClick={() => setVisible(true)} disabled={!created_at}>
+      <IconButton
+        onClick={() => setVisible(true)}
+        disabled={!created_at || paused}
+      >
         {viewed_at ? (
           <DraftsRounded fontSize="large" style={{ color: "#4b5e82" }} />
         ) : (
@@ -61,7 +66,7 @@ export default function MailItem({
       </IconButton>
       {/* TODO: Re-add dropdown later */}
       {/* <ArrowDropDown fontSize="large" style={{ color: "#4b5e82" }} /> */}
-      <IconButton component={Link} to={`/record/${id}`}>
+      <IconButton component={Link} to={`/record/${id}`} disabled={paused}>
         <SendRounded fontSize="large" style={{ color: "#4b5282" }} />
       </IconButton>
       {created_at && (

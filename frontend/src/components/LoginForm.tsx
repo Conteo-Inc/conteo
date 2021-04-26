@@ -15,6 +15,7 @@ import LockOutlinedIcon from "@material-ui/icons/LockOutlined"
 import { red } from "@material-ui/core/colors"
 import { Nullable, useStatefulLocation, useUser } from "../utils/context"
 import { useHistory } from "react-router-dom"
+import AbstractModal from "./AbstractModal"
 
 export type UserHandlerArgs = {
   e: React.FormEvent<HTMLFormElement>
@@ -55,6 +56,7 @@ export default function LoginForm({
 }: LoginFormProps): JSX.Element {
   const [username, setUsername] = React.useState<Nullable<string>>(null)
   const [password, setPassword] = React.useState<Nullable<string>>(null)
+  const [showReactivate, setShowReactivate] = React.useState<boolean>(false)
   const { login } = useUser()
   const location = useStatefulLocation()
   const history = useHistory()
@@ -62,6 +64,27 @@ export default function LoginForm({
   const { from } = location.state || { from: { pathname: "/" } }
 
   const classes = useStyles()
+
+  const onConfirmReactivation = () => {
+    setShowReactivate(false)
+    if (username && password) {
+      login({ username, password, reactivate: true })
+        .then(onLoginSuccess)
+        .catch(onLoginFail)
+    }
+  }
+
+  const onLoginSuccess = () => {
+    history.replace(from)
+  }
+
+  const onLoginFail = (err: Response) => {
+    if (err.status === 409) {
+      setShowReactivate(true)
+    } else {
+      console.error("Login failed:", err)
+    }
+  }
 
   return (
     <Grid>
@@ -78,15 +101,20 @@ export default function LoginForm({
           </Avatar>
           <h2>Log In </h2>
         </Grid>
+        <AbstractModal
+          title="Reactivate"
+          description="Your account has been paused, would you like to unpause it?"
+          isModalOpen={showReactivate}
+          handleConfirm={onConfirmReactivation}
+          handleCancel={() => setShowReactivate(false)}
+        />
         <form
           onSubmit={(e) => {
             e.preventDefault()
             if (username && password) {
               login({ username, password })
-                .then(() => {
-                  history.replace(from)
-                })
-                .catch((err) => console.log("Login failed", err))
+                .then(onLoginSuccess)
+                .catch(onLoginFail)
             }
           }}
         >

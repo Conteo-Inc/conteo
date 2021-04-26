@@ -1,6 +1,6 @@
 import * as Cookies from "js-cookie"
 
-type HttpResponse<T> = Response & {
+export type HttpResponse<T> = Response & {
   parsedBody: T
 }
 
@@ -8,7 +8,7 @@ export async function http(request: RequestInfo): Promise<Response> {
   const res: Response = await fetch(request)
 
   if (!res.ok) {
-    throw new Error(res.statusText)
+    throw res
   }
   return res
 }
