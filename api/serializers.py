@@ -219,10 +219,10 @@ class AccountSerializer(serializers.ModelSerializer):
 class ContactUsSerializer(serializers.ModelSerializer):
     class Meta:
         model = ContactUs
-        fields = ("email", "name", "message")
+        fields = "__all__"
 
 
 class FeedbackSerializer(serializers.ModelSerializer):
     class Meta:
         model = Feedback
-        fields = ("reason", "message", "email")
+        fields = "__all__"

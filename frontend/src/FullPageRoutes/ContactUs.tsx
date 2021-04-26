@@ -7,7 +7,6 @@ import {
   Button,
   Typography,
 } from "@material-ui/core"
-import { useHistory } from "react-router-dom"
 import { request } from "../utils/fetch"
 
 const useStyles = makeStyles({
@@ -52,13 +51,8 @@ const contactValue = {
 export default function ContactUs(): JSX.Element {
   const [values, setValues] = useState(contactValue)
   const classes = useStyles()
-  const history = useHistory()
 
   const handleSubmit = (e: any) => {
-    e.preventDefault().then(history.push("/help"))
-  }
-
-  const setContactValue = (e: any) => {
     const { name, value } = e.target
     setValues({
       ...values,
@@ -68,7 +62,7 @@ export default function ContactUs(): JSX.Element {
       path: "/api/contact/",
       method: "post",
       body: contactValue,
-    })
+    }).then(e.preventDefault())
   }
 
   return (
@@ -111,14 +105,14 @@ export default function ContactUs(): JSX.Element {
                   label="Your name"
                   name="name"
                   value={values.name}
-                  onChange={setContactValue}
+                  onChange={handleSubmit}
                 />
                 <TextField
                   variant="outlined"
                   label="Your email"
                   name="email"
                   value={values.email}
-                  onChange={setContactValue}
+                  onChange={handleSubmit}
                 />
                 <TextField
                   variant="outlined"
@@ -127,7 +121,7 @@ export default function ContactUs(): JSX.Element {
                   multiline
                   rowsMax={6}
                   value={values.message}
-                  onChange={setContactValue}
+                  onChange={handleSubmit}
                 />
               </Grid>
               <Grid item>

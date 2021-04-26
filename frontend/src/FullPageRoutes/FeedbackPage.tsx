@@ -8,7 +8,6 @@ import {
   Grid,
   Button,
 } from "@material-ui/core"
-import { useHistory } from "react-router-dom"
 import { request } from "../utils/fetch"
 
 const useStyles = makeStyles({
@@ -41,13 +40,8 @@ const feedBackValue = {
 export default function FeedbackPage(): JSX.Element {
   const [values, setValues] = useState(feedBackValue)
   const classes = useStyles()
-  const history = useHistory()
 
   const handleSubmit = (e: any) => {
-    e.preventDefault().then(history.push("/help"))
-  }
-
-  const setFeedbackValue = (e: any) => {
     const { name, value } = e.target
     setValues({
       ...values,
@@ -57,7 +51,7 @@ export default function FeedbackPage(): JSX.Element {
       path: "/api/feedback/",
       method: "post",
       body: feedBackValue,
-    })
+    }).then(e.preventDefault())
   }
 
   return (
@@ -86,7 +80,7 @@ export default function FeedbackPage(): JSX.Element {
                   id="reasons"
                   name="reasons"
                   value={values.reason}
-                  onChange={setFeedbackValue}
+                  onChange={handleSubmit}
                 >
                   <option aria-label="None" value="" />
                   <option value={"website"}>Website</option>
@@ -103,14 +97,14 @@ export default function FeedbackPage(): JSX.Element {
                   multiline
                   rowsMax={6}
                   value={values.message}
-                  onChange={setFeedbackValue}
+                  onChange={handleSubmit}
                 />
                 <TextField
                   variant="outlined"
                   label="Your email"
                   name="email"
                   value={values.email}
-                  onChange={setFeedbackValue}
+                  onChange={handleSubmit}
                 />
               </Grid>
               <Grid item>
