@@ -204,4 +204,4 @@ class AccountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ("email", "is_active")
+        fields = ("email",)

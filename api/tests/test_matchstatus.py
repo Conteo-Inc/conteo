@@ -32,8 +32,8 @@ class MatchesViewTestCase(APITestCase):
         fog = make_user("fog", 70)
         make_user("gil", 80)
         hal = make_user("hal", 80)
-        hal.is_active = False
-        hal.save()
+        hal.profile.paused = True
+        hal.profile.save()
 
         MatchStatus.objects.create(
             user_lo=ale, user_hi=boy, user_lo_response=True, user_hi_response=True

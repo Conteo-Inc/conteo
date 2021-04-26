@@ -416,7 +416,7 @@ class Reports(generics.CreateAPIView):
         return self.create(request, *args, **kwargs)
 
 
-class Accounts(generics.RetrieveUpdateAPIView):
+class Accounts(generics.RetrieveAPIView):
     serializer_class = AccountSerializer
 
     def get_object(self):
