@@ -65,6 +65,7 @@ class ProfileFromUserSerializer(serializers.ModelSerializer):
     def to_representation(self, instance: User):
         rep = super().to_representation(instance)  # type: OrderedDict
         rep.update(instance.profile.__dict__)
+        rep.update({"interests": instance.profile.interest_set.values()})
         del rep["_state"]  # Not meant to be serialized
 
         # check for video
@@ -76,7 +77,6 @@ class ProfileFromUserSerializer(serializers.ModelSerializer):
             return rep
 
     class Meta:
-        # TODO: Change to Profile
         model = User
         exclude = (
             "first_name",
