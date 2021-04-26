@@ -28,6 +28,7 @@ import {
   ProfileContentSetters,
   getProfileContentUpdates,
 } from "../../utils/profile"
+import AbstractModal from "../AbstractModal"
 
 type EditableProfileContentProps = {
   readonlyContent: ProfileContentType
@@ -112,6 +113,7 @@ export default function EditableProfileContent({
   const [errorMessage, setErrorMessage] = React.useState<string>("")
   const [interestInputValue, setInterestInputValue] = React.useState<string>("")
   const [interestOptions, setInterestOptions] = React.useState<Interest[]>([])
+  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false)
 
   React.useEffect(() => {
     request<Interest[]>({ path: "/api/interests/", method: "get" })
@@ -253,6 +255,11 @@ export default function EditableProfileContent({
   }
 
   const handleCancelEdit = () => {
+    setIsModalOpen(true)
+  }
+
+  const handleConfirm = () => {
+    setIsModalOpen(false)
     setErrorMessage("")
     toggleEditMode(false)
 
@@ -262,6 +269,10 @@ export default function EditableProfileContent({
     setBirthDate(readonlyContent.birth_date)
     setGender(readonlyContent.gender)
     setInterests(readonlyContent.interests)
+  }
+
+  const handleClose = () => {
+    setIsModalOpen(false)
   }
 
   return (
@@ -352,6 +363,13 @@ export default function EditableProfileContent({
                   Cancel
                 </Button>
               </Grid>
+              <AbstractModal
+                isModalOpen={isModalOpen}
+                handleConfirm={handleConfirm}
+                handleCancel={handleClose}
+                title="Confirmation"
+                description={`You can't undo this action`}
+              />
             </Grid>
           </Grid>
         </Grid>
