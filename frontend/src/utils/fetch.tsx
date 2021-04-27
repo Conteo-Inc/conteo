@@ -15,7 +15,7 @@ export async function http(request: RequestInfo): Promise<Response> {
 
 type requestArgs<T> = {
   path: string
-  method: "get" | "put" | "post"
+  method: "get" | "put" | "post" | "delete"
   parser?: (res: Response) => Promise<T>
   headers?: RequestInit["headers"] & { "Content-Type": string }
   body?: any // eslint-disable-line
