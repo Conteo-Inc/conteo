@@ -4,6 +4,7 @@ from datetime import date, timedelta
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.files.base import ContentFile
 from django.core.mail import send_mail
 from django.db.models import Q
 from django.db.models.query import QuerySet
@@ -11,6 +12,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.utils.timezone import now
 from django.views import View
 from rest_framework import (
     generics,
@@ -195,15 +197,37 @@ class ProfileRetrieveUpdateView(generics.RetrieveUpdateAPIView):
         return response.Response(data=data, status=status.HTTP_200_OK)
 
     def put(self, request):
+        self.updateImage(request)
         self.updateInterests(request)
         return self.update(request=request)
+
+    def updateImage(self, request):
+        imageData = None
+        try:
+            imageData = request.data.pop("image")
+        except KeyError:
+            # Image was not updated.
+            pass
+
+        if imageData is not None:
+            # Data is prepended by "data:image/*;base64,".
+            # Encode converts from string to bytes.
+            data_bytes = imageData.encode()
+
+            # Create the image content file.
+            created_at = now()
+            fname = f"{request.user.id}_{created_at}"
+            cf = ContentFile(data_bytes, name=fname)
+
+            # Save the profile image field.
+            request.user.profile.image.save(fname, cf)
 
     def updateInterests(self, request):
         newInterests = None
         try:
             newInterests = request.data["interests"]
         except KeyError:
-            # User did not updates their interests.
+            # Interests were not updated.
             pass
 
         if newInterests is not None:

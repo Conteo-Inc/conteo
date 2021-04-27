@@ -19,8 +19,10 @@ import {
   KeyboardDatePicker,
 } from "@material-ui/pickers"
 import Autocomplete from "@material-ui/lab/Autocomplete"
+import CameraAltIcon from "@material-ui/icons/CameraAlt"
 import ProfileContent, { GENDER_CHOICES } from "./ProfileContent"
 import type { ProfileContentType, GenderKey, Interest } from "./ProfileContent"
+import UploadImageModal from "./UploadImageModal"
 import Video from "../video/Video"
 import { Colors } from "../../utils/colors"
 import { request } from "../../utils/fetch"
@@ -41,44 +43,70 @@ type EditableProfileContentProps = {
 const MAX_FIRST_NAME_LENGTH = 50
 const MAX_LAST_NAME_LENGTH = 50
 
+const pictureSize = 200
 const useStyles = makeStyles({
-  profileAvatar: {
-    height: "200px",
-    width: "200px",
+  iconContainer: {
+    position: "absolute",
+    bottom: "3px",
+    right: "3px",
+    backgroundColor: "rgba(255, 255, 255, 0.15)",
+    "&:hover": {
+      backgroundColor: "rgba(255, 255, 255, 0.25)",
+    },
+    cursor: "pointer",
+    boxShadow: "0 4px 8px 0 rgb(0 0 0 / 20%), 0 6px 20px 0 rgb(0 0 0 / 19%)",
   },
-  circle: {
-    height: "200px",
-    width: "200px",
-    display: "flex",
-    overflow: "hidden",
-    alignItems: "center",
-    borderRadius: "50%",
-    justifyContent: "center",
+  avatar: {
+    height: `${pictureSize}px`,
+    width: `${pictureSize}px`,
+    position: "relative",
+    cursor: "pointer",
   },
-  image: {
-    width: "inherit",
-    height: "inherit",
-    objectFit: "cover",
-  },
-  uploadImage: {
-    width: "100%",
+  picture: {
     height: "100%",
-    backgroundColor: "grey",
+    width: "100%",
+    "&:after": {
+      content: "''",
+      height: "100%",
+      width: "100%",
+      position: "absolute",
+      top: "0px",
+      right: "0px",
+      opacity: "0%",
+      backgroundColor: "white",
+    },
+    "&:hover:after": {
+      opacity: "25%",
+    },
+  },
+  cameraContainer: {
+    height: `${pictureSize / 4}px`,
+    width: `${pictureSize / 4}px`,
+    borderRadius: "50%",
+  },
+  cameraIconItem: {
+    height: "75%",
+    width: "75%",
+  },
+  cameraIcon: {
+    height: "100%",
+    width: "100%",
+    color: "white",
   },
   introVideo: {
-    maxHeight: "200px",
+    maxHeight: `${pictureSize}px`,
   },
   fieldsContainer: {
-    paddingTop: 40,
-    paddingBottom: 10,
+    paddingTop: "40px",
+    paddingBottom: "10px",
   },
   field: {
     fontSize: "2rem",
-    marginBottom: 15,
+    marginBottom: "15px",
   },
   recordButton: {
-    backgroundColor: Colors.DEEP_BLUE,
     color: "white",
+    backgroundColor: Colors.DEEP_BLUE,
     "&:hover": {
       backgroundColor: Colors.DEEP_RED,
     },
@@ -87,16 +115,21 @@ const useStyles = makeStyles({
     width: "100%",
   },
   button: {
-    margin: 5,
+    margin: "5px",
   },
   error: {
     color: "red",
   },
 })
 
-export default function EditableProfileContent({
-  readonlyContent,
-  editableContent,
+type EditableElementListProps = {
+  editableContent: ProfileContentType
+  contentSetters: ProfileContentSetters
+  interestOptions: Interest[]
+}
+
+function buildEditableElementList({
+  editableContent: { first_name, last_name, birth_date, gender, interests },
   contentSetters: {
     setFirstName,
     setLastName,
@@ -104,38 +137,16 @@ export default function EditableProfileContent({
     setGender,
     setInterests,
   },
-  setProfileContent,
-  userId,
-}: EditableProfileContentProps): JSX.Element {
+  interestOptions,
+}: EditableElementListProps): JSX.Element[] {
   const classes = useStyles()
-
-  const [isEditMode, toggleEditMode] = React.useState<boolean>(false)
-  const [errorMessage, setErrorMessage] = React.useState<string>("")
   const [interestInputValue, setInterestInputValue] = React.useState<string>("")
-  const [interestOptions, setInterestOptions] = React.useState<Interest[]>([])
-  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false)
-
-  React.useEffect(() => {
-    request<Interest[]>({ path: "/api/interests/", method: "get" })
-      .then((res) => {
-        const options: Interest[] = res.parsedBody
-          .sort((a: Interest, b: Interest) => -b.title.localeCompare(a.title))
-          .sort(
-            (a: Interest, b: Interest) => -b.category.localeCompare(a.category)
-          )
-        setInterestOptions(options)
-      })
-      .catch((error) => {
-        console.log(error)
-      })
-  }, [])
 
   const isInterestEqual = (a: Interest, b: Interest): boolean => {
     return a.category === b.category && a.title === b.title
   }
 
-  // Editable user profile element list.
-  const editableElements: JSX.Element[] = [
+  return [
     // FIRST NAME
     <TextField
       key={"editableContent-firstName"}
@@ -143,7 +154,7 @@ export default function EditableProfileContent({
       className={classes.textField}
       variant="outlined"
       label="First Name"
-      value={editableContent.first_name}
+      value={first_name}
       onChange={(e) => setFirstName(e.currentTarget.value)}
       inputProps={{ maxLength: MAX_FIRST_NAME_LENGTH }}
     />,
@@ -155,7 +166,7 @@ export default function EditableProfileContent({
       className={classes.textField}
       variant="outlined"
       label="Last Name"
-      value={editableContent.last_name}
+      value={last_name}
       onChange={(e) => setLastName(e.currentTarget.value)}
       inputProps={{ maxLength: MAX_LAST_NAME_LENGTH }}
     />,
@@ -174,7 +185,7 @@ export default function EditableProfileContent({
         margin="none"
         label="Birthday"
         format="MM/dd/yyyy"
-        value={editableContent.birth_date}
+        value={birth_date}
         onChange={setBirthDate}
         KeyboardButtonProps={{ "aria-label": "change date" }}
       />
@@ -190,7 +201,7 @@ export default function EditableProfileContent({
       <Select
         native
         label="Gender"
-        value={editableContent.gender ? editableContent.gender : ""}
+        value={gender ? gender : ""}
         onChange={(e) => setGender(e.currentTarget.value as GenderKey)}
       >
         <option aria-label="None" value="" />
@@ -212,7 +223,7 @@ export default function EditableProfileContent({
       groupBy={(interest) => interest.category}
       getOptionLabel={(interest) => interest.title}
       getOptionSelected={isInterestEqual}
-      value={editableContent.interests}
+      value={interests}
       onChange={(e, interests: Interest[]) => setInterests(interests)}
       inputValue={interestInputValue}
       onInputChange={(e, value: string) => setInterestInputValue(value)}
@@ -232,6 +243,43 @@ export default function EditableProfileContent({
       )}
     />,
   ]
+}
+
+export default function EditableProfileContent({
+  readonlyContent,
+  editableContent,
+  contentSetters,
+  setProfileContent,
+  userId,
+}: EditableProfileContentProps): JSX.Element {
+  const classes = useStyles()
+
+  const [isEditMode, toggleEditMode] = React.useState<boolean>(false)
+  const [errorMessage, setErrorMessage] = React.useState<string>("")
+  const [interestOptions, setInterestOptions] = React.useState<Interest[]>([])
+  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false)
+
+  React.useEffect(() => {
+    request<Interest[]>({ path: "/api/interests/", method: "get" })
+      .then((res) => {
+        const options: Interest[] = res.parsedBody
+          .sort((a: Interest, b: Interest) => -b.title.localeCompare(a.title))
+          .sort(
+            (a: Interest, b: Interest) => -b.category.localeCompare(a.category)
+          )
+        setInterestOptions(options)
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+  }, [])
+
+  // Editable user profile element list.
+  const editableElements: JSX.Element[] = buildEditableElementList({
+    editableContent,
+    contentSetters,
+    interestOptions,
+  })
 
   const handleSaveContent = () => {
     const updates = getProfileContentUpdates(readonlyContent, editableContent)
@@ -264,12 +312,16 @@ export default function EditableProfileContent({
     toggleEditMode(false)
 
     // Reset editable content values.
-    setFirstName(readonlyContent.first_name)
-    setLastName(readonlyContent.last_name)
-    setBirthDate(readonlyContent.birth_date)
-    setGender(readonlyContent.gender)
-    setInterests(readonlyContent.interests)
+    contentSetters.setFirstName(readonlyContent.first_name)
+    contentSetters.setLastName(readonlyContent.last_name)
+    contentSetters.setBirthDate(readonlyContent.birth_date)
+    contentSetters.setGender(readonlyContent.gender)
+    contentSetters.setInterests(readonlyContent.interests)
   }
+  const [
+    isUploadImageModalOpen,
+    toggleUploadImageModal,
+  ] = React.useState<boolean>(false)
 
   const handleClose = () => {
     setIsModalOpen(false)
@@ -280,22 +332,36 @@ export default function EditableProfileContent({
       {isEditMode ? (
         <Grid container justify="center" spacing={2}>
           <Grid item xs={12}>
-            <Grid
-              container
-              alignItems="center"
-              justify="space-evenly"
-              spacing={2}
-            >
-              <Grid item>
-                <Avatar src={""} className={classes.profileAvatar} />
+            <Grid container alignItems="center" justify="space-evenly">
+              <Grid
+                item
+                className={classes.avatar}
+                onClick={() => toggleUploadImageModal(true)}
+              >
+                <Avatar
+                  src={
+                    editableContent.image !== null ? editableContent.image : ""
+                  }
+                  className={classes.picture}
+                />
+                <Grid
+                  container
+                  alignItems="center"
+                  justify="center"
+                  className={`${classes.iconContainer} ${classes.cameraContainer}`}
+                >
+                  <Grid item className={classes.cameraIconItem}>
+                    <CameraAltIcon className={classes.cameraIcon} />
+                  </Grid>
+                </Grid>
               </Grid>
-              <Grid item>
-                {editableContent.video ? (
-                  <Video
-                    src={editableContent.video}
-                    className={classes.introVideo}
-                  />
-                ) : (
+              {editableContent.video ? (
+                <Video
+                  src={editableContent.video}
+                  className={classes.introVideo}
+                />
+              ) : (
+                <Grid item>
                   <Button
                     className={classes.recordButton}
                     size="large"
@@ -304,8 +370,8 @@ export default function EditableProfileContent({
                   >
                     <Typography variant="h6">Record Intro Video</Typography>
                   </Button>
-                )}
-              </Grid>
+                </Grid>
+              )}
             </Grid>
           </Grid>
           <Grid item xs={12}>
@@ -390,6 +456,11 @@ export default function EditableProfileContent({
           </Grid>
         </Grid>
       )}
+      <UploadImageModal
+        isModalOpen={isUploadImageModalOpen}
+        toggleModal={toggleUploadImageModal}
+        updateProfilePicture={contentSetters.setImage}
+      />
     </>
   )
 }
