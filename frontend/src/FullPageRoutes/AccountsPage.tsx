@@ -320,7 +320,9 @@ export default function AccountsPage(): JSX.Element {
                 title="Confirmation"
                 description={`Are you sure you want to ${btnText}?`}
               >
-                <Typography className={classes.error}>{errorMessage}</Typography>
+                <Typography className={classes.error}>
+                  {errorMessage}
+                </Typography>
               </AbstractModal>
             </Grid>
           </form>
