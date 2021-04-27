@@ -13,6 +13,9 @@ class Profile(models.Model):
     birth_date = models.DateField(null=True)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True)
     paused = models.BooleanField(default=False)
+    image = models.FileField(
+        upload_to="images/", null=True, verbose_name="profile picture"
+    )
 
 
 class Privacy(models.Model):
