@@ -145,12 +145,12 @@ class Report(models.Model):
 class ContactUs(models.Model):
     email = models.CharField(max_length=50, blank=True)
     name = models.CharField(max_length=50, blank=True)
-    message = models.CharField(max_length=2000, null=True)
+    message = models.TextField()
 
 
 class Feedback(models.Model):
     FEEDBACK_REASON = (("W", "Website"), ("Pp", "Penpal"), ("P", "Performance"))
 
-    reason = models.CharField(max_length=2, choices=FEEDBACK_REASON, null=True)
-    message = models.CharField(max_length=2000, blank=True)
+    reason = models.TextField(choices=FEEDBACK_REASON)
+    message = models.TextField()
     email = models.CharField(max_length=50, blank=True)

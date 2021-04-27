@@ -422,16 +422,8 @@ class Accounts(generics.RetrieveAPIView):
 
 class ContactUs(generics.CreateAPIView):
     serializer_class = ContactUsSerializer
-    permission_clsses = permissions.AllowAny
-
-    def post(self, request):
-        serializer = self.serializer_class(data=request.data)
-        return response.Response(serializer.data, status=status.HTTP_201_CREATED)
+    permission_classes = (permissions.AllowAny,)
 
 
 class Feedback(generics.CreateAPIView):
     serializer_class = FeedbackSerializer
-
-    def post(self, request):
-        serializer = self.serializer_class(data=request.data)
-        return response.Response(serializer.data, status=status.HTTP_201_CREATED)
