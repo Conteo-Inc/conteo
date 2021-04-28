@@ -21,6 +21,15 @@ from .models import (
 class ProfileSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         rep = super().to_representation(instance)
+
+        # Replace image file path with the file data.
+        image = instance.image
+        if image != "":
+            try:
+                rep["image"] = image.read().decode()
+            finally:
+                image.close()
+
         # get video
         video = None
         try:

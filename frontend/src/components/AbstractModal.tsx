@@ -13,24 +13,29 @@ import * as React from "react"
 
 type ModalType = {
   title: string
-  description: string
+  description?: string
   confirmText?: string
   cancelText?: string
   isModalOpen: boolean
   handleConfirm: () => void
   handleCancel: () => void
+  children?: React.ReactNode
 }
 
 const useStyles = makeStyles((theme) => ({
   modal: {
     position: "absolute",
-    top: theme.spacing(5),
-    padding: theme.spacing(2),
+    top: "0px",
+    left: "50%",
+    transform: "translate(-50%, 25%)",
+    margin: "0px",
   },
   modalContent: {
     textAlign: "center",
   },
   modalAction: {
+    margin: "25px 50px",
+    padding: "0px",
     justifyContent: "center",
   },
   modalTitle: {
@@ -48,6 +53,7 @@ export default function AbstractModal({
   isModalOpen,
   handleConfirm,
   handleCancel,
+  children,
 }: ModalType): JSX.Element {
   const classes = useStyles()
 
@@ -61,6 +67,7 @@ export default function AbstractModal({
       <DialogContent className={classes.modalContent}>
         <Typography variant="h6">{title}</Typography>
         <Typography variant="subtitle2">{description}</Typography>
+        {children}
       </DialogContent>
       <DialogActions className={classes.modalAction}>
         <Button variant="contained" onClick={handleCancel} color="secondary">
