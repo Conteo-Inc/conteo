@@ -151,6 +151,6 @@ class ContactUs(models.Model):
 class Feedback(models.Model):
     FEEDBACK_REASON = (("W", "Website"), ("Pp", "Penpal"), ("P", "Performance"))
 
-    reason = models.TextField(choices=FEEDBACK_REASON)
+    reason = models.CharField(max_length=2, choices=FEEDBACK_REASON, null=True)
     message = models.TextField()
     email = models.CharField(max_length=50, blank=True)
