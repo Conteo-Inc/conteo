@@ -146,19 +146,22 @@ class UserChangePassword(views.APIView):
 class UserLoginView(views.APIView):
     permission_classes = (permissions.AllowAny,)
 
-    def post(
-        self,
-        request: request.Request,
-    ):
+    def post(self, request: request.Request):
         username = request.data["username"]
         password = request.data["password"]
+        reactivate = request.data.get("reactivate", False)
 
         user = authenticate(request=request, username=username, password=password)
         if user is not None:
+            if reactivate:
+                user.profile.paused = False
+                user.profile.save()
+            if user.profile.paused:
+                return response.Response("Profile is paused", status.HTTP_409_CONFLICT)
             login(request=request, user=user)
             return response.Response(status=status.HTTP_200_OK)
 
-        return response.Response(status=status.HTTP_400_BAD_REQUEST)
+        return response.Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
 class UserLogoutView(generics.GenericAPIView):
@@ -368,6 +371,7 @@ class Matches(viewsets.ModelViewSet):
             | Q(
                 matchstatus_lo__user_hi=req.user, matchstatus_lo__user_lo_response=False
             )
+            | Q(profile__paused=True)
         )
 
         min_age = int(req.query_params.get("minAge", 18))
@@ -437,6 +441,7 @@ class Reports(generics.CreateAPIView):
 
 
 class Accounts(generics.RetrieveAPIView):
-    def get(self, request):
-        serializer = AccountSerializer(request.user)
-        return response.Response(serializer.data, status=status.HTTP_200_OK)
+    serializer_class = AccountSerializer
+
+    def get_object(self):
+        return self.request.user
