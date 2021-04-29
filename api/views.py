@@ -3,8 +3,17 @@ from datetime import date, timedelta
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
+from django.contrib.sites.shortcuts import get_current_site
+from django.core.files.base import ContentFile
+from django.core.mail import send_mail
 from django.db.models import Q
 from django.db.models.query import QuerySet
+from django.shortcuts import redirect
+from django.urls import reverse
+from django.utils.encoding import force_bytes, force_text
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.utils.timezone import now
+from django.views import View
 from rest_framework import (
     generics,
     permissions,
@@ -29,6 +38,7 @@ from .serializers import (
     UserRegistrationSerializer,
     VideoSerializer,
 )
+from .utils import account_activation_token
 
 
 class UserAuthView(generics.RetrieveAPIView):
@@ -58,6 +68,78 @@ class UserAccountDeleteView(views.APIView):
     def delete(self, request):
         req_user = request.user
         req_user.delete()
+        return response.Response(status=status.HTTP_200_OK)
+
+
+# send email..
+class UserForgotPassword(views.APIView):
+    permission_classes = (permissions.AllowAny,)
+
+    def post(self, request):
+        username = request.data["username"]
+        # check if email exists
+        if User.objects.filter(username=username).exists():
+            # encode userId
+            currentUser = User.objects.get(username__exact=username)
+            uidb64 = urlsafe_base64_encode(
+                force_bytes(currentUser.pk)
+            )  # encoded userId
+            # get domain we are on
+            domain = get_current_site(request).domain
+            # relative url for verification
+            link = reverse(
+                "activate",
+                kwargs={
+                    "uidb64": uidb64,
+                    "token": account_activation_token.make_token(currentUser),
+                },
+            )
+            reset_url = "http://" + domain + link
+            try:
+                send_mail(
+                    "Password reset request",
+                    "Hi "
+                    + currentUser.username
+                    + " Please use this link to reset your account\n"
+                    + reset_url,
+                    "conteobot@gmail.com",
+                    [username],
+                    fail_silently=False,
+                )
+            except OSError:
+                return response.Response(status=status.HTTP_400_BAD_REQUEST)
+            return response.Response(status=status.HTTP_200_OK)
+
+        return response.Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+# Used to render password reset page for user
+class UserVerificationCode(View):
+    permission_classes = (permissions.AllowAny,)
+
+    def get(self, request, uidb64, token):
+        return redirect("/verification/" + uidb64 + "/" + token)
+
+
+class UserChangePassword(views.APIView):
+    permission_classes = (permissions.AllowAny,)
+
+    def post(self, request):
+        newPassword = request.data["newPassword"]
+        encodedUidb64 = request.data["uidb64"]
+        token = request.data["token"]
+        # update user password
+        try:
+            id_ = force_text(urlsafe_base64_decode(encodedUidb64))
+            user = User.objects.get(pk=id_)
+            if not account_activation_token.check_token(user, token):
+                print("Account token problem")
+                return response.Response(status=status.HTTP_400_BAD_REQUEST)
+            user.set_password(newPassword)  # Use newPassword her
+            user.save()
+        except Exception as ex:
+            print("Exc: " + str(ex))
+            return response.Response(status=status.HTTP_400_BAD_REQUEST)
         return response.Response(status=status.HTTP_200_OK)
 
 
@@ -115,15 +197,37 @@ class ProfileRetrieveUpdateView(generics.RetrieveUpdateAPIView):
         return response.Response(data=data, status=status.HTTP_200_OK)
 
     def put(self, request):
+        self.updateImage(request)
         self.updateInterests(request)
         return self.update(request=request)
+
+    def updateImage(self, request):
+        imageData = None
+        try:
+            imageData = request.data.pop("image")
+        except KeyError:
+            # Image was not updated.
+            pass
+
+        if imageData is not None:
+            # Data is prepended by "data:image/*;base64,".
+            # Encode converts from string to bytes.
+            data_bytes = imageData.encode()
+
+            # Create the image content file.
+            created_at = now()
+            fname = f"{request.user.id}_{created_at}"
+            cf = ContentFile(data_bytes, name=fname)
+
+            # Save the profile image field.
+            request.user.profile.image.save(fname, cf)
 
     def updateInterests(self, request):
         newInterests = None
         try:
             newInterests = request.data["interests"]
         except KeyError:
-            # User did not updates their interests.
+            # Interests were not updated.
             pass
 
         if newInterests is not None:

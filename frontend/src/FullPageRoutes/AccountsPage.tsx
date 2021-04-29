@@ -1,4 +1,5 @@
 import * as React from "react"
+import { useHistory } from "react-router-dom"
 import {
   Grid,
   makeStyles,
@@ -17,7 +18,7 @@ import {
 import EditIcon from "@material-ui/icons/Edit"
 import { useState, useEffect } from "react"
 import AbstractModal from "../components/AbstractModal"
-import { request } from "../utils/fetch"
+import { parseIdentity, request } from "../utils/fetch"
 
 export type UserAccounts = {
   first_name: string
@@ -47,6 +48,9 @@ const useStyles = makeStyles({
   button: {
     margin: "5px",
   },
+  error: {
+    color: "red",
+  },
 })
 
 export default function AccountsPage(): JSX.Element {
@@ -55,6 +59,9 @@ export default function AccountsPage(): JSX.Element {
   const [value, setValues] = useState("")
   const [btnText, setBtnText] = useState("Delete or Deactivate Account")
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [accountAction, setAccountAction] = useState<"delete" | "">("")
+  const [errorMessage, setErrorMessage] = useState<string>("")
+  const history = useHistory()
 
   const [accountData, setAccountData] = useState<UserAccounts>({
     first_name: "",
@@ -89,6 +96,7 @@ export default function AccountsPage(): JSX.Element {
       setIsModalOpen(true)
     } else if (value === "Delete Account") {
       setBtnText("Delete Account")
+      setAccountAction("delete")
       setIsModalOpen(true)
     } else {
       setBtnText("Delete or Deactivate Account")
@@ -96,8 +104,36 @@ export default function AccountsPage(): JSX.Element {
     }
   }
 
+  const handleConfirm = () => {
+    if (accountAction === "delete") {
+      deleteAccount()
+      setAccountAction("")
+    } else {
+      setIsModalOpen(false)
+    }
+
+    setAccountAction("")
+  }
+
   const handleClose = () => {
     setIsModalOpen(false)
+    setAccountAction("")
+  }
+
+  const deleteAccount = () => {
+    request({
+      path: "/api/deleteaccount/",
+      method: "delete",
+      parser: parseIdentity,
+    })
+      .then(() => {
+        setIsModalOpen(false)
+        history.push("/tokens")
+      })
+      .catch((error) => {
+        console.log(error)
+        setErrorMessage("Error while deleting account.")
+      })
   }
 
   useEffect(() => {
@@ -279,11 +315,15 @@ export default function AccountsPage(): JSX.Element {
               </Button>
               <AbstractModal
                 isModalOpen={isModalOpen}
-                handleConfirm={handleClose}
+                handleConfirm={handleConfirm}
                 handleCancel={handleClose}
                 title="Confirmation"
                 description={`Are you sure you want to ${btnText}?`}
-              />
+              >
+                <Typography className={classes.error}>
+                  {errorMessage}
+                </Typography>
+              </AbstractModal>
             </Grid>
           </form>
         </Grid>

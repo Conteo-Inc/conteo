@@ -8,13 +8,15 @@ import {
   Checkbox,
   Button,
   Typography,
-  Link,
 } from "@material-ui/core"
 import { withStyles, makeStyles } from "@material-ui/core/styles"
+import { Link } from "react-router-dom"
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined"
 import { red } from "@material-ui/core/colors"
 import { Nullable, useStatefulLocation, useUser } from "../utils/context"
 import { useHistory } from "react-router-dom"
+import Notification, { NotificationType } from "./Notification"
+import { useState } from "react"
 
 export type UserHandlerArgs = {
   e: React.FormEvent<HTMLFormElement>
@@ -60,8 +62,28 @@ export default function LoginForm({
   const history = useHistory()
 
   const { from } = location.state || { from: { pathname: "/" } }
+  const [isOpen, setOpen] = React.useState<boolean>(false)
+  const [type] = useState<NotificationType["type"]>("error")
+  const [message] = useState("Email and/or password entered incorrectly")
 
   const classes = useStyles()
+
+  const handleClose = () => {
+    setOpen(false)
+  }
+
+  const handleSubmit = () => {
+    if (username && password) {
+      login({ username, password })
+        .then(() => {
+          history.replace(from)
+        })
+        .catch((error: string) => {
+          setOpen(true)
+          console.log(error)
+        })
+    }
+  }
 
   return (
     <Grid>
@@ -81,11 +103,7 @@ export default function LoginForm({
         <form
           onSubmit={(e) => {
             e.preventDefault()
-            if (username && password) {
-              login({ username, password }).then(() => {
-                history.replace(from)
-              })
-            }
+            handleSubmit()
           }}
         >
           <TextField
@@ -119,13 +137,20 @@ export default function LoginForm({
             Sign In
           </ColorButton>
           <Typography>
-            <Link href="#">Forgot password</Link>
+            <Link to="/forgotpassword">forgot password</Link>
           </Typography>
           <br />
           <span>{errorMessage}</span>
           <br />
         </form>
       </Paper>
+      <Notification
+        isOpen={isOpen}
+        setisOpen={setOpen}
+        handleClose={handleClose}
+        type={type}
+        message={message}
+      />
     </Grid>
   )
 }
