@@ -13,7 +13,7 @@ import * as React from "react"
 
 type ModalType = {
   title: string
-  description: string
+  description?: string
   confirmText?: string
   cancelText?: string
   isModalOpen: boolean
@@ -25,13 +25,17 @@ type ModalType = {
 const useStyles = makeStyles((theme) => ({
   modal: {
     position: "absolute",
-    top: theme.spacing(5),
-    padding: theme.spacing(2),
+    top: "0px",
+    left: "50%",
+    transform: "translate(-50%, 25%)",
+    margin: "0px",
   },
   modalContent: {
     textAlign: "center",
   },
   modalAction: {
+    margin: "25px 50px",
+    padding: "0px",
     justifyContent: "center",
   },
   modalTitle: {

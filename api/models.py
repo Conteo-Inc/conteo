@@ -12,6 +12,10 @@ class Profile(models.Model):
     phone_number = models.CharField(max_length=10, unique=True, null=True)
     birth_date = models.DateField(null=True)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True)
+    paused = models.BooleanField(default=False)
+    image = models.FileField(
+        upload_to="images/", null=True, verbose_name="profile picture"
+    )
 
 
 class Privacy(models.Model):
@@ -41,6 +45,9 @@ class Privacy(models.Model):
     interests_privacy = models.CharField(
         max_length=2, choices=Setting.choices, default=Setting.PUBLIC
     )
+
+    class Meta:
+        verbose_name_plural = "Privacy"
 
 
 class Interest(models.Model):
@@ -133,10 +140,15 @@ class Report(models.Model):
         on_delete=models.SET_NULL,
         limit_choices_to={"is_staff": True},
         null=True,
+        blank=True,
         help_text="The admin handling the report",
         related_name="assigned_reports",
     )
     video = models.ForeignKey(
-        Video, on_delete=models.SET_NULL, null=True, help_text="The offending video"
+        Video,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        help_text="The offending video",
     )
     submitted_on = models.DateTimeField(auto_now_add=True, editable=False)
