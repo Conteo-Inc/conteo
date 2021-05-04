@@ -84,8 +84,15 @@ function MatchControls({
         title="Report"
         description="Optional report message"
         isModalOpen={showReport}
-        handleConfirm={() => onReport(matchId, description)}
-        handleCancel={() => setShowReport(false)}
+        handleConfirm={() => {
+          setDescription("")
+          setShowReport(false)
+          onReport(matchId, description)
+        }}
+        handleCancel={() => {
+          setDescription("")
+          setShowReport(false)
+        }}
       >
         <TextField
           multiline
