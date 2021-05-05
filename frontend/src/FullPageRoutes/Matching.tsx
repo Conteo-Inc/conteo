@@ -59,8 +59,8 @@ class FilterState {
   static readonly ageLimits = { min: 18, max: 130 }
   readonly minAge?: number
   readonly maxAge?: number
-  readonly genders?: Gender[]
-  readonly interests?: Interest[]
+  readonly genders?: Gender[] = []
+  readonly interests?: Interest[] = []
 }
 
 const useStyles = makeStyles({
@@ -189,92 +189,54 @@ function MatchingFilters({
           />
         </Grid>
       </Grid>
-      <Grid container item direction="column" xs>
-        <Grid item>
-          <FormControl fullWidth>
-            <InputLabel id="gender-select-label" htmlFor="gender-select">
-              Gender
-            </InputLabel>
-            <Select
-              id="gender-select"
-              labelId="gender-select-label"
-              disabled={!filters.genders}
-              multiple
-              value={filters.genders ?? []}
-              onChange={(e) => {
-                dispatch({ genders: e.target.value as Gender[] })
-              }}
-            >
-              <MenuItem value={Gender.MALE}>Male</MenuItem>
-              <MenuItem value={Gender.FEMALE}>Female</MenuItem>
-              <MenuItem value={Gender.OTHER}>Other</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={!filters.genders}
-                onChange={(ev) => {
-                  dispatch({
-                    genders: ev.target.checked ? undefined : [],
-                  })
-                }}
-              />
-            }
-            label="Ignore gender"
-          />
-        </Grid>
-      </Grid>
-      <Grid container item direction="column" xs>
-        <Grid item>
-          <Autocomplete
-            disabled={!filters.interests}
+      <Grid item xs>
+        <FormControl fullWidth>
+          <InputLabel id="gender-select-label" htmlFor="gender-select">
+            Gender
+          </InputLabel>
+          <Select
+            id="gender-select"
+            labelId="gender-select-label"
+            disabled={!filters.genders}
             multiple
-            clearOnBlur
-            loading={loading}
-            options={interestOptions}
-            groupBy={(interest) => interest.category}
-            getOptionLabel={(interest) => interest.title}
-            getOptionSelected={(opt, val) => opt.id === val.id}
-            value={filters.interests ?? []}
-            onChange={(_, interests) => dispatch({ interests })}
-            inputValue={interestInputValue}
-            onInputChange={(_, value) => setInterestInputValue(value)}
-            renderOption={(interest) =>
-              `${interest.category}: ${interest.title}`
-            }
-            renderTags={(interest, getTagProps) =>
-              interest.map(({ category, title }, index) => (
-                <Chip
-                  key={`interestChip-${index}`}
-                  variant="outlined"
-                  label={`${category}: ${title}`}
-                  {...getTagProps({ index })}
-                />
-              ))
-            }
-            renderInput={(params) => (
-              <TextField {...params} label="Interests" />
-            )}
-          />
-        </Grid>
-        <Grid item>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={!filters.interests}
-                onChange={(ev) => {
-                  dispatch({
-                    interests: ev.target.checked ? undefined : [],
-                  })
-                }}
+            value={filters.genders ?? []}
+            onChange={(e) => {
+              dispatch({ genders: e.target.value as Gender[] })
+            }}
+          >
+            <MenuItem value={Gender.MALE}>Male</MenuItem>
+            <MenuItem value={Gender.FEMALE}>Female</MenuItem>
+            <MenuItem value={Gender.OTHER}>Other</MenuItem>
+          </Select>
+        </FormControl>
+      </Grid>
+      <Grid item xs>
+        <Autocomplete
+          disabled={!filters.interests}
+          multiple
+          clearOnBlur
+          loading={loading}
+          options={interestOptions}
+          groupBy={(interest) => interest.category}
+          getOptionLabel={(interest) => interest.title}
+          getOptionSelected={(opt, val) => opt.id === val.id}
+          value={filters.interests ?? []}
+          onChange={(_, interests) => dispatch({ interests })}
+          inputValue={interestInputValue}
+          onInputChange={(_, value) => setInterestInputValue(value)}
+          renderOption={(interest) => `${interest.category}: ${interest.title}`}
+          renderTags={(interest, getTagProps) =>
+            interest.map(({ category, title }, index) => (
+              <Chip
+                key={`interestChip-${index}`}
+                variant="outlined"
+                label={`${category}: ${title}`}
+                {...getTagProps({ index })}
               />
-            }
-            label="Ignore interests"
-          />
-        </Grid>
+            ))
+          }
+          renderInput={(params) => <TextField {...params} label="Interests" />}
+        />
       </Grid>
     </Grid>
   )
