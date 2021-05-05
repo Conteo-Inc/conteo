@@ -92,6 +92,9 @@ export function queryParams(obj: Record<PropertyKey, unknown>): string {
           throw new Error(`Failed to encode key/value pair: ${key}=${val}`)
         }
         break
+      case "undefined":
+        /* Don't add any query param if value is undefined */
+        break
       default:
         throw new Error(`Failed to encode key/value pair: ${key}=${val}`)
     }
