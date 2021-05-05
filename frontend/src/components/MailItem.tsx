@@ -1,3 +1,5 @@
+import * as React from "react"
+import { Link } from "react-router-dom"
 import { Grid, IconButton, makeStyles, Typography } from "@material-ui/core"
 import {
   AccountCircle,
@@ -6,11 +8,9 @@ import {
   MailOutlineRounded,
   SendRounded,
 } from "@material-ui/icons"
-import * as React from "react"
-import { Link } from "react-router-dom"
-import { Nullable } from "../../utils/context"
-import ViewVideo from "../video/ViewVideo"
-import AbstractModal from "../AbstractModal"
+import ViewVideo from "./video/ViewVideo"
+import { Nullable } from "../utils/context"
+import AbstractModal from "./AbstractModal"
 
 const useStyles = makeStyles({
   mailItem: {
@@ -26,6 +26,7 @@ export type MailListItem = {
   viewed_at: Nullable<string>
   created_at: string
   id: number
+  paused: boolean
   removePenpal: (id: number) => void
 }
 
@@ -35,6 +36,7 @@ export default function MailItem({
   viewed_at,
   created_at,
   id,
+  paused,
   removePenpal,
 }: MailListItem): JSX.Element {
   const { mailItem } = useStyles()
@@ -76,7 +78,10 @@ export default function MailItem({
       <IconButton onClick={() => setConfirmRemove(true)}>
         <Delete fontSize="large" style={{ color: "#4b5282" }} />
       </IconButton>
-      <IconButton onClick={() => setVisible(true)} disabled={!created_at}>
+      <IconButton
+        onClick={() => setVisible(true)}
+        disabled={!created_at || paused}
+      >
         {viewed_at ? (
           <DraftsRounded fontSize="large" style={{ color: "#4b5e82" }} />
         ) : (
@@ -85,7 +90,7 @@ export default function MailItem({
       </IconButton>
       {/* TODO: Re-add dropdown later */}
       {/* <ArrowDropDown fontSize="large" style={{ color: "#4b5e82" }} /> */}
-      <IconButton component={Link} to={`/record/${id}`}>
+      <IconButton component={Link} to={`/record/${id}`} disabled={paused}>
         <SendRounded fontSize="large" style={{ color: "#4b5282" }} />
       </IconButton>
       {created_at && (

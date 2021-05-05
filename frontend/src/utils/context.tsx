@@ -2,6 +2,7 @@ import * as React from "react"
 import { useLocation } from "react-router-dom"
 import { parseIdentity, request } from "./fetch"
 import { Location } from "history"
+import type { HttpResponse } from "./fetch"
 
 export type Nullable<T> = T | null
 export type NullableId = Nullable<number>
@@ -18,6 +19,7 @@ export type UserAuth = {
 export type AuthInformation = {
   username: string
   password: string
+  reactivate?: boolean
 }
 export type SetStateDispatch<T> = React.Dispatch<React.SetStateAction<T>>
 
@@ -45,7 +47,7 @@ type UseUserReturnType = {
   user: Nullable<User>
   logged_in: Nullable<boolean>
   register: (authInfo: AuthInformation) => Promise<void>
-  login: (authInfo: AuthInformation) => Promise<void>
+  login: (authInfo: AuthInformation) => Promise<HttpResponse<Response>>
   logout: () => Promise<void>
 }
 export function useUser(): UseUserReturnType {
@@ -69,13 +71,15 @@ export function useUser(): UseUserReturnType {
     })
   }
 
-  const login = (authInfo: AuthInformation): Promise<void> => {
+  const login = (
+    authInfo: AuthInformation
+  ): Promise<HttpResponse<Response>> => {
     return request({
       path: "/api/login/",
       method: "post",
       body: authInfo,
       parser: parseIdentity,
-    }).then(() => {
+    }).then((resp) => {
       setUser({
         logged_in: true,
         user: {
@@ -83,6 +87,7 @@ export function useUser(): UseUserReturnType {
           first_name: "foo",
         },
       })
+      return resp
     })
   }
 

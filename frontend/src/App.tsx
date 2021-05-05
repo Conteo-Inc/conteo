@@ -4,13 +4,14 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom"
 import TokenPage from "./FullPageRoutes/TokenPage"
 import ProfilePage from "./FullPageRoutes/Profile"
 import MatchingPage from "./FullPageRoutes/Matching"
-import { Box, makeStyles } from "@material-ui/core"
+import { Box, makeStyles, Grid } from "@material-ui/core"
 import RecordPage from "./FullPageRoutes/RecordPage"
 import ProvideContext from "./components/utils/ProvideContext"
-import AppHeader from "./components/AppHeader"
-import AppFooter from "./components/AppFooter"
+import AppHeader from "./components/core/AppHeader"
+import AppFooter from "./components/core/AppFooter"
+import AppSideBar from "./components/core/AppSidebar"
 import { ProtectedRoute } from "./components/ProtectedRoute"
-import Dashboard from "./FullPageRoutes/Dashboard"
+import MailPage from "./FullPageRoutes/MailPage"
 import VideoViewPage from "./FullPageRoutes/VideoViewPage"
 import Help from "./FullPageRoutes/Help"
 import ContactUs from "./FullPageRoutes/ContactUs"
@@ -20,10 +21,11 @@ import ResetPassword from "./FullPageRoutes/ResetPassword"
 
 const useStyles = makeStyles({
   app: {
-    minHeight: "40rem",
+    minHeight: "38rem",
     display: "flex",
     flexDirection: "column",
-    paddingTop: "50px",
+    padding: "3rem 0",
+    backgroundColor: "#ede8db",
   },
   appRoot: {
     minHeight: "55rem",
@@ -32,10 +34,53 @@ const useStyles = makeStyles({
     minHeight: "49rem",
     width: "100%",
   },
+  sidebar: {
+    borderRight: "1px solid white",
+  },
 })
+
+type Page = {
+  path: string
+  pageJsx: JSX.Element
+}
 
 export default function App(): JSX.Element {
   const classes = useStyles()
+
+  const pageList: Page[] = [
+    {
+      path: "/record/:receiver",
+      pageJsx: <RecordPage />,
+    },
+    {
+      path: "/matches/",
+      pageJsx: <MatchingPage />,
+    },
+    {
+      path: "/profile/",
+      pageJsx: <ProfilePage />,
+    },
+    {
+      path: "/watch/",
+      pageJsx: <VideoViewPage />,
+    },
+    {
+      path: "/help/",
+      pageJsx: <Help />,
+    },
+    {
+      path: "/contact/",
+      pageJsx: <ContactUs />,
+    },
+    {
+      path: "/accounts/",
+      pageJsx: <AccountsPage />,
+    },
+    {
+      path: "/",
+      pageJsx: <MailPage />,
+    },
+  ]
 
   return (
     <ProvideContext>
@@ -52,30 +97,18 @@ export default function App(): JSX.Element {
             <Route path="/verification/:uidb64/:token">
               <ResetPassword />
             </Route>
-            <ProtectedRoute path="/record/:receiver">
-              <RecordPage />
-            </ProtectedRoute>
-            <ProtectedRoute path="/matches">
-              <MatchingPage />
-            </ProtectedRoute>
-            <ProtectedRoute path="/profile">
-              <ProfilePage />
-            </ProtectedRoute>
-            <ProtectedRoute path="/watch">
-              <VideoViewPage />
-            </ProtectedRoute>
-            <ProtectedRoute path="/help">
-              <Help />
-            </ProtectedRoute>
-            <ProtectedRoute path="/contact">
-              <ContactUs />
-            </ProtectedRoute>
-            <ProtectedRoute path="/accounts">
-              <AccountsPage />
-            </ProtectedRoute>
-            <ProtectedRoute path="/">
-              <Dashboard />
-            </ProtectedRoute>
+            {pageList.map(({ path, pageJsx }: Page, index: number) => (
+              <ProtectedRoute key={`page-${index}`} path={path}>
+                <Grid container direction="row">
+                  <Grid item className={classes.sidebar} xs={2}>
+                    <AppSideBar />
+                  </Grid>
+                  <Grid item xs={10}>
+                    {pageJsx}
+                  </Grid>
+                </Grid>
+              </ProtectedRoute>
+            ))}
           </Switch>
         </Box>
         <AppFooter />

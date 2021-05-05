@@ -156,7 +156,7 @@ class MailListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ("id", "first_name", "last_name")
+        fields = ("id", "first_name", "last_name", "paused")
 
 
 class VideoSerializer(serializers.ModelSerializer):
@@ -213,16 +213,16 @@ class MatchStatusSerializer(serializers.ModelSerializer):
 
 
 class AccountSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ("email",)
-
-    def to_representation(self, instance):
+    def to_representation(self, instance: User):
         rep = super().to_representation(instance)
-        profile = Profile.objects.get(Q(user__email=instance.email))
+        profile = instance.profile
         rep["first_name"] = profile.first_name
         rep["last_name"] = profile.last_name
         return rep
+
+    class Meta:
+        model = User
+        fields = ("email",)
 
 
 class ContactUsSerializer(serializers.ModelSerializer):
