@@ -74,7 +74,7 @@ class MatchesViewTestCase(APITestCase):
         MatchStatus model, users that have not matched with the requesting
         user, users who have not declined the requesting user, users
         for which the requesting user has not already made a decision for, and
-        the requesting user.
+        not the requesting user.
         """
 
         endpoint = "/api/matches/"
