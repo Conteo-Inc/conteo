@@ -1,8 +1,14 @@
 import * as React from "react"
 import { Link } from "react-router-dom"
-import { Grid, IconButton, makeStyles, Typography } from "@material-ui/core"
 import {
-  AccountCircle,
+  Grid,
+  IconButton,
+  makeStyles,
+  Typography,
+  Button,
+  Avatar,
+} from "@material-ui/core"
+import {
   Delete,
   DraftsRounded,
   MailOutlineRounded,
@@ -10,6 +16,10 @@ import {
 } from "@material-ui/icons"
 import ViewVideo from "./video/ViewVideo"
 import { Nullable } from "../utils/context"
+import { request } from "../utils/fetch"
+import { parseBirthday } from "../utils/profile"
+import ProfileContent from "./profile/ProfileContent"
+import type { ProfileContentType } from "./profile/ProfileContent"
 import AbstractModal from "./AbstractModal"
 
 const useStyles = makeStyles({
@@ -43,6 +53,43 @@ export default function MailItem({
   const [visible, setVisible] = React.useState<boolean>(false)
   const [showConfirmRemove, setConfirmRemove] = React.useState<boolean>(false)
   const video_date = new Date(created_at)
+  const [
+    profileContent,
+    setProfileContent,
+  ] = React.useState<ProfileContentType>({
+    first_name: "",
+    last_name: "",
+    birth_date: null,
+    gender: null,
+    interests: [],
+    image: null,
+    video: null,
+  })
+  const [showProfile, setShowProfile] = React.useState<boolean>(false)
+
+  React.useEffect(() => {
+    request<ProfileContentType>({ path: `/api/profiles/${id}/`, method: "get" })
+      .then((res) => {
+        const profile_content = res.parsedBody
+
+        // Fields that are restricted on a user's profile (i.e. Private or Hidden)
+        // are not returned for privacy purposes. Test if certain field were not
+        // returned to avoid frontend errors related to undefined values.
+        if (typeof profile_content.birth_date === "undefined") {
+          profile_content.birth_date = null
+        } else {
+          profile_content.birth_date = parseBirthday(profile_content.birth_date)
+        }
+        if (typeof profile_content.interests === "undefined") {
+          profile_content.interests = []
+        }
+
+        setProfileContent(profile_content)
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+  }, [id, setProfileContent])
 
   const onConfirmRemove = () => {
     setConfirmRemove(false)
@@ -68,10 +115,30 @@ export default function MailItem({
         handleConfirm={onConfirmRemove}
         handleCancel={onCancelRemove}
       />
+      <AbstractModal
+        title="View Profile"
+        isModalOpen={showProfile}
+        handleCancel={() => setShowProfile(false)}
+        isActionable={false}
+      >
+        <ProfileContent readonlyContent={profileContent} />
+      </AbstractModal>
       <Grid item container direction="row" xs={3} wrap="nowrap">
-        <AccountCircle fontSize="large" style={{ color: "#4b5e82" }} />
+        <IconButton onClick={() => setShowProfile(true)}>
+          <Avatar
+            src={profileContent.image ? profileContent.image : ""}
+            alt={profileContent.first_name}
+          />
+        </IconButton>
         <Typography variant="h6">{`${first_name} ${last_name}`}</Typography>
       </Grid>
+      <Button
+        variant="contained"
+        color="default"
+        onClick={() => setShowProfile(true)}
+      >
+        <Typography>View Profile</Typography>
+      </Button>
       <Typography variant="h6">
         {created_at ? video_date.toLocaleDateString() : "No video"}
       </Typography>

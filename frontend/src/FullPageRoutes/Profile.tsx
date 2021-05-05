@@ -11,8 +11,8 @@ import {
   useProfileComponents,
   useProfileContent,
   usePrivacySettings,
+  parseBirthday,
 } from "../utils/profile"
-import { Nullable } from "../utils/context"
 
 export type UserProfile = {
   profile_content: ProfileContentType
@@ -34,19 +34,6 @@ const useStyles = makeStyles({
     padding: "50px",
   },
 })
-
-function parseBirthday(birth_date: Nullable<Date>): Nullable<Date> {
-  let birthday = null
-  if (birth_date !== null) {
-    birthday = new Date(birth_date)
-    // We have Django configured to store dates using local time.
-    // Date objects assume the date is UTC when parsing so we add 1
-    // to correct for the EST/EDT - UTC timezone difference
-    birthday.setDate(birthday.getDate() + 1)
-  }
-
-  return birthday
-}
 
 export default function Profile(): JSX.Element {
   const classes = useStyles()
