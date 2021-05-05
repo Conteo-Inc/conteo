@@ -131,6 +131,7 @@ class MailListSerializer(serializers.ModelSerializer):
         rep = super().to_representation(instance)
         rep["created_at"] = None
         rep["viewed_at"] = None
+        rep["video_id"] = None
 
         receiver = self.context.get("receiver")
         # get videos sent, filter, and order
@@ -142,6 +143,7 @@ class MailListSerializer(serializers.ModelSerializer):
             latest_video = sent_videos[0]
             rep["created_at"] = latest_video.created_at
             rep["viewed_at"] = latest_video.viewed_at
+            rep["video_id"] = latest_video.id
 
         return rep
 
