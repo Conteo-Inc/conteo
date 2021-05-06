@@ -4,9 +4,10 @@ import vd from "vidar"
 import { Colors } from "../../../utils/colors"
 import { Nullable, SetStateDispatch } from "../../../utils/context"
 import { onTrimConfirm, undoEdit, undoTrim } from "../../../utils/editing"
-import { MOVIE_TIME_PRECISION } from "../../../utils/movie"
 import ControlButton from "../ControlButton"
 import EditControls from "./EditControls"
+
+export const MOVIE_TIME_PRECISION = 0.001
 
 function itoa(i: number): string {
   return `${i}`

@@ -46,7 +46,6 @@ function sendVideo(
 }
 
 export default function RecordPage(): JSX.Element {
-  const [, setVideoBlob] = React.useState<Nullable<Blob>>(null)
   const { receiver } = useParams<{ receiver: string }>()
   const history = useHistory()
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false)
@@ -62,7 +61,6 @@ export default function RecordPage(): JSX.Element {
     previewStream,
   } = useReactMediaRecorder({
     video: true,
-    onStop: (_, blob) => setVideoBlob(blob),
   })
 
   const handleConfirm = () => {
