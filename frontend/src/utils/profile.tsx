@@ -211,8 +211,8 @@ export function getPrivacySettingsUpdates(
   return result
 }
 
-function toDateString(date: Date): string {
+export function toDateString(date: Date): string {
   // Month is zero-indexed in Typescript.
-  const month = `${date.getMonth() + 1}`
-  return `${date.getFullYear()}-${month}-${date.getDate()}`
+  const month = date.getUTCMonth() + 1
+  return `${date.getUTCFullYear()}-${month}-${date.getUTCDate()}`
 }
