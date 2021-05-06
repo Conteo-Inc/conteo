@@ -1,5 +1,4 @@
 import * as React from "react"
-import { useHistory } from "react-router-dom"
 import {
   Grid,
   makeStyles,
@@ -16,17 +15,24 @@ import {
   FormHelperText,
 } from "@material-ui/core"
 import EditIcon from "@material-ui/icons/Edit"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useReducer } from "react"
 import AbstractModal from "../components/AbstractModal"
-import { parseIdentity, request } from "../utils/fetch"
+import { request, parseIdentity } from "../utils/fetch"
+import { useHistory } from "react-router-dom"
+import { useUser } from "../utils/context"
 
-export type UserAccounts = {
-  first_name: string
-  last_name: string
-  username: string
-  password: string
-  email: string
-  successor: string
+const initAccountData = {
+  first_name: "",
+  last_name: "",
+  username: "",
+  password: "",
+  email: "",
+  successor: "",
+}
+
+enum Action {
+  DELETE = "delete",
+  DEACTIVATE = "deactivate",
 }
 
 const useStyles = makeStyles({
@@ -56,21 +62,21 @@ const useStyles = makeStyles({
 export default function AccountsPage(): JSX.Element {
   const classes = useStyles()
   const [editMode, editModeOn] = useState(false)
-  const [value, setValues] = useState("")
   const [btnText, setBtnText] = useState("Delete or Deactivate Account")
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [accountAction, setAccountAction] = useState<"delete" | "">("")
+  const [accountAction, setAccountAction] = useState<Action | null>(null)
   const [errorMessage, setErrorMessage] = useState<string>("")
+  const { logout } = useUser()
   const history = useHistory()
-
-  const [accountData, setAccountData] = useState<UserAccounts>({
-    first_name: "",
-    last_name: "",
-    username: "",
-    password: "",
-    email: "",
-    successor: "",
-  })
+  const [accountData, dispatch] = useReducer(
+    (
+      state: typeof initAccountData,
+      action: Partial<typeof initAccountData>
+    ) => {
+      return { ...state, ...action }
+    },
+    initAccountData
+  )
 
   const handleEdit = () => {
     editModeOn(!editMode)
@@ -78,25 +84,21 @@ export default function AccountsPage(): JSX.Element {
 
   const handleSave = () => {
     editModeOn(false)
+    setIsModalOpen(false)
   }
 
   const handleCancel = () => {
     editModeOn(false)
   }
 
-  const handleDeleteChanges = (event: any) => {
-    setValues(event.target.value)
-  }
-
   const handleAccountChanges = (event: any) => {
     event.preventDefault()
 
-    if (value === "Deactivating Account") {
+    if (accountAction === Action.DEACTIVATE) {
       setBtnText("Deactivate Account")
       setIsModalOpen(true)
-    } else if (value === "Delete Account") {
+    } else if (accountAction === Action.DELETE) {
       setBtnText("Delete Account")
-      setAccountAction("delete")
       setIsModalOpen(true)
     } else {
       setBtnText("Delete or Deactivate Account")
@@ -104,20 +106,20 @@ export default function AccountsPage(): JSX.Element {
     }
   }
 
+  const handleClose = () => {
+    setIsModalOpen(false)
+    setAccountAction(null)
+  }
+
   const handleConfirm = () => {
-    if (accountAction === "delete") {
+    if (accountAction === Action.DELETE) {
       deleteAccount()
-      setAccountAction("")
+    } else if (accountAction === Action.DEACTIVATE) {
+      deactivateAccount()
     } else {
       setIsModalOpen(false)
     }
-
-    setAccountAction("")
-  }
-
-  const handleClose = () => {
-    setIsModalOpen(false)
-    setAccountAction("")
+    setAccountAction(null)
   }
 
   const deleteAccount = () => {
@@ -136,198 +138,207 @@ export default function AccountsPage(): JSX.Element {
       })
   }
 
+  const deactivateAccount = () => {
+    request({
+      path: "/api/profile/",
+      method: "patch",
+      body: { paused: true },
+    })
+      .then(logout)
+      .then(() => history.push("/tokens"))
+  }
+
   useEffect(() => {
-    request({ path: "/api/accounts/", method: "get" }).then((res) => {
-      const account: any = res.parsedBody
-      const content: UserAccounts = {
-        first_name: account.first_name,
-        last_name: account.last_name,
-        username: account.username,
-        password: account.password,
-        email: account.email,
-        successor: account.successor,
-      }
-      setAccountData(content)
+    request<typeof initAccountData>({
+      path: "/api/accounts/",
+      method: "get",
+    }).then((res) => {
+      dispatch(res.parsedBody)
     })
   }, [])
 
   return (
-    <>
-      <Grid
-        container
-        direction="column"
-        alignItems="center"
-        className={classes.topBar}
-      >
-        <Grid item justify="center">
-          <Typography variant="h4">Accounts Settings</Typography>
-        </Grid>
+    <Grid
+      container
+      direction="column"
+      alignItems="center"
+      className={classes.topBar}
+    >
+      <Grid container item justify="center">
+        <Typography variant="h4">Accounts Settings</Typography>
+      </Grid>
 
-        <Grid item>
-          <form className={classes.root} onSubmit={handleSave}>
-            <Grid container className={classes.pageContent} spacing={5}>
-              <Grid item xs={6}>
-                <TextField
-                  name="firstName"
-                  label="First Name"
-                  variant="outlined"
-                  value={accountData.first_name}
-                  InputProps={{
-                    readOnly: true,
-                  }}
-                />
+      <Grid item>
+        <form className={classes.root} onSubmit={handleSave}>
+          <Grid container className={classes.pageContent} spacing={5}>
+            <Grid item xs={6}>
+              <TextField
+                name="firstName"
+                label="First Name"
+                variant="outlined"
+                value={accountData.first_name}
+                onChange={(e) =>
+                  dispatch({ first_name: e.currentTarget.value })
+                }
+                InputProps={{
+                  readOnly: true,
+                }}
+              />
 
-                <TextField
-                  name="username"
-                  label="Username"
-                  variant="outlined"
-                  value={accountData.username}
-                  InputProps={{
-                    readOnly: true,
-                  }}
-                />
+              <TextField
+                name="username"
+                label="Username"
+                variant="outlined"
+                value={accountData.username}
+                onChange={(e) => dispatch({ username: e.currentTarget.value })}
+                InputProps={{
+                  readOnly: true,
+                }}
+              />
 
-                <TextField
-                  name="email"
-                  label="Email"
-                  type="email"
-                  variant="outlined"
-                  value={accountData.email}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton onClick={handleEdit}>
-                          <EditIcon />
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-
-              <Grid item xs={6}>
-                <TextField
-                  name="lastName"
-                  label="Last Name"
-                  variant="outlined"
-                  value={accountData.last_name}
-                  InputProps={{
-                    readOnly: true,
-                  }}
-                />
-
-                <TextField
-                  name="password"
-                  label="Password"
-                  type="password"
-                  value={accountData.password}
-                  autoComplete="current-password"
-                  variant="outlined"
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton onClick={handleEdit}>
-                          <EditIcon />
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-
-                <TextField
-                  name="sucessor"
-                  label="Account Successor Email"
-                  variant="outlined"
-                  type="email"
-                  value={accountData.successor}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton onClick={handleEdit}>
-                          <EditIcon />
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-
-              <Grid item>
-                <Button
-                  variant="contained"
-                  className={classes.button}
-                  type="submit"
-                >
-                  Save
-                </Button>
-                <Button
-                  variant="contained"
-                  className={classes.button}
-                  onClick={handleCancel}
-                >
-                  Cancel
-                </Button>
-              </Grid>
+              <TextField
+                name="email"
+                label="Email"
+                type="email"
+                variant="outlined"
+                value={accountData.email}
+                onChange={(e) => dispatch({ email: e.currentTarget.value })}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={handleEdit}>
+                        <EditIcon />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
             </Grid>
-            <Divider />
-          </form>
-        </Grid>
-        <Grid item justify="center">
-          <Typography variant="h5">Deactivate or Delete Account</Typography>
-        </Grid>
-        <Grid item>
-          <form onSubmit={handleAccountChanges}>
-            <Grid container>
-              <Grid item></Grid>
-              <FormControl>
-                <RadioGroup
-                  name="accountDelete"
-                  value={value}
-                  onChange={handleDeleteChanges}
-                >
-                  <FormControlLabel
-                    value="Deactivating Account"
-                    control={<Radio />}
-                    label="Deactivate Account"
-                  />
-                  <FormHelperText>
-                    Your account would be temporarily disabled.
-                  </FormHelperText>
-                  <FormControlLabel
-                    value="Delete Account"
-                    control={<Radio />}
-                    label="Delete Account"
-                  />
-                  <FormHelperText>
-                    Your account would be deleted permanently.
-                  </FormHelperText>
-                </RadioGroup>
-              </FormControl>
+
+            <Grid item xs={6}>
+              <TextField
+                name="lastName"
+                label="Last Name"
+                variant="outlined"
+                value={accountData.last_name}
+                onChange={(e) => dispatch({ last_name: e.currentTarget.value })}
+                InputProps={{
+                  readOnly: true,
+                }}
+              />
+
+              <TextField
+                name="password"
+                label="Password"
+                type="password"
+                value={accountData.password}
+                onChange={(e) => dispatch({ password: e.currentTarget.value })}
+                autoComplete="current-password"
+                variant="outlined"
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={handleEdit}>
+                        <EditIcon />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+
+              <TextField
+                name="sucessor"
+                label="Account Successor Email"
+                variant="outlined"
+                type="email"
+                value={accountData.successor}
+                onChange={(e) => dispatch({ successor: e.currentTarget.value })}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={handleEdit}>
+                        <EditIcon />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
             </Grid>
+
             <Grid item>
               <Button
-                type="submit"
                 variant="contained"
                 className={classes.button}
-                onClick={handleAccountChanges}
+                type="submit"
               >
-                {btnText}
+                Save
               </Button>
-              <AbstractModal
-                isModalOpen={isModalOpen}
-                handleConfirm={handleConfirm}
-                handleCancel={handleClose}
-                title="Confirmation"
-                description={`Are you sure you want to ${btnText}?`}
+              <Button
+                variant="contained"
+                className={classes.button}
+                onClick={handleCancel}
               >
-                <Typography className={classes.error}>
-                  {errorMessage}
-                </Typography>
-              </AbstractModal>
+                Cancel
+              </Button>
             </Grid>
-          </form>
-        </Grid>
+          </Grid>
+          <Divider />
+        </form>
       </Grid>
-    </>
+      <Grid container item justify="center">
+        <Typography variant="h5">Deactivate or Delete Account</Typography>
+      </Grid>
+      <Grid item>
+        <form onSubmit={handleAccountChanges}>
+          <Grid container>
+            <Grid item></Grid>
+            <FormControl>
+              <RadioGroup
+                name="accountDelete"
+                value={accountAction}
+                onChange={(e) =>
+                  setAccountAction(e.currentTarget.value as Action)
+                }
+              >
+                <FormControlLabel
+                  value={Action.DEACTIVATE}
+                  control={<Radio />}
+                  label="Deactivate Account"
+                />
+                <FormHelperText>
+                  Your account would be temporarily disabled.
+                </FormHelperText>
+                <FormControlLabel
+                  value={Action.DELETE}
+                  control={<Radio />}
+                  label="Delete Account"
+                />
+                <FormHelperText>
+                  Your account would be deleted permanently.
+                </FormHelperText>
+              </RadioGroup>
+            </FormControl>
+          </Grid>
+          <Grid item>
+            <Button
+              type="submit"
+              variant="contained"
+              className={classes.button}
+            >
+              {btnText}
+            </Button>
+            <AbstractModal
+              isModalOpen={isModalOpen}
+              handleConfirm={handleConfirm}
+              handleCancel={handleClose}
+              title="Confirmation"
+              description={`Are you sure you want to ${btnText}?`}
+            >
+              <Typography className={classes.error}>{errorMessage}</Typography>
+            </AbstractModal>
+          </Grid>
+        </form>
+      </Grid>
+    </Grid>
   )
 }
