@@ -1,3 +1,5 @@
+import * as React from "react"
+import { Link } from "react-router-dom"
 import { Grid, IconButton, makeStyles, Typography } from "@material-ui/core"
 import {
   AccountCircle,
@@ -6,11 +8,9 @@ import {
   MailOutlineRounded,
   SendRounded,
 } from "@material-ui/icons"
-import * as React from "react"
-import { Link } from "react-router-dom"
-import { Nullable } from "../../utils/context"
-import ViewVideo from "../video/ViewVideo"
-import AbstractModal from "../AbstractModal"
+import ViewVideo from "./video/ViewVideo"
+import { Nullable } from "../utils/context"
+import AbstractModal from "./AbstractModal"
 
 const useStyles = makeStyles({
   mailItem: {

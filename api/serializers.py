@@ -6,7 +6,16 @@ from django.db.models.query_utils import Q
 from django.utils.timezone import now
 from rest_framework import serializers
 
-from .models import Interest, MatchStatus, Privacy, Profile, Report, Video
+from .models import (
+    ContactUs,
+    Feedback,
+    Interest,
+    MatchStatus,
+    Privacy,
+    Profile,
+    Report,
+    Video,
+)
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -204,13 +213,25 @@ class MatchStatusSerializer(serializers.ModelSerializer):
 
 
 class AccountSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ("email",)
-
     def to_representation(self, instance):
         rep = super().to_representation(instance)
         profile = Profile.objects.get(Q(user__email=instance.email))
         rep["first_name"] = profile.first_name
         rep["last_name"] = profile.last_name
         return rep
+
+    class Meta:
+        model = User
+        fields = ("email",)
+
+
+class ContactUsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ContactUs
+        fields = "__all__"
+
+
+class FeedbackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Feedback
+        fields = "__all__"

@@ -1,9 +1,9 @@
-import { Grid } from "@material-ui/core"
 import * as React from "react"
-import { request } from "../../utils/fetch"
-import MailItem, { MailListItem } from "./MailItem"
+import { Grid } from "@material-ui/core"
+import MailItem, { MailListItem } from "../components/MailItem"
+import { request } from "../utils/fetch"
 
-export default function MailList(): JSX.Element {
+export default function MailPage(): JSX.Element {
   const [mail, setMail] = React.useState<MailListItem[]>([])
 
   React.useEffect(() => {
