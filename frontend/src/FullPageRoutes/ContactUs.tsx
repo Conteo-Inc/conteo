@@ -7,6 +7,7 @@ import {
   Button,
   Typography,
 } from "@material-ui/core"
+import { request } from "../utils/fetch"
 
 const useStyles = makeStyles({
   root: {
@@ -56,6 +57,14 @@ export default function ContactUs(): JSX.Element {
     setValues({
       ...values,
       [name]: value,
+    })
+  }
+
+  const handleSubmit = () => {
+    return request({
+      path: "/api/contact/",
+      method: "post",
+      body: contactValue,
     })
   }
 
@@ -125,7 +134,7 @@ export default function ContactUs(): JSX.Element {
                   className={classes.submitButton}
                   size="large"
                   type="submit"
-                  href="#"
+                  onSubmit={handleSubmit}
                 >
                   Submit
                 </Button>
