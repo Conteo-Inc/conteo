@@ -27,6 +27,8 @@ from rest_framework import (
 from .models import Interest, MatchStatus, Privacy, Profile, Video
 from .serializers import (
     AccountSerializer,
+    ContactUsSerializer,
+    FeedbackSerializer,
     InterestSerializer,
     MailListSerializer,
     MatchStatusSerializer,
@@ -445,3 +447,12 @@ class Accounts(generics.RetrieveAPIView):
 
     def get_object(self):
         return self.request.user
+
+
+class ContactUs(generics.CreateAPIView):
+    serializer_class = ContactUsSerializer
+    permission_classes = (permissions.AllowAny,)
+
+
+class Feedback(generics.CreateAPIView):
+    serializer_class = FeedbackSerializer
