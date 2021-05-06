@@ -279,7 +279,9 @@ export default function MatchingPage(): JSX.Element {
         "/api/matches/" +
         queryParams({
           ...filters,
-          ...(filters.interests && {"interests": filters.interests.map((v) => v.id)})
+          ...(filters.interests && {
+            interests: filters.interests.map((v) => v.id),
+          }),
         }),
       method: "get",
     })
