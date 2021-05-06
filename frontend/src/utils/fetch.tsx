@@ -1,6 +1,6 @@
 import * as Cookies from "js-cookie"
 
-type HttpResponse<T> = Response & {
+export type HttpResponse<T> = Response & {
   parsedBody: T
 }
 
@@ -8,14 +8,14 @@ export async function http(request: RequestInfo): Promise<Response> {
   const res: Response = await fetch(request)
 
   if (!res.ok) {
-    throw new Error(res.statusText)
+    throw res
   }
   return res
 }
 
 type requestArgs<T> = {
   path: string
-  method: "get" | "put" | "post" | "delete"
+  method: "get" | "put" | "post" | "patch" | "delete"
   parser?: (res: Response) => Promise<T>
   headers?: RequestInit["headers"] & { "Content-Type": string }
   body?: any // eslint-disable-line
