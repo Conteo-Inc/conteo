@@ -19,7 +19,7 @@ const useStyles = makeStyles({
     marginBottom: "5px",
   },
   undecidedMatch: {
-    backgroundColor: "grey",
+    backgroundColor: "lightgrey",
     borderRadius: "10px",
   },
 })
