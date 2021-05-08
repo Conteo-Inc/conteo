@@ -10,6 +10,10 @@ import {
   Select,
   MenuItem,
   Chip,
+  Checkbox,
+  FormControlLabel,
+  InputLabel,
+  FormControl,
 } from "@material-ui/core"
 import { Autocomplete } from "@material-ui/lab"
 import { Check, Block, Flag, PlayCircleFilled } from "@material-ui/icons"
@@ -54,10 +58,10 @@ enum Gender {
 
 class FilterState {
   static readonly ageLimits = { min: 18, max: 130 }
-  readonly minAge = FilterState.ageLimits.min
-  readonly maxAge = FilterState.ageLimits.max
-  readonly genders = Object.values(Gender)
-  readonly interests: Interest[] = []
+  readonly minAge?: number
+  readonly maxAge?: number
+  readonly genders?: Gender[] = []
+  readonly interests?: Interest[] = []
 }
 
 const useStyles = makeStyles({
@@ -67,6 +71,9 @@ const useStyles = makeStyles({
   card: {
     border: "1px solid blue",
     minHeight: "25rem",
+  },
+  filters: {
+    width: "max-content",
   },
 })
 
@@ -123,9 +130,11 @@ function MatchingFilters({
   filters: FilterState
   dispatch: React.Dispatch<Partial<FilterState>>
 }): JSX.Element {
+  const classes = useStyles()
   const [loading, setLoading] = React.useState<boolean>(true)
   const [interestOptions, setInterestOptions] = React.useState<Interest[]>([])
   const [interestInputValue, setInterestInputValue] = React.useState<string>("")
+
   React.useEffect(() => {
     request<Interest[]>({ path: "/api/interests/", method: "get" })
       .then((res) => {
@@ -138,45 +147,95 @@ function MatchingFilters({
       })
       .catch((err) => console.log(`Failed to load interests: ${err}`))
   }, [])
+
   return (
-    <Grid container justify={"center"} spacing={2}>
-      <Grid item>
-        <TextField
-          type="number"
-          helperText="Min age"
-          inputProps={FilterState.ageLimits}
-          value={filters.minAge}
-          onChange={(e) => {
-            dispatch({ minAge: parseInt(e.currentTarget.value) })
-          }}
-        />
+    <Grid container className={classes.filters} spacing={2}>
+      <Grid container item direction="column" xs>
+        <Grid item>
+          <TextField
+            type="number"
+            label="Min age"
+            disabled={!filters.minAge}
+            inputProps={FilterState.ageLimits}
+            value={filters.minAge ?? FilterState.ageLimits.min}
+            onChange={(e) => {
+              dispatch({ minAge: parseInt(e.target.value) })
+            }}
+          />
+        </Grid>
+        <Grid item>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={!filters.minAge}
+                onChange={(ev) => {
+                  dispatch({
+                    minAge: ev.target.checked
+                      ? undefined
+                      : FilterState.ageLimits.min,
+                  })
+                }}
+              />
+            }
+            label="Ignore min age"
+          />
+        </Grid>
       </Grid>
-      <Grid item>
-        <TextField
-          type="number"
-          helperText="Max age"
-          inputProps={FilterState.ageLimits}
-          value={filters.maxAge}
-          onChange={(e) =>
-            dispatch({ maxAge: parseInt(e.currentTarget.value) })
-          }
-        />
+      <Grid container item direction="column" xs>
+        <Grid item>
+          <TextField
+            type="number"
+            label="Max age"
+            disabled={!filters.maxAge}
+            inputProps={FilterState.ageLimits}
+            value={filters.maxAge ?? FilterState.ageLimits.max}
+            onChange={(e) => {
+              dispatch({ maxAge: parseInt(e.target.value) })
+            }}
+          />
+        </Grid>
+        <Grid item>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={!filters.maxAge}
+                onChange={(ev) => {
+                  dispatch({
+                    maxAge: ev.target.checked
+                      ? undefined
+                      : FilterState.ageLimits.max,
+                  })
+                }}
+              />
+            }
+            label="Ignore max age"
+          />
+        </Grid>
       </Grid>
-      <Grid item>
-        <Select
-          multiple
-          value={filters.genders}
-          onChange={(e) => {
-            dispatch({ genders: e.target.value as Gender[] })
-          }}
-        >
-          <MenuItem value={Gender.MALE}>Male</MenuItem>
-          <MenuItem value={Gender.FEMALE}>Female</MenuItem>
-          <MenuItem value={Gender.OTHER}>Other</MenuItem>
-        </Select>
+      <Grid item xs>
+        <FormControl fullWidth>
+          <InputLabel id="gender-select-label" htmlFor="gender-select">
+            Gender
+          </InputLabel>
+          <Select
+            id="gender-select"
+            labelId="gender-select-label"
+            disabled={!filters.genders}
+            multiple
+            value={filters.genders ?? []}
+            onChange={(e) => {
+              dispatch({ genders: e.target.value as Gender[] })
+            }}
+          >
+            <MenuItem value={Gender.MALE}>Male</MenuItem>
+            <MenuItem value={Gender.FEMALE}>Female</MenuItem>
+            <MenuItem value={Gender.OTHER}>Other</MenuItem>
+          </Select>
+        </FormControl>
       </Grid>
-      <Grid item>
+      <Grid item xs>
         <Autocomplete
+          disabled={!filters.interests}
           multiple
           clearOnBlur
           loading={loading}
@@ -184,7 +243,7 @@ function MatchingFilters({
           groupBy={(interest) => interest.category}
           getOptionLabel={(interest) => interest.title}
           getOptionSelected={(opt, val) => opt.id === val.id}
-          value={filters.interests}
+          value={filters.interests ?? []}
           onChange={(_, interests) => dispatch({ interests })}
           inputValue={interestInputValue}
           onInputChange={(_, value) => setInterestInputValue(value)}
@@ -199,9 +258,7 @@ function MatchingFilters({
               />
             ))
           }
-          renderInput={(params) => (
-            <TextField {...params} variant="outlined" label="Interests" />
-          )}
+          renderInput={(params) => <TextField {...params} label="Interests" />}
         />
       </Grid>
     </Grid>
@@ -245,7 +302,9 @@ export default function MatchingPage(): JSX.Element {
         "/api/matches/" +
         queryParams({
           ...filters,
-          interests: filters.interests.map((v) => v.id),
+          ...(filters.interests && {
+            interests: filters.interests.map((v) => v.id),
+          }),
         }),
       method: "get",
     })
