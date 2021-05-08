@@ -8,6 +8,8 @@ node_modules/
 # python
 /venv/
 __pycache__/
+python.pythonPath
+
 
 # django
 db.sqlite3
@@ -34,3 +36,6 @@ yarn-error.log*
 
 #videos
 media/*
+
+#vscode
+.vscode
