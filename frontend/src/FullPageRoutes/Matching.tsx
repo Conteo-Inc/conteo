@@ -15,6 +15,7 @@ import { Autocomplete } from "@material-ui/lab"
 import { Check, Block, Flag, PlayCircleFilled } from "@material-ui/icons"
 import { request, queryParams } from "../utils/fetch"
 import ViewVideo from "../components/video/ViewVideo"
+import AbstractModal from "../components/AbstractModal"
 
 type EnqueueFunc<T> = (...newItems: T[]) => void
 
@@ -22,7 +23,7 @@ type MatchControlsType = {
   matchId: number
   onAccept: (matchId: number) => void
   onReject: (matchId: number) => void
-  onReport: (matchId: number) => void
+  onReport: (matchId: number, description?: string) => void
 }
 
 type Match = {
@@ -75,8 +76,30 @@ function MatchControls({
   onReject,
   onReport,
 }: MatchControlsType): JSX.Element {
+  const [showReport, setShowReport] = React.useState<boolean>(false)
+  const [description, setDescription] = React.useState<string>("")
   return (
     <Grid item container direction="row" justify="space-around">
+      <AbstractModal
+        title="Report"
+        description="Optional report message"
+        isModalOpen={showReport}
+        handleConfirm={() => {
+          setDescription("")
+          setShowReport(false)
+          onReport(matchId, description)
+        }}
+        handleCancel={() => {
+          setDescription("")
+          setShowReport(false)
+        }}
+      >
+        <TextField
+          multiline
+          value={description}
+          onChange={(ev) => setDescription(ev.currentTarget.value)}
+        />
+      </AbstractModal>
       <Button onClick={() => onAccept(matchId)}>
         <Check />
         Accept
@@ -85,7 +108,7 @@ function MatchControls({
         <Block />
         Reject
       </Button>
-      <Button onClick={() => onReport(matchId)}>
+      <Button onClick={() => setShowReport(true)}>
         <Flag />
         Report
       </Button>
@@ -250,7 +273,7 @@ export default function MatchingPage(): JSX.Element {
     next()
   }
 
-  const onReport = (matchId: number) => {
+  const onReport = (matchId: number, description?: string) => {
     request({
       path: "/api/matches/",
       method: "put",
@@ -259,7 +282,7 @@ export default function MatchingPage(): JSX.Element {
     request({
       path: "/api/reports/",
       method: "post",
-      body: { report_type: "P", reportee: matchId },
+      body: { report_type: "P", reportee: matchId, description },
     }).catch((err) => console.error(`Failed to report match: ${err}`))
     next()
   }

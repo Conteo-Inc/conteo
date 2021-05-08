@@ -75,7 +75,9 @@ export default function Profile(): JSX.Element {
         const { profile_content, privacy_settings, userId } = res.parsedBody
         setUserId(userId)
 
-        const birthday = parseBirthday(profile_content.birth_date)
+        const birthday = new Date(
+          (profile_content.birth_date as unknown) as string
+        )
         const profileContent: ProfileContentType = {
           first_name: profile_content.first_name,
           last_name: profile_content.last_name,
