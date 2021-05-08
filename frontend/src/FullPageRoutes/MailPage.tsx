@@ -5,13 +5,16 @@ import { request } from "../utils/fetch"
 
 export default function MailPage(): JSX.Element {
   const [mail, setMail] = React.useState<MailListItem[]>([])
+  const [undecided, setUndecided] = React.useState<MailListItem[]>([])
 
   React.useEffect(() => {
-    request<MailListItem[]>({ path: "/api/mail/", method: "get" }).then(
-      (mailList) => {
-        setMail(mailList.parsedBody)
-      }
-    )
+    request<{ penpals: MailListItem[]; undecided: MailListItem[] }>({
+      path: "/api/mail/",
+      method: "get",
+    }).then((mailList) => {
+      setMail(mailList.parsedBody.penpals)
+      setUndecided(mailList.parsedBody.undecided)
+    })
   }, [])
 
   const removePenpal = (id: number) => {
@@ -34,6 +37,13 @@ export default function MailPage(): JSX.Element {
   return (
     <Grid direction="column" container>
       {mail.map((mailListItem, index) => {
+        return (
+          <Grid item key={index} sm={6}>
+            <MailItem {...mailListItem} removePenpal={removePenpal} isDecided />
+          </Grid>
+        )
+      })}
+      {undecided.map((mailListItem, index) => {
         return (
           <Grid item key={index} sm={6}>
             <MailItem {...mailListItem} removePenpal={removePenpal} />
