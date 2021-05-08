@@ -8,6 +8,7 @@ import {
   Grid,
   Button,
 } from "@material-ui/core"
+import { request } from "../utils/fetch"
 
 const useStyles = makeStyles({
   root: {
@@ -39,6 +40,14 @@ const feedBackValue = {
 export default function FeedbackPage(): JSX.Element {
   const [values, setValues] = useState(feedBackValue)
   const classes = useStyles()
+
+  const handleSubmit = () => {
+    return request({
+      path: "/api/feedback/",
+      method: "post",
+      body: feedBackValue,
+    })
+  }
 
   const setFeedbackValue = (e: any) => {
     const { name, value } = e.target
@@ -108,7 +117,7 @@ export default function FeedbackPage(): JSX.Element {
                   className={classes.submitButton}
                   size="large"
                   type="submit"
-                  href="#"
+                  onSubmit={handleSubmit}
                 >
                   Send Feedback
                 </Button>

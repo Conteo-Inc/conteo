@@ -22,6 +22,8 @@ urlpatterns = [
     path("reports/", views.Reports.as_view()),
     path("accounts/", views.Accounts.as_view()),
     path("user/", views.UserAuthView.as_view()),
+    path("contact/", views.ContactUs.as_view()),
+    path("feedback/", views.Feedback.as_view()),
     path("forgotpassword/", views.UserForgotPassword.as_view()),
     path("changepassword/", views.UserChangePassword.as_view()),
     path(

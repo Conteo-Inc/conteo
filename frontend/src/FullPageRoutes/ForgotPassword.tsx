@@ -10,6 +10,7 @@ import { useState } from "react"
 import Notification from "../components/Notification"
 import { NotificationType } from "../components/Notification"
 import { parseIdentity, request } from "../utils/fetch"
+import { useHistory } from "react-router-dom"
 
 const useStyles = makeStyles({
   root: {
@@ -38,6 +39,7 @@ export default function ForgotPassword(): JSX.Element {
   const [username, setUsername] = React.useState<string>("")
   const [type, setType] = useState<NotificationType["type"]>("error")
   const [message, setMessage] = useState("")
+  const history = useHistory()
 
   const handleSave = (username: string) => {
     request({
@@ -62,6 +64,7 @@ export default function ForgotPassword(): JSX.Element {
 
   const handleClose = () => {
     setIsOpen(false)
+    history.push("/")
   }
 
   return (

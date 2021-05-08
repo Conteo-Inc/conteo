@@ -4,6 +4,7 @@ import { makeStyles } from "@material-ui/core/styles"
 import Video from "../video/Video"
 import { Colors } from "../../utils/colors"
 import { Nullable } from "../../utils/context"
+import { toDateString } from "../../utils/profile"
 
 type ProfileContentProps = {
   readonlyContent: ProfileContentType
@@ -92,7 +93,7 @@ function buildProfileFieldList({
     },
     {
       title: "Birthday",
-      value: birth_date !== null ? birth_date.toLocaleDateString() : "",
+      value: birth_date !== null ? toDateString(birth_date) : "",
     },
     {
       title: "Gender",

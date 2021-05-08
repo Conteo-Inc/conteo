@@ -9,6 +9,8 @@ import {
   CardContent,
   CardActions,
 } from "@material-ui/core"
+import SearchIcon from "@material-ui/icons/Search"
+import { useState } from "react"
 
 type helpBtns = {
   href: string
@@ -35,6 +37,7 @@ const useStyles = makeStyles({
 
 export default function Help(): JSX.Element {
   const classes = useStyles()
+  const [search, getSearch] = useState("")
   const pages: helpBtns[] = [
     {
       href: "/contact",
@@ -49,6 +52,10 @@ export default function Help(): JSX.Element {
       value: "Tutorials",
     },
   ]
+
+  const handleSearch = (e: any) => {
+    e.preventDefault()
+  }
 
   return (
     <>
@@ -65,7 +72,17 @@ export default function Help(): JSX.Element {
               variant="outlined"
               label="Ask a question..."
               placeholder="Ask a question..."
+              value={search}
+              onChange={(e) => getSearch(e.target.value)}
             />
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<SearchIcon />}
+              onClick={handleSearch}
+            >
+              Search
+            </Button>
           </form>
         </Grid>
 
