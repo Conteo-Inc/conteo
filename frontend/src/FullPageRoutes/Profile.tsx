@@ -11,6 +11,7 @@ import {
   useProfileComponents,
   useProfileContent,
   usePrivacySettings,
+  parseBirthday,
 } from "../utils/profile"
 
 export type UserProfile = {
