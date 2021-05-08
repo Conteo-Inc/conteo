@@ -439,7 +439,7 @@ class Reports(generics.CreateAPIView):
 
     def post(self, request, *args, **kwargs):
         request.data["reporter"] = request.user.id
-        return self.create(request, *args, **kwargs)
+        return super().post(request, *args, **kwargs)
 
 
 class Accounts(generics.RetrieveAPIView):
