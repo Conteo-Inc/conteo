@@ -258,35 +258,33 @@ class InterestRetrieveView(generics.ListAPIView):
 class MailListView(generics.ListAPIView):
     serializer_class = MailListSerializer
 
-    def get_queryset(self):
-        user = self.request.user
+    def get_mail_list(self, user, match_decision=True):
         case1 = Profile.objects.filter(
             Q(user__matchstatus_hi__user_lo=user)
             & Q(user__matchstatus_hi__user_lo_response=True)
-            & Q(user__matchstatus_hi__user_hi_response=True)
+            & Q(user__matchstatus_hi__user_hi_response=match_decision)
         )
         # Case 2: User is user_hi
         case2 = Profile.objects.filter(
             Q(user__matchstatus_lo__user_hi=user)
-            & Q(user__matchstatus_lo__user_lo_response=True)
+            & Q(user__matchstatus_lo__user_lo_response=match_decision)
             & Q(user__matchstatus_lo__user_hi_response=True)
         )
 
-        # remove self
-        # union = union.exclude(user=user)
-
         # make distinct
-        union = QuerySet.union(case1, case2)
-
-        return union
+        usion = QuerySet.union(case1, case2)
+        return self.get_serializer(usion, context={"receiver": user}, many=True).data
 
     def get(self, request):
-        queryset = self.filter_queryset(self.get_queryset())
-        serializer = self.get_serializer(
-            queryset, context={"receiver": request.user}, many=True
-        )
+        penpals = self.get_mail_list(request.user)
+        undecided = self.get_mail_list(request.user, None)
+        data = {
+            "penpals": penpals,
+            "undecided": undecided,
+        }
+
         return response.Response(
-            data=serializer.data,
+            data=data,
             status=status.HTTP_200_OK,
         )
 
