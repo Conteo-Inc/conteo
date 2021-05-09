@@ -123,6 +123,7 @@ export default function AccountsPage(): JSX.Element {
   }
 
   const deleteAccount = () => {
+    logout()
     request({
       path: "/api/deleteaccount/",
       method: "delete",
