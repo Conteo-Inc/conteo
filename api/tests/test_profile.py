@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework.test import APITestCase
 
-from api.factory import UserFactory
+from api.factory import UserFactory, VideoFactory
 from api.models import MatchStatus, Profile
 
 
@@ -57,27 +57,18 @@ class MailListTest(APITestCase):
             user_lo_response=True,
             user_hi_response=True,
         )
-        # It's easier to create the video object through the view than directly
-        # via the model, so for now just text
-        self.video = "video"
+
+        VideoFactory(sender=self.p3, receiver=self.main_user)
 
     def test_retrieval(self):
-        # Finish setup by sending video from p3 to main
-        # This can be moved back to setup when
-        # we have a good way to construct video objects
-        self.client.login(username=self.p3.username, password="test")
-        self.client.post(
-            "/api/videos/",
-            {"data": self.video, "receiver": self.main_user.id},
-            format="json",
-        )
-
         # main user logs in and gets mail
         self.client.login(username="main@main.main", password="main")
         mail = self.client.get("/api/mail/").json()
 
         penpals = mail.get("penpals")
         undecided = mail.get("undecided")
+
+        print(mail)
 
         # expected response structure: {penpals: [2], undecided: [1]}
         self.assertEqual(len(penpals), 2)
@@ -88,8 +79,8 @@ class MailListTest(APITestCase):
         self.assertEqual(penpals[1].get("id"), self.p2.id)
         self.assertEqual(undecided[0].get("id"), self.p1.id)
 
-        # check viewed_at is None
-        for mailitem in penpals + undecided:
+        # check viewed_at is None for all except the first
+        for mailitem in penpals[1:] + undecided:
             self.assertEqual(mailitem.get("viewed_at"), None)
 
         # check that p1 and p2 created_at is None
