@@ -255,6 +255,38 @@ class InterestRetrieveView(generics.ListAPIView):
     queryset = Interest.objects.all()
 
 
+def split_mail(mail):
+    # 2 variables: created_at and viewed_at
+    # 4 total cases, but viewed_at must be None if created_at is None
+    # so 3 actual cases
+    both = []
+    neither = []
+    c_not_v = []
+
+    # helper function
+    def lens(x):
+        return (x.get("created_at"), x.get("viewed_at"))
+
+    for item in mail:
+        c, v = lens(item)
+        if c is None:
+            neither.append(item)
+        elif v is None:
+            c_not_v.append(item)
+        else:
+            both.append(item)
+
+    return both, c_not_v, neither
+
+
+def sort_mail(mail):
+    both, c_not_v, neither = split_mail(mail)
+    both_sorted = sorted(both, key=lambda x: x.get("viewed_at"))
+    c_not_v_sorted = sorted(c_not_v, key=lambda x: x.get("created_at"))
+
+    return c_not_v_sorted + both_sorted + neither
+
+
 class MailListView(generics.ListAPIView):
     serializer_class = MailListSerializer
 
@@ -279,7 +311,7 @@ class MailListView(generics.ListAPIView):
         penpals = self.get_mail_list(request.user)
         undecided = self.get_mail_list(request.user, None)
         data = {
-            "penpals": penpals,
+            "penpals": sort_mail(penpals),
             "undecided": undecided,
         }
 
