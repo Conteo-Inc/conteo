@@ -3,6 +3,10 @@ import { colors } from "@material-ui/core"
 export const Colors = {
   DEEP_RED: colors.red[900],
   DEEP_BLUE: colors.blue[900],
+  GREY: colors.grey[800],
 }
 
-export type ColorsType = typeof Colors["DEEP_RED"] | typeof Colors["DEEP_BLUE"]
+export type ColorsType =
+  | typeof Colors["DEEP_RED"]
+  | typeof Colors["DEEP_BLUE"]
+  | typeof Colors["GREY"]
