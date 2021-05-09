@@ -77,6 +77,7 @@ class VideoFactory(factory.django.DjangoModelFactory):
     """
 
     created_at = factory.Faker("date")
+    # @TODO: viewed should always be after created
     viewed_at = factory.Faker("date")
 
     @post_generation
