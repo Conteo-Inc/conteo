@@ -1,8 +1,8 @@
 from django.contrib.auth.models import User
 from rest_framework.test import APITestCase
 
-from api.factory import UserFactory, VideoFactory
-from api.models import MatchStatus, Profile
+from api.factory import MatchStatusFactory, UserFactory, VideoFactory
+from api.models import Profile
 
 
 class ProfileTest(APITestCase):
@@ -36,26 +36,30 @@ class MailListTest(APITestCase):
         # main user, 3 penpals
         self.main_user = UserFactory(username="main@main.main", pw="main")
         self.p1, self.p2, self.p3 = UserFactory.create_batch(pw="test", size=3)
+
+        # helper function
+        def setup_match(user, response):
+            MatchStatusFactory(
+                user_lo=self.main_user,
+                user_hi=user,
+                user_lo_response=True,
+                user_hi_response=response,
+            )
+
         # penpal 1 has not matched
-        MatchStatus.objects.create(
-            user_lo=self.main_user,
-            user_hi=self.p1,
-            user_lo_response=True,
-            user_hi_response=None,
+        setup_match(
+            user=self.p1,
+            response=None,
         )
         # penpal 2 has matched but no video
-        MatchStatus.objects.create(
-            user_lo=self.main_user,
-            user_hi=self.p2,
-            user_lo_response=True,
-            user_hi_response=True,
+        setup_match(
+            user=self.p2,
+            response=True,
         )
         # penpal 3 has matched and sent video
-        MatchStatus.objects.create(
-            user_lo=self.main_user,
-            user_hi=self.p3,
-            user_lo_response=True,
-            user_hi_response=True,
+        setup_match(
+            user=self.p3,
+            response=True,
         )
 
         VideoFactory(sender=self.p3, receiver=self.main_user)
