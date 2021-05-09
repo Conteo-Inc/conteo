@@ -68,8 +68,6 @@ class MailListTest(APITestCase):
         penpals = mail.get("penpals")
         undecided = mail.get("undecided")
 
-        print(mail)
-
         # expected response structure: {penpals: [2], undecided: [1]}
         self.assertEqual(len(penpals), 2)
         self.assertEqual(len(undecided), 1)
