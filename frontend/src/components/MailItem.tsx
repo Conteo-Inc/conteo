@@ -78,7 +78,9 @@ export default function MailItem({
         if (typeof profile_content.birth_date === "undefined") {
           profile_content.birth_date = null
         } else {
-          profile_content.birth_date = parseBirthday(profile_content.birth_date)
+          profile_content.birth_date = new Date(
+            (profile_content.birth_date as unknown) as string
+          )
         }
         if (typeof profile_content.interests === "undefined") {
           profile_content.interests = []
