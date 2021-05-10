@@ -13,23 +13,26 @@ def firstnames(data):
 
 class MatchesViewTestCase(APITestCase):
     def setUp(self):
-        def make_user(name: str, age: int, gender=Profile.GENDER_CHOICES[0][0]) -> User:
+        def make_user(name: str, age=None, gender=None, interests=None) -> User:
             user = User.objects.create_user(username=name, password="password")
             p = Profile.objects.create(
                 user=user,
                 first_name=name,
                 gender=gender,
-                birth_date=date.today() - timedelta(days=365.2425 * age),
+                birth_date=date.today() - timedelta(days=365.2425 * age)
+                if age
+                else None,
             )
-            p.interest_set.add(Interest.objects.get(pk=1))
+            p.interest_set.add(interests)
+            p.save()
             return user
 
-        ale = make_user("ale", 20)
+        ale = make_user("ale", interests=Interest.objects.get(pk=1))
         boy = make_user("boy", 30)
         cad = make_user("cad", 40)
         dig = make_user("dig", 50)
         eel = make_user("eel", 60, Profile.GENDER_CHOICES[1][0])
-        fog = make_user("fog", 70)
+        fog = make_user("fog", 70, Profile.GENDER_CHOICES[0][0])
         make_user("gil", 80)
         hal = make_user("hal", 80)
         hal.profile.paused = True
@@ -69,8 +72,9 @@ class MatchesViewTestCase(APITestCase):
 
         Basic matching criteria includes matching with users not in the
         MatchStatus model, users that have not matched with the requesting
-        user, users who have not declined the requesting user, and users
-        for which the requesting user has not already made a decision for.
+        user, users who have not declined the requesting user, users
+        for which the requesting user has not already made a decision for, and
+        not the requesting user.
         """
 
         endpoint = "/api/matches/"
@@ -186,6 +190,16 @@ class MatchesViewTestCase(APITestCase):
         )
         self.assertEqual(res.status_code, 200)
         self.assertCountEqual(firstnames(res.json()), [])
+
+        res = self.client.get(
+            "/api/matches/",
+            {
+                "interests": Interest.objects.filter(pk=1).values_list("id", flat=True),
+            },
+            format="json",
+        )
+        self.assertEqual(res.status_code, 200)
+        self.assertCountEqual(firstnames(res.json()), ("ale",))
 
     def test_inactive_users(self):
         """

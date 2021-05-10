@@ -258,35 +258,33 @@ class InterestRetrieveView(generics.ListAPIView):
 class MailListView(generics.ListAPIView):
     serializer_class = MailListSerializer
 
-    def get_queryset(self):
-        user = self.request.user
+    def get_mail_list(self, user, match_decision=True):
         case1 = Profile.objects.filter(
             Q(user__matchstatus_hi__user_lo=user)
             & Q(user__matchstatus_hi__user_lo_response=True)
-            & Q(user__matchstatus_hi__user_hi_response=True)
+            & Q(user__matchstatus_hi__user_hi_response=match_decision)
         )
         # Case 2: User is user_hi
         case2 = Profile.objects.filter(
             Q(user__matchstatus_lo__user_hi=user)
-            & Q(user__matchstatus_lo__user_lo_response=True)
+            & Q(user__matchstatus_lo__user_lo_response=match_decision)
             & Q(user__matchstatus_lo__user_hi_response=True)
         )
 
-        # remove self
-        # union = union.exclude(user=user)
-
         # make distinct
-        union = QuerySet.union(case1, case2)
-
-        return union
+        usion = QuerySet.union(case1, case2)
+        return self.get_serializer(usion, context={"receiver": user}, many=True).data
 
     def get(self, request):
-        queryset = self.filter_queryset(self.get_queryset())
-        serializer = self.get_serializer(
-            queryset, context={"receiver": request.user}, many=True
-        )
+        penpals = self.get_mail_list(request.user)
+        undecided = self.get_mail_list(request.user, None)
+        data = {
+            "penpals": penpals,
+            "undecided": undecided,
+        }
+
         return response.Response(
-            data=serializer.data,
+            data=data,
             status=status.HTTP_200_OK,
         )
 
@@ -366,7 +364,7 @@ class Matches(viewsets.ModelViewSet):
         Return a QuerySet of Users that can be served to the request user
         as a match.
         """
-        req = self.request  # type: request.Request
+        req: request.Request = self.request
         invalid_users = User.objects.filter(
             # Users req_user has responded to
             Q(
@@ -387,25 +385,22 @@ class Matches(viewsets.ModelViewSet):
             | Q(profile__paused=True)
         )
 
-        min_age = int(req.query_params.get("minAge", 18))
-        max_age = int(req.query_params.get("maxAge", 130))
-        genders = req.query_params.getlist(
-            "genders", (v for v, _ in Profile.GENDER_CHOICES)
-        )
-        interests = req.query_params.getlist(
-            "interests", Interest.objects.values_list("id", flat=True)
-        )
-        hi_date = date.today() - timedelta(days=365.2425 * min_age)
-        lo_date = date.today() - timedelta(days=365.2425 * max_age)
-        return (
-            User.objects.filter(
-                profile__gender__in=genders,
-                profile__birth_date__range=(lo_date, hi_date),
-                profile__interest__in=interests,
-            )
-            .exclude(pk=req.user.pk)
-            .difference(invalid_users)
-        )
+        users = User.objects.all()
+        if "minAge" in req.query_params:
+            min_age = int(req.query_params["minAge"])
+            d = date.today() - timedelta(days=365.2425 * min_age)
+            users = users.filter(profile__birth_date__lte=d)
+        if "maxAge" in req.query_params:
+            max_age = int(req.query_params["maxAge"])
+            d = date.today() - timedelta(days=365.2425 * max_age)
+            users = users.filter(profile__birth_date__gte=d)
+        if "genders" in req.query_params:
+            genders = req.query_params.getlist("genders")
+            users = users.filter(profile__gender__in=genders)
+        if "interests" in req.query_params:
+            interests = req.query_params.getlist("interests")
+            users = users.filter(profile__interest__in=interests)
+        return users.exclude(pk=req.user.pk).difference(invalid_users)
 
     def get_object(self):
         match_id = self.request.data["matchId"]
