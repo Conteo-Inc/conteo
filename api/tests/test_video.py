@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework.test import APITestCase
 
-from api.models import MatchStatus
+from api.models import MatchStatus, Video
 
 
 class VideoViewTestCase(APITestCase):
@@ -53,3 +53,29 @@ class VideoViewTestCase(APITestCase):
         results = res.json()
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0]["video_file"], self.video)
+
+    def test_video_viewed(self):
+        # lo sends to hi
+        self.client.login(username="lo", password="lo")
+        self.client.post(
+            "/api/videos/",
+            {"data": self.video, "receiver": self.hi.id},
+            format="json",
+        )
+
+        # hi retrieves the video
+        self.client.login(username="hi", password="hi")
+        res = self.client.get("/api/videos/")
+        results = res.json()
+        video_id = results[0]["id"]
+
+        # check video viewed_at is None
+        viewed_at = Video.objects.get(id=video_id).viewed_at
+        self.assertTrue(viewed_at is None)
+
+        # hi views the video
+        self.client.put(f"/api/mailviewed/{video_id}/")
+
+        # check video viewed_at is not None
+        viewed_at = Video.objects.get(id=video_id).viewed_at
+        self.assertFalse(viewed_at is None)
