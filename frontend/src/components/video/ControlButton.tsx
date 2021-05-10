@@ -4,16 +4,30 @@ import {
   StopRounded,
   PlayCircleFilled,
   SendRounded,
+  TheatersRounded,
+  CheckCircleRounded,
+  CancelRounded,
+  RestorePageRounded,
 } from "@material-ui/icons"
 import * as React from "react"
-import { ColorsType } from "../../utils/colors"
+import { Colors, ColorsType } from "../../utils/colors"
+import { ActiveToolType } from "./editing/EditableVideo"
 
-type ControlButtonProps = {
+type ControlType =
+  | ActiveToolType
+  | "start"
+  | "stop"
+  | "send"
+  | "loading"
+  | "confirm"
+  | "cancel"
+
+export type ControlButtonProps = {
   ariaLabel?: string
   color?: ColorsType
   onClick?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
   size?: "inherit" | "default" | "small" | "large"
-  type: "start" | "stop" | "send" | "loading"
+  type: ControlType
   disabled?: boolean
 }
 
@@ -27,6 +41,14 @@ function Button({
     <StopRounded fontSize={size} />
   ) : type === "send" ? (
     <SendRounded fontSize={size} />
+  ) : type === "trim" ? (
+    <TheatersRounded fontSize={size} />
+  ) : type === "confirm" ? (
+    <CheckCircleRounded fontSize={size} />
+  ) : type === "cancel" ? (
+    <CancelRounded fontSize={size} />
+  ) : type === "undo" ? (
+    <RestorePageRounded fontSize={size} />
   ) : (
     <Block fontSize={size} />
   )
@@ -34,7 +56,7 @@ function Button({
 
 export default function ControlButton({
   ariaLabel,
-  color,
+  color = Colors.DEEP_RED,
   onClick,
   size = "default",
   type,

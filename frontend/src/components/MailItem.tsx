@@ -26,6 +26,11 @@ const useStyles = makeStyles({
   mailItem: {
     minHeight: "4rem",
     padding: "0 1rem",
+    marginBottom: "5px",
+  },
+  undecidedMatch: {
+    backgroundColor: "lightgrey",
+    borderRadius: "10px",
   },
 })
 
@@ -38,6 +43,7 @@ export type MailListItem = {
   id: number
   paused: boolean
   removePenpal: (id: number) => void
+  isDecided: boolean
 }
 
 export default function MailItem({
@@ -48,8 +54,9 @@ export default function MailItem({
   id,
   paused,
   removePenpal,
+  isDecided,
 }: MailListItem): JSX.Element {
-  const { mailItem } = useStyles()
+  const { mailItem, undecidedMatch } = useStyles()
   const [visible, setVisible] = React.useState<boolean>(false)
   const [showConfirmRemove, setConfirmRemove] = React.useState<boolean>(false)
   const video_date = new Date(created_at)
@@ -108,7 +115,7 @@ export default function MailItem({
       direction="row"
       justify="space-between"
       alignItems="center"
-      className={mailItem}
+      className={`${mailItem} ${!isDecided && undecidedMatch}`}
     >
       <AbstractModal
         title="Remove penpal"
@@ -144,12 +151,12 @@ export default function MailItem({
       <Typography variant="h6">
         {created_at ? video_date.toLocaleDateString() : "No video"}
       </Typography>
-      <IconButton onClick={() => setConfirmRemove(true)}>
+      <IconButton onClick={() => setConfirmRemove(true)} disabled={!isDecided}>
         <Delete fontSize="large" style={{ color: "#4b5282" }} />
       </IconButton>
       <IconButton
         onClick={() => setVisible(true)}
-        disabled={!created_at || paused}
+        disabled={!created_at || paused || isDecided}
       >
         {viewed_at ? (
           <DraftsRounded fontSize="large" style={{ color: "#4b5e82" }} />
@@ -159,7 +166,11 @@ export default function MailItem({
       </IconButton>
       {/* TODO: Re-add dropdown later */}
       {/* <ArrowDropDown fontSize="large" style={{ color: "#4b5e82" }} /> */}
-      <IconButton component={Link} to={`/record/${id}`} disabled={paused}>
+      <IconButton
+        component={Link}
+        to={`/record/${id}`}
+        disabled={paused || !isDecided}
+      >
         <SendRounded fontSize="large" style={{ color: "#4b5282" }} />
       </IconButton>
       {created_at && (
