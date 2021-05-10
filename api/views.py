@@ -1,5 +1,5 @@
 import random
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
@@ -294,7 +294,7 @@ class MailListView(generics.ListAPIView):
 class MailUpdateView(generics.UpdateAPIView):
     def put(self, request, video_id):
         video_object = Video.objects.get(id=video_id)
-        viewed_at = datetime.now()
+        viewed_at = now()
         video_object.viewed_at = viewed_at
         video_object.save()
         return response.Response(
