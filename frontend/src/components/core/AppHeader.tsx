@@ -11,6 +11,7 @@ const useStyles = makeStyles({
     position: "fixed",
     left: "0px",
     top: "0px",
+    zIndex: 1,
   },
   bannerText: {
     color: "white",
@@ -26,10 +27,10 @@ export default function AppHeader(): JSX.Element {
   const welcome = !logged_in
     ? "Welcome"
     : user
-    ? user.first_name === ""
-      ? `Hi ${user.email}`
-      : `Hi ${user.first_name}`
-    : ""
+      ? user.first_name === ""
+        ? `Hi ${user.email}`
+        : `Hi ${user.first_name}`
+      : ""
 
   return (
     <Grid
