@@ -216,18 +216,3 @@ export function toDateString(date: Date): string {
   const month = date.getUTCMonth() + 1
   return `${date.getUTCFullYear()}-${month}-${date.getUTCDate()}`
 }
-
-export function parseBirthday(birth_date: Nullable<Date>): Nullable<Date> {
-  console.log("birth_date:", birth_date)
-  let birthday = null
-  if (birth_date !== null) {
-    birthday = new Date(birth_date)
-    // We have Django configured to store dates using local time.
-    // Date objects assume the date is UTC when parsing so we add 1
-    // to correct for the EST/EDT - UTC timezone difference
-    birthday.setDate(birthday.getDate() + 1)
-  }
-  console.log("birthday:", birthday)
-
-  return birthday
-}
