@@ -17,7 +17,6 @@ import {
 import ViewVideo from "./video/ViewVideo"
 import { Nullable } from "../utils/context"
 import { request } from "../utils/fetch"
-import { parseBirthday } from "../utils/profile"
 import ProfileContent from "./profile/ProfileContent"
 import type { ProfileContentType } from "./profile/ProfileContent"
 import AbstractModal from "./AbstractModal"
