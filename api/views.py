@@ -182,24 +182,13 @@ class ProfileRetrieveUpdateView(generics.RetrieveUpdateAPIView):
     def get(self, request):
         profile = request.user.profile
         profileData = self.serializer_class(profile).data
-        userId = profileData.pop("id")
 
         # Add user interests to profile content.
         interestObjects = profile.interest_set.all()
         interestData = InterestSerializer(interestObjects, many=True).data
         profileData["interests"] = interestData
 
-        # Get privacy object related to user profile.
-        privacyObjects = Privacy.objects.get(profile=profile)
-        privacyData = PrivacySerializer(privacyObjects).data
-
-        data = {
-            "profile_content": profileData,
-            "privacy_settings": privacyData,
-            "userId": userId,
-        }
-
-        return response.Response(data=data, status=status.HTTP_200_OK)
+        return response.Response(data=profileData, status=status.HTTP_200_OK)
 
     def put(self, request):
         self.updateImage(request)
@@ -248,6 +237,18 @@ class ProfileRetrieveUpdateView(generics.RetrieveUpdateAPIView):
 class PrivacyRetrieveUpdateView(generics.RetrieveUpdateAPIView):
     serializer_class = PrivacySerializer
     queryset = Privacy.objects.all()
+
+    def get_object(self):
+        return self.get_queryset().get(profile_id=self.request.user.profile.id)
+
+    def get(self, request):
+        privacy_instance = self.get_queryset().get(profile_id=request.user.profile.id)
+        privacy = self.serializer_class(privacy_instance).data
+        return response.Response(data=privacy, status=status.HTTP_200_OK)
+
+    def put(self, request):
+        # profile = request.user.profile.id
+        return self.update(request=request)
 
 
 class InterestRetrieveView(generics.ListAPIView):
