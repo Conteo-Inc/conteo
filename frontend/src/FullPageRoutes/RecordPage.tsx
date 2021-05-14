@@ -23,6 +23,10 @@ function sendVideo(
   history: History
 ): void {
   if (movie) {
+    movie.pause()
+    //@TODO: The progressRef for the timeline bar is still subscribed to the movie,
+    // so they both need to be paused
+    // vd.event.unsubscribe(movie, "movie.timeupdate", someListener)
     movie
       .record({
         frameRate: 60,
