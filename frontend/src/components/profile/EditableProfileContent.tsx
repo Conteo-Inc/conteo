@@ -355,23 +355,16 @@ export default function EditableProfileContent({
                   </Grid>
                 </Grid>
               </Grid>
-              {editableContent.video ? (
-                <Video
-                  src={editableContent.video}
-                  className={classes.introVideo}
-                />
-              ) : (
-                <Grid item>
-                  <Button
-                    className={classes.recordButton}
-                    size="large"
-                    component={Link}
-                    to={`/record/${userId}`}
-                  >
-                    <Typography variant="h6">Record Intro Video</Typography>
-                  </Button>
-                </Grid>
-              )}
+              <Grid item>
+                <Button
+                  className={classes.recordButton}
+                  size="large"
+                  component={Link}
+                  to={`/record/${userId}/`}
+                >
+                  <Typography variant="h6">Record Intro Video</Typography>
+                </Button>
+              </Grid>
             </Grid>
           </Grid>
           <Grid item xs={12}>

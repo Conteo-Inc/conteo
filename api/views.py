@@ -299,9 +299,27 @@ class VideoListCreate(generics.ListCreateAPIView):
             data=request.data, context={"data": data, "user": request.user}
         )
         if serializer.is_valid():
+            # Test if video is intro video.
+            sender_id = request.user.id
+            receiver_id = request.data["receiver"]
+            if (self.is_intro_video(sender_id, receiver_id)):
+                self.delete_old_intro(sender_id)
+
+            # Save new intro video.
             serializer.save()
             return response.Response(serializer.data, status=status.HTTP_201_CREATED)
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def is_intro_video(self, sender, receiver):
+        return sender == receiver
+
+    def delete_old_intro(self, user_id):
+        try:
+            video_instance = Video.objects.get(sender=user_id, receiver=user_id)
+            video_instance.delete()
+        except Exception as e:
+            # No previous intro video exists.
+            pass
 
     # def get(self, request):
     #     queryset = self.filter_queryset(self.get_queryset())
