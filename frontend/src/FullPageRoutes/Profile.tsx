@@ -72,15 +72,18 @@ export default function Profile(): JSX.Element {
     request<UserProfile>({ path: "/api/profile/", method: "get" })
       .then((res) => {
         const { profile_content, privacy_settings, userId } = res.parsedBody
+        console.log("profile_content:", profile_content)
         setUserId(userId)
 
-        const birthday = new Date(
-          (profile_content.birth_date as unknown) as string
-        )
+        if (profile_content.birth_date !== null) {
+          profile_content.birth_date = new Date(
+            (profile_content.birth_date as unknown) as string
+          )
+        }
         const profileContent: ProfileContentType = {
           first_name: profile_content.first_name,
           last_name: profile_content.last_name,
-          birth_date: birthday,
+          birth_date: profile_content.birth_date,
           gender: profile_content.gender,
           interests: profile_content.interests,
           image: profile_content.image,
