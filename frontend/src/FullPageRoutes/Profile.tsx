@@ -72,7 +72,6 @@ export default function Profile(): JSX.Element {
     request<UserProfile>({ path: "/api/profile/", method: "get" })
       .then((res) => {
         const { profile_content, privacy_settings, userId } = res.parsedBody
-        console.log("profile_content:", profile_content)
         setUserId(userId)
 
         if (profile_content.birth_date !== null) {
