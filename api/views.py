@@ -289,6 +289,17 @@ class MailListView(generics.ListAPIView):
         )
 
 
+class MailUpdateView(generics.UpdateAPIView):
+    def put(self, request, video_id):
+        video_object = Video.objects.get(id=video_id)
+        viewed_at = now()
+        video_object.viewed_at = viewed_at
+        video_object.save()
+        return response.Response(
+            data={"viewed_at": str(viewed_at)}, status=status.HTTP_200_OK
+        )
+
+
 class VideoListCreate(generics.ListCreateAPIView):
     serializer_class = VideoSerializer
     queryset = Video.objects.all()
