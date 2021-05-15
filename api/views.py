@@ -417,10 +417,15 @@ class VideoListCreate(generics.ListCreateAPIView):
             # No previous intro video exists.
             pass
 
-    # def get(self, request):
-    #     queryset = self.filter_queryset(self.get_queryset())
-    #     serializer = self.list_serializer_class(queryset, many=True)
-    #     return response.Response(data=serializer.data, status=status.HTTP_200_OK)
+    def filter_queryset(self, queryset):
+        return queryset.filter(
+            Q(receiver=self.request.user) & ~Q(sender=self.request.user)
+        )
+
+    def get(self, request):
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.serializer_class(queryset, many=True)
+        return response.Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
 class IntroVideoRetrieveView(views.APIView):
