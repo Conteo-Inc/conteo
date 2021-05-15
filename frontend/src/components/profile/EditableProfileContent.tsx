@@ -103,17 +103,15 @@ const useStyles = makeStyles({
     marginBottom: "15px",
   },
   recordButton: {
+    margin: "5px",
     color: "white",
-    backgroundColor: Colors.DEEP_BLUE,
+    backgroundColor: Colors.DEEP_RED,
     "&:hover": {
-      backgroundColor: Colors.DEEP_RED,
+      backgroundColor: Colors.DEEP_BLUE,
     },
   },
   textField: {
     width: "100%",
-  },
-  button: {
-    margin: "5px",
   },
   error: {
     color: "red",
@@ -404,16 +402,15 @@ export default function EditableProfileContent({
             <Grid container justify="center">
               <Grid item>
                 <Button
-                  variant="contained"
-                  color="primary"
-                  className={classes.button}
+                  // variant="contained"
+                  className={classes.recordButton}
                   onClick={handleSaveContent}
                 >
                   Save
                 </Button>
                 <Button
                   variant="contained"
-                  className={classes.button}
+                  className={classes.recordButton}
                   onClick={handleCancelEdit}
                 >
                   Cancel
@@ -438,7 +435,7 @@ export default function EditableProfileContent({
             <Button
               variant="contained"
               color="secondary"
-              className={classes.button}
+              className={classes.recordButton}
               onClick={handleEditContent}
             >
               Edit

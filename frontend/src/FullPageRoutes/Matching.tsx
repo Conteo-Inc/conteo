@@ -20,6 +20,7 @@ import { Check, Block, Flag, PlayCircleFilled } from "@material-ui/icons"
 import { request, queryParams } from "../utils/fetch"
 import ViewVideo from "../components/video/ViewVideo"
 import AbstractModal from "../components/AbstractModal"
+import { ButtonStyle } from "../utils/colors"
 
 type EnqueueFunc<T> = (...newItems: T[]) => void
 
@@ -107,15 +108,15 @@ function MatchControls({
           onChange={(ev) => setDescription(ev.currentTarget.value)}
         />
       </AbstractModal>
-      <Button onClick={() => onAccept(matchId)}>
+      <Button style={ButtonStyle} onClick={() => onAccept(matchId)}>
         <Check />
         Accept
       </Button>
-      <Button onClick={() => onReject(matchId)}>
+      <Button style={ButtonStyle} onClick={() => onReject(matchId)}>
         <Block />
         Reject
       </Button>
-      <Button onClick={() => setShowReport(true)}>
+      <Button style={ButtonStyle} onClick={() => setShowReport(true)}>
         <Flag />
         Report
       </Button>
@@ -175,6 +176,7 @@ function MatchingFilters({
                       : FilterState.ageLimits.min,
                   })
                 }}
+                style={ButtonStyle}
               />
             }
             label="Ignore min age"
@@ -198,6 +200,7 @@ function MatchingFilters({
           <FormControlLabel
             control={
               <Checkbox
+                style={ButtonStyle}
                 checked={!filters.maxAge}
                 onChange={(ev) => {
                   dispatch({

@@ -19,6 +19,7 @@ import ContactUs from "./FullPageRoutes/ContactUs"
 import AccountsPage from "./FullPageRoutes/AccountsPage"
 import ForgotPassword from "./FullPageRoutes/ForgotPassword"
 import ResetPassword from "./FullPageRoutes/ResetPassword"
+import FAQ from "./FullPageRoutes/FAQ"
 
 const useStyles = makeStyles({
   app: {
@@ -80,6 +81,10 @@ export default function App(): JSX.Element {
     {
       path: "/accounts/",
       pageJsx: <AccountsPage />,
+    },
+    {
+      path: "/faqs",
+      pageJsx: <FAQ />,
     },
     {
       path: "/",

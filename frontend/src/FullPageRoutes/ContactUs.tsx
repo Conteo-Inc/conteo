@@ -8,6 +8,7 @@ import {
   Typography,
 } from "@material-ui/core"
 import { request } from "../utils/fetch"
+import { ButtonStyle } from "../utils/colors"
 
 const useStyles = makeStyles({
   root: {
@@ -28,9 +29,17 @@ const useStyles = makeStyles({
   },
   submitButton: {
     margin: "1px",
+    //This is weird, but it's not recognizing that `ButtonStyle` is defined otherwise
+    //So the first spread puts it into an anon object
+    //and the second puts it into the css object
+    ...{ ...ButtonStyle },
   },
   cancelButton: {
     margin: "1px",
+    //This is weird, but it's not recognizing that `ButtonStyle` is defined otherwise
+    //So the first spread puts it into an anon object
+    //and the second puts it into the css object
+    ...{ ...ButtonStyle },
   },
   sideBar: {
     fontSize: "1rem",

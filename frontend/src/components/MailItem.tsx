@@ -20,6 +20,7 @@ import { request } from "../utils/fetch"
 import ProfileContent from "./profile/ProfileContent"
 import type { ProfileContentType } from "./profile/ProfileContent"
 import AbstractModal from "./AbstractModal"
+import { ButtonStyle, ColorStyle } from "../utils/colors"
 
 const useStyles = makeStyles({
   mailItem: {
@@ -147,7 +148,7 @@ export default function MailItem({
         handleCancel={onCancelRemove}
       />
       <AbstractModal
-        title="View Profile"
+        title="Profile" //@TODO: Replace with name when available
         isModalOpen={showProfile}
         handleCancel={() => setShowProfile(false)}
         isActionable={false}
@@ -172,7 +173,7 @@ export default function MailItem({
       </Grid>
       <Button
         variant="contained"
-        color="default"
+        style={ButtonStyle}
         onClick={() => setShowProfile(true)}
       >
         <Typography>View Profile</Typography>
@@ -181,16 +182,16 @@ export default function MailItem({
         {created_at ? video_date.toLocaleDateString() : "No video"}
       </Typography>
       <IconButton onClick={() => setConfirmRemove(true)} disabled={!isDecided}>
-        <Delete fontSize="large" style={{ color: "#4b5282" }} />
+        <Delete fontSize="large" style={ColorStyle} />
       </IconButton>
       <IconButton
         onClick={viewVideo}
         disabled={!created_at || paused || !isDecided}
       >
         {timeViewed ? (
-          <DraftsRounded fontSize="large" style={{ color: "#4b5e82" }} />
+          <DraftsRounded fontSize="large" style={ColorStyle} />
         ) : (
-          <MailOutlineRounded fontSize="large" style={{ color: "#4b5282" }} />
+          <MailOutlineRounded fontSize="large" style={ColorStyle} />
         )}
       </IconButton>
       {/* TODO: Re-add dropdown later */}
@@ -200,7 +201,7 @@ export default function MailItem({
         to={`/record/${id}`}
         disabled={paused || !isDecided}
       >
-        <SendRounded fontSize="large" style={{ color: "#4b5282" }} />
+        <SendRounded fontSize="large" style={ColorStyle} />
       </IconButton>
       {created_at && (
         <ViewVideo

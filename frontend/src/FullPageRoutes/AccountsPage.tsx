@@ -20,6 +20,7 @@ import AbstractModal from "../components/AbstractModal"
 import { request, parseIdentity } from "../utils/fetch"
 import { useHistory } from "react-router-dom"
 import { useUser } from "../utils/context"
+import { ButtonStyle } from "../utils/colors"
 
 const initAccountData = {
   first_name: "",
@@ -53,6 +54,10 @@ const useStyles = makeStyles({
   },
   button: {
     margin: "5px",
+    //This is weird, but it's not recognizing that `ButtonStyle` is defined otherwise
+    //So the first spread puts it into an anon object
+    //and the second puts it into the css object
+    ...{ ...ButtonStyle },
   },
   error: {
     color: "red",

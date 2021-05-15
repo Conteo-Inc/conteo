@@ -10,3 +10,12 @@ export type ColorsType =
   | typeof Colors["DEEP_RED"]
   | typeof Colors["DEEP_BLUE"]
   | typeof Colors["GREY"]
+
+export const ColorStyle = { color: Colors.DEEP_RED }
+export const ButtonStyle = {
+  color: "white",
+  backgroundColor: Colors.DEEP_RED,
+  "&:hover": {
+    backgroundColor: Colors.DEEP_BLUE,
+  },
+}

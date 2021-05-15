@@ -12,6 +12,7 @@ import {
 import { request } from "../utils/fetch"
 import type { PrivacySetters } from "../utils/profile"
 import { usePrivacySettings } from "../utils/profile"
+import { ButtonStyle } from "../utils/colors"
 
 // A user's privacy settings.
 export type PrivacySettingsType = {
@@ -55,6 +56,10 @@ const useStyles = makeStyles({
   },
   button: {
     margin: "5px",
+    //This is weird, but it's not recognizing that `ButtonStyle` is defined otherwise
+    //So the first spread puts it into an anon object
+    //and the second puts it into the css object
+    ...{ ...ButtonStyle },
   },
   error: {
     color: "red",

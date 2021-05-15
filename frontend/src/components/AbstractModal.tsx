@@ -10,6 +10,7 @@ import {
 } from "@material-ui/core"
 import CloseIcon from "@material-ui/icons/Close"
 import * as React from "react"
+import { ButtonStyle } from "../utils/colors"
 
 type ModalType = {
   title: string
@@ -73,10 +74,20 @@ export default function AbstractModal({
       </DialogContent>
       {isActionable && (
         <DialogActions className={classes.modalAction}>
-          <Button variant="contained" onClick={handleCancel} color="secondary">
+          <Button
+            variant="contained"
+            onClick={handleCancel}
+            style={ButtonStyle}
+            color="secondary"
+          >
             {cancelText}
           </Button>
-          <Button variant="contained" onClick={handleConfirm} color="default">
+          <Button
+            variant="contained"
+            onClick={handleConfirm}
+            style={ButtonStyle}
+            color="default"
+          >
             {confirmText}
           </Button>
         </DialogActions>
