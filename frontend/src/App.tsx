@@ -93,37 +93,39 @@ export default function App(): JSX.Element {
   ]
 
   return (
-    <ProvideContext>
-      <Router>
-        <AppHeader />
-        <Box className={classes.app}>
-          <Switch>
-            <Route path="/tokens">
-              <TokenPage />
-            </Route>
-            <Route path="/forgotpassword">
-              <ForgotPassword />
-            </Route>
-            <Route path="/verification/:uidb64/:token">
-              <ResetPassword />
-            </Route>
-            {pageList.map(({ path, pageJsx }: Page, index: number) => (
-              <ProtectedRoute key={`page-${index}`} path={path}>
-                <Grid container direction="row">
-                  <Grid item className={classes.sidebar} xs={2}>
-                    <AppSideBar />
+    <Box className={classes.appRoot}>
+      <ProvideContext>
+        <Router>
+          <AppHeader />
+          <Box className={classes.app}>
+            <Switch>
+              <Route path="/tokens">
+                <TokenPage />
+              </Route>
+              <Route path="/forgotpassword">
+                <ForgotPassword />
+              </Route>
+              <Route path="/verification/:uidb64/:token">
+                <ResetPassword />
+              </Route>
+              {pageList.map(({ path, pageJsx }: Page, index: number) => (
+                <ProtectedRoute key={`page-${index}`} path={path}>
+                  <Grid container direction="row">
+                    <Grid item className={classes.sidebar} xs={2}>
+                      <AppSideBar />
+                    </Grid>
+                    <Grid item xs={10}>
+                      {pageJsx}
+                    </Grid>
                   </Grid>
-                  <Grid item xs={10}>
-                    {pageJsx}
-                  </Grid>
-                </Grid>
-              </ProtectedRoute>
-            ))}
-          </Switch>
-        </Box>
-        <AppFooter />
-      </Router>
-    </ProvideContext>
+                </ProtectedRoute>
+              ))}
+            </Switch>
+          </Box>
+          <AppFooter />
+        </Router>
+      </ProvideContext>
+    </Box>
   )
 }
 

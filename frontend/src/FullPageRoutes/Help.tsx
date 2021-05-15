@@ -11,6 +11,7 @@ import {
 } from "@material-ui/core"
 import SearchIcon from "@material-ui/icons/Search"
 import { useState } from "react"
+import { ButtonStyle } from "../utils/colors"
 
 type helpBtns = {
   href: string
@@ -27,11 +28,11 @@ const useStyles = makeStyles({
   topBar: {
     margin: 1,
     padding: 50,
-    backgroundColor: "rgb(238,235,228)",
+    // backgroundColor: "rgb(238,235,228)",
   },
   bottomBar: {
     margin: 2,
-    padding: 110,
+    padding: "1rem",
   },
 })
 
@@ -65,7 +66,13 @@ export default function Help(): JSX.Element {
         alignItems="center"
         className={classes.topBar}
       >
-        <Grid item justify="center">
+        <Grid
+          item
+          justify="center"
+          container
+          direction="column"
+          alignItems="center"
+        >
           <Typography variant="h3">Need some help?</Typography>
           <form>
             <TextField
@@ -78,6 +85,7 @@ export default function Help(): JSX.Element {
             <Button
               variant="contained"
               color="primary"
+              style={ButtonStyle}
               startIcon={<SearchIcon />}
               onClick={handleSearch}
             >

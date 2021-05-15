@@ -46,11 +46,11 @@ const useStyles = makeStyles({
   topBar: {
     margin: "1px",
     padding: "50px",
-    backgroundColor: "rgb(238,235,228)",
+    // backgroundColor: "rgb(238,235,228)",
   },
   pageContent: {
     margin: "8px",
-    padding: "110px",
+    padding: "1rem",
   },
   button: {
     margin: "5px",

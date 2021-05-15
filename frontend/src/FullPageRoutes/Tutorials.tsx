@@ -13,12 +13,12 @@ const useStyles = makeStyles({
   page: {
     margin: "1px",
     padding: "50px",
-    backgroundColor: "rgb(238,235,228)",
+    // backgroundColor: "rgb(238,235,228)",
   },
   topBar: {
     margin: "1px",
     padding: "50px",
-    backgroundColor: "rgb(238,235,228)",
+    // backgroundColor: "rgb(238,235,228)",
   },
   bottomBar: {
     margin: "2px",

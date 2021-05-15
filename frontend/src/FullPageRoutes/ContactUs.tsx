@@ -20,12 +20,12 @@ const useStyles = makeStyles({
   pageSideBar: {
     margin: "8px",
     padding: "50px",
-    backgroundColor: "rgb(238,235,228)",
+    // backgroundColor: "rgb(238,235,228)",
   },
   pageContent: {
     margin: "10px",
     padding: "80px",
-    backgroundColor: "rgb(234,232,224)",
+    // backgroundColor: "rgb(234,232,224)",
   },
   submitButton: {
     margin: "1px",
@@ -78,89 +78,94 @@ export default function ContactUs(): JSX.Element {
   }
 
   return (
-    <>
-      <Grid container>
-        <Grid item className={classes.pageSideBar}>
-          <Grid container spacing={2} direction="column" justify="center">
-            <Grid item>
-              <Typography className={classes.sideBar}>
-                Report a Video
-              </Typography>
-            </Grid>
-            <Grid item>
-              <Typography className={classes.sideBar}>
-                Report an Issue
-              </Typography>
-            </Grid>
-            <Grid item>
-              <Typography className={classes.sideBar}>
-                Provide Feedback
-              </Typography>
-            </Grid>
-            <Grid item>
-              <Typography className={classes.sideBar}>
-                Report a Profile
-              </Typography>
-            </Grid>
-            <Grid item>
-              <Typography className={classes.sideBar}>FAQs</Typography>
-            </Grid>
-          </Grid>
-        </Grid>
-
-        <Grid item className={classes.pageContent}>
-          <form className={classes.root}>
+    <Grid container direction="column" alignItems="center">
+      <Grid item>
+        <Typography variant="h3"> Contact Us</Typography>
+      </Grid>
+      <Grid item>
+        <Grid container>
+          <Grid item className={classes.pageSideBar}>
             <Grid container spacing={2} direction="column" justify="center">
-              <Grid item xs={12}>
-                <TextField
-                  variant="outlined"
-                  label="Your name"
-                  name="name"
-                  value={values.name}
-                  onChange={setContactValue}
-                />
-                <TextField
-                  variant="outlined"
-                  label="Your email"
-                  name="email"
-                  value={values.email}
-                  onChange={setContactValue}
-                />
-                <TextField
-                  variant="outlined"
-                  label="Type your message here"
-                  name="message"
-                  multiline
-                  rowsMax={6}
-                  value={values.message}
-                  onChange={setContactValue}
-                />
+              <Grid item>
+                <Typography className={classes.sideBar}>
+                  Report a Video
+                </Typography>
               </Grid>
               <Grid item>
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  className={classes.submitButton}
-                  size="large"
-                  type="submit"
-                  onSubmit={handleSubmit}
-                >
-                  Submit
-                </Button>
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  className={classes.cancelButton}
-                  size="large"
-                  type="reset"
-                >
-                  Cancel
-                </Button>
+                <Typography className={classes.sideBar}>
+                  Report an Issue
+                </Typography>
+              </Grid>
+              <Grid item>
+                <Typography className={classes.sideBar}>
+                  Provide Feedback
+                </Typography>
+              </Grid>
+              <Grid item>
+                <Typography className={classes.sideBar}>
+                  Report a Profile
+                </Typography>
+              </Grid>
+              <Grid item>
+                <Typography className={classes.sideBar}>FAQs</Typography>
               </Grid>
             </Grid>
-          </form>
+          </Grid>
+
+          <Grid item className={classes.pageContent}>
+            <form className={classes.root}>
+              <Grid container spacing={2} direction="column" justify="center">
+                <Grid item xs={12}>
+                  <TextField
+                    variant="outlined"
+                    label="Your name"
+                    name="name"
+                    value={values.name}
+                    onChange={setContactValue}
+                  />
+                  <TextField
+                    variant="outlined"
+                    label="Your email"
+                    name="email"
+                    value={values.email}
+                    onChange={setContactValue}
+                  />
+                  <TextField
+                    variant="outlined"
+                    label="Type your message here"
+                    name="message"
+                    multiline
+                    rowsMax={6}
+                    value={values.message}
+                    onChange={setContactValue}
+                  />
+                </Grid>
+                <Grid item>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    className={classes.submitButton}
+                    size="large"
+                    type="submit"
+                    onSubmit={handleSubmit}
+                  >
+                    Submit
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    className={classes.cancelButton}
+                    size="large"
+                    type="reset"
+                  >
+                    Cancel
+                  </Button>
+                </Grid>
+              </Grid>
+            </form>
+          </Grid>
         </Grid>
       </Grid>
-    </>
+    </Grid>
   )
 }

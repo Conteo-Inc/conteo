@@ -13,16 +13,16 @@ const useStyles = makeStyles({
   page: {
     margin: "1px",
     padding: "50px",
-    backgroundColor: "rgb(238,235,228)",
+    // backgroundColor: "rgb(238,235,228)",
   },
   topBar: {
     margin: "1px",
     padding: "50px",
-    backgroundColor: "rgb(238,235,228)",
+    // backgroundColor: "rgb(238,235,228)",
   },
   bottomBar: {
     margin: "2px",
-    padding: "110px",
+    padding: "1rem",
   },
 })
 
@@ -36,8 +36,14 @@ export default function FAQ(): JSX.Element {
         alignItems="center"
         className={classes.topBar}
       >
-        <Grid item justify="center">
-          <Typography variant="h4">Frequently Asked Questions</Typography>
+        <Grid
+          item
+          justify="center"
+          container
+          direction="row"
+          alignItems="center"
+        >
+          <Typography variant="h4">Frequently Asked Questions </Typography>
           <Typography variant="h5">(FAQs)</Typography>
         </Grid>
 
