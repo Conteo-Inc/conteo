@@ -153,7 +153,14 @@ export default function MailItem({
       >
         <ProfileContent readonlyContent={profileContent} />
       </AbstractModal>
-      <Grid item container direction="row" xs={3} wrap="nowrap">
+      <Grid
+        item
+        container
+        direction="row"
+        xs={3}
+        wrap="nowrap"
+        alignItems="center"
+      >
         <IconButton onClick={() => setShowProfile(true)}>
           <Avatar
             src={profileContent.image ? profileContent.image : ""}
@@ -175,7 +182,10 @@ export default function MailItem({
       <IconButton onClick={() => setConfirmRemove(true)} disabled={!isDecided}>
         <Delete fontSize="large" style={{ color: "#4b5282" }} />
       </IconButton>
-      <IconButton onClick={viewVideo} disabled={!created_at || paused || !isDecided}>
+      <IconButton
+        onClick={viewVideo}
+        disabled={!created_at || paused || !isDecided}
+      >
         {timeViewed ? (
           <DraftsRounded fontSize="large" style={{ color: "#4b5e82" }} />
         ) : (
