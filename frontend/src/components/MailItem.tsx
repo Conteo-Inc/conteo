@@ -42,6 +42,7 @@ export type MailListItem = {
   id: number
   paused: boolean
   removePenpal: (id: number) => void
+  video_id: number
   isDecided: boolean
 }
 
@@ -53,6 +54,7 @@ export default function MailItem({
   id,
   paused,
   removePenpal,
+  video_id,
   isDecided,
 }: MailListItem): JSX.Element {
   const { mailItem, undecidedMatch } = useStyles()
@@ -98,6 +100,9 @@ export default function MailItem({
         console.log(error)
       })
   }, [id, setProfileContent])
+  const [timeViewed, setTimeViewed] = React.useState<Nullable<string>>(
+    viewed_at
+  )
 
   const onConfirmRemove = () => {
     setConfirmRemove(false)
@@ -106,6 +111,23 @@ export default function MailItem({
 
   const onCancelRemove = () => {
     setConfirmRemove(false)
+  }
+
+  const viewVideo = () => {
+    setVisible(true)
+
+    // Test if video has not already been viewed.
+    if (timeViewed === null) {
+      // Update video viewed_at field.
+      request<{ viewed_at: Nullable<string> }>({
+        path: `/api/mailviewed/${video_id}/`,
+        method: "put",
+      })
+        .then((res) => {
+          setTimeViewed(res.parsedBody.viewed_at)
+        })
+        .catch((err) => console.error(err))
+    }
   }
 
   return (
@@ -153,11 +175,8 @@ export default function MailItem({
       <IconButton onClick={() => setConfirmRemove(true)} disabled={!isDecided}>
         <Delete fontSize="large" style={{ color: "#4b5282" }} />
       </IconButton>
-      <IconButton
-        onClick={() => setVisible(true)}
-        disabled={!created_at || paused || isDecided}
-      >
-        {viewed_at ? (
+      <IconButton onClick={viewVideo} disabled={!created_at || paused || !isDecided}>
+        {timeViewed ? (
           <DraftsRounded fontSize="large" style={{ color: "#4b5e82" }} />
         ) : (
           <MailOutlineRounded fontSize="large" style={{ color: "#4b5282" }} />
