@@ -27,8 +27,8 @@ class MatchesViewTestCase(APITestCase):
             p.save()
             Privacy.objects.create(
                 profile=p,
-                birth_date_privacy=Privacy.Setting.PUBLIC,
-                gender_privacy=Privacy.Setting.PUBLIC,
+                birth_date=Privacy.Setting.PUBLIC,
+                gender=Privacy.Setting.PUBLIC,
             )
             return user
 
