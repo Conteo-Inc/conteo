@@ -23,7 +23,6 @@ import CameraAltIcon from "@material-ui/icons/CameraAlt"
 import ProfileContent, { GENDER_CHOICES } from "./ProfileContent"
 import type { ProfileContentType, GenderKey, Interest } from "./ProfileContent"
 import UploadImageModal from "./UploadImageModal"
-import Video from "../video/Video"
 import { Colors } from "../../utils/colors"
 import { request } from "../../utils/fetch"
 import {
