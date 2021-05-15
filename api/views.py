@@ -182,7 +182,6 @@ class ProfileRetrieveUpdateView(generics.RetrieveUpdateAPIView):
     def get(self, request):
         profile_object = request.user.profile
         data = get_profile_data(profile_object)
-
         return response.Response(data=data, status=status.HTTP_200_OK)
 
     def put(self, request):
@@ -231,27 +230,30 @@ class ProfileRetrieveUpdateView(generics.RetrieveUpdateAPIView):
 
 def get_profile_data(profile_object):
     profile = ProfileSerializer(profile_object).data
-    user_id = profile.pop("id")
 
     # Add user interests to profile content.
     interest_objects = profile_object.interest_set.all()
     interests = InterestSerializer(interest_objects, many=True).data
     profile["interests"] = interests
 
-    # Get privacy object related to user profile.
-    privacy_object = Privacy.objects.get(profile=profile_object)
-    privacy = PrivacySerializer(privacy_object).data
-
-    return {
-        "profile_content": profile,
-        "privacy_settings": privacy,
-        "userId": user_id,
-    }
+    return profile
 
 
 class PrivacyRetrieveUpdateView(generics.RetrieveUpdateAPIView):
     serializer_class = PrivacySerializer
     queryset = Privacy.objects.all()
+
+    def get_object(self):
+        return self.get_queryset().get(profile_id=self.request.user.profile.id)
+
+    def get(self, request):
+        privacy_instance = self.get_queryset().get(profile_id=request.user.profile.id)
+        privacy = self.serializer_class(privacy_instance).data
+        return response.Response(data=privacy, status=status.HTTP_200_OK)
+
+    def put(self, request):
+        # profile = request.user.profile.id
+        return self.update(request=request)
 
 
 class InterestRetrieveView(generics.ListAPIView):
@@ -268,9 +270,14 @@ class PenpalProfileRetrieveView(generics.RetrieveAPIView):
     def get(self, request, user_id):
         profile_object = Profile.objects.get(user=user_id)
         profile = get_profile_data(profile_object)
+
+        # Get privacy object related to user profile.
+        privacy_object = Privacy.objects.get(profile=profile_object)
+        privacy = PrivacySerializer(privacy_object).data
+
         data = filter_profile_data(
-            profile["profile_content"],
-            profile["privacy_settings"],
+            profile,
+            privacy,
             Privacy.Setting.HIDDEN,
         )
 
@@ -289,7 +296,7 @@ def filter_profile_data(profile_content, privacy_settings, privacy_level):
         is_permitted = True
         try:
             # Test if profile content is restricted.
-            if privacy_settings[f"{name}_privacy"] == privacy_level:
+            if privacy_settings[name] == privacy_level:
                 is_permitted = False
         except KeyError:
             # Privacy setting does not exist.
@@ -391,7 +398,7 @@ class VideoListCreate(generics.ListCreateAPIView):
             # Test if video is intro video.
             sender_id = request.user.id
             receiver_id = request.data["receiver"]
-            if (self.is_intro_video(sender_id, receiver_id)):
+            if self.is_intro_video(sender_id, receiver_id):
                 self.delete_old_intro(sender_id)
 
             # Save new intro video.
@@ -406,7 +413,7 @@ class VideoListCreate(generics.ListCreateAPIView):
         try:
             video_instance = Video.objects.get(sender=user_id, receiver=user_id)
             video_instance.delete()
-        except Exception as e:
+        except Exception:
             # No previous intro video exists.
             pass
 

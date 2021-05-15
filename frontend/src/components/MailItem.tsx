@@ -72,6 +72,7 @@ export default function MailItem({
     interests: [],
     image: null,
     video: null,
+    id: -1,
   })
   const [showProfile, setShowProfile] = React.useState<boolean>(false)
 

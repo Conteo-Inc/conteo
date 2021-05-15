@@ -30,19 +30,19 @@ class Privacy(models.Model):
         primary_key=True,
         verbose_name="related profile",
     )
-    first_name_privacy = models.CharField(
+    first_name = models.CharField(
         max_length=2, choices=Setting.choices, default=Setting.PUBLIC
     )
-    last_name_privacy = models.CharField(
+    last_name = models.CharField(
         max_length=2, choices=Setting.choices, default=Setting.PUBLIC
     )
-    birth_date_privacy = models.CharField(
+    birth_date = models.CharField(
         max_length=2, choices=Setting.choices, default=Setting.PRIVATE
     )
-    gender_privacy = models.CharField(
+    gender = models.CharField(
         max_length=2, choices=Setting.choices, default=Setting.PRIVATE
     )
-    interests_privacy = models.CharField(
+    interests = models.CharField(
         max_length=2, choices=Setting.choices, default=Setting.PUBLIC
     )
 

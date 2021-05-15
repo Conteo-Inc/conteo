@@ -7,7 +7,15 @@ import {
   makeStyles,
 } from "@material-ui/core"
 import { Link } from "react-router-dom"
-import { Home, Person, People, Info, Help, Settings } from "@material-ui/icons"
+import {
+  Home,
+  Person,
+  People,
+  Info,
+  Help,
+  Settings,
+  Lock,
+} from "@material-ui/icons"
 
 const useStyles = makeStyles({
   link: {
@@ -36,6 +44,11 @@ const links: SidebarLink[] = [
     title: "Matching",
     link: "/matches",
     iconJsx: <People />,
+  },
+  {
+    title: "Privacy",
+    link: "/privacy",
+    iconJsx: <Lock />,
   },
   {
     title: "Account",
