@@ -17,8 +17,9 @@ type ModalType = {
   confirmText?: string
   cancelText?: string
   isModalOpen: boolean
-  handleConfirm: () => void
+  handleConfirm?: () => void
   handleCancel: () => void
+  isActionable?: boolean
   children?: React.ReactNode
 }
 
@@ -53,6 +54,7 @@ export default function AbstractModal({
   isModalOpen,
   handleConfirm,
   handleCancel,
+  isActionable = true,
   children,
 }: ModalType): JSX.Element {
   const classes = useStyles()
@@ -69,14 +71,16 @@ export default function AbstractModal({
         <Typography variant="subtitle2">{description}</Typography>
         {children}
       </DialogContent>
-      <DialogActions className={classes.modalAction}>
-        <Button variant="contained" onClick={handleCancel} color="secondary">
-          {cancelText}
-        </Button>
-        <Button variant="contained" onClick={handleConfirm} color="default">
-          {confirmText}
-        </Button>
-      </DialogActions>
+      {isActionable && (
+        <DialogActions className={classes.modalAction}>
+          <Button variant="contained" onClick={handleCancel} color="secondary">
+            {cancelText}
+          </Button>
+          <Button variant="contained" onClick={handleConfirm} color="default">
+            {confirmText}
+          </Button>
+        </DialogActions>
+      )}
     </Dialog>
   )
 }

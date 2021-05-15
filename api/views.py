@@ -180,24 +180,8 @@ class ProfileRetrieveUpdateView(generics.RetrieveUpdateAPIView):
         return self.request.user.profile
 
     def get(self, request):
-        profile = request.user.profile
-        profileData = self.serializer_class(profile).data
-        userId = profileData.pop("id")
-
-        # Add user interests to profile content.
-        interestObjects = profile.interest_set.all()
-        interestData = InterestSerializer(interestObjects, many=True).data
-        profileData["interests"] = interestData
-
-        # Get privacy object related to user profile.
-        privacyObjects = Privacy.objects.get(profile=profile)
-        privacyData = PrivacySerializer(privacyObjects).data
-
-        data = {
-            "profile_content": profileData,
-            "privacy_settings": privacyData,
-            "userId": userId,
-        }
+        profile_object = request.user.profile
+        data = get_profile_data(profile_object)
 
         return response.Response(data=data, status=status.HTTP_200_OK)
 
@@ -245,6 +229,26 @@ class ProfileRetrieveUpdateView(generics.RetrieveUpdateAPIView):
             profile.interest_set.set(idList)
 
 
+def get_profile_data(profile_object):
+    profile = ProfileSerializer(profile_object).data
+    user_id = profile.pop("id")
+
+    # Add user interests to profile content.
+    interest_objects = profile_object.interest_set.all()
+    interests = InterestSerializer(interest_objects, many=True).data
+    profile["interests"] = interests
+
+    # Get privacy object related to user profile.
+    privacy_object = Privacy.objects.get(profile=profile_object)
+    privacy = PrivacySerializer(privacy_object).data
+
+    return {
+        "profile_content": profile,
+        "privacy_settings": privacy,
+        "userId": user_id,
+    }
+
+
 class PrivacyRetrieveUpdateView(generics.RetrieveUpdateAPIView):
     serializer_class = PrivacySerializer
     queryset = Privacy.objects.all()
@@ -253,6 +257,48 @@ class PrivacyRetrieveUpdateView(generics.RetrieveUpdateAPIView):
 class InterestRetrieveView(generics.ListAPIView):
     serializer_class = InterestSerializer
     queryset = Interest.objects.all()
+
+
+class PenpalProfileRetrieveView(generics.RetrieveAPIView):
+    serializer_class = ProfileSerializer
+
+    def get_object(self):
+        return self.request.user.profile
+
+    def get(self, request, user_id):
+        profile_object = Profile.objects.get(user=user_id)
+        profile = get_profile_data(profile_object)
+        data = filter_profile_data(
+            profile["profile_content"],
+            profile["privacy_settings"],
+            Privacy.Setting.HIDDEN,
+        )
+
+        return response.Response(data=data, status=status.HTTP_200_OK)
+
+
+def filter_profile_data(profile_content, privacy_settings, privacy_level):
+    """
+    Returns the profile content which does not have a privacy level
+    equal to the privacy_level argument.
+    To be used when a user requests to view another's profile.
+    """
+
+    filtered_data = {}
+    for name in profile_content:
+        is_permitted = True
+        try:
+            # Test if profile content is restricted.
+            if privacy_settings[f"{name}_privacy"] == privacy_level:
+                is_permitted = False
+        except KeyError:
+            # Privacy setting does not exist.
+            pass
+
+        if is_permitted:
+            filtered_data[name] = profile_content[name]
+
+    return filtered_data
 
 
 def split_mail(mail):
