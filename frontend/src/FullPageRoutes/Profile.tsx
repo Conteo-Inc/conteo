@@ -1,42 +1,20 @@
 import * as React from "react"
 import { Grid } from "@material-ui/core"
 import { makeStyles } from "@material-ui/core/styles"
-import ProfileSidebar from "../components/profile/ProfileSidebar"
 import type { ProfileContentType } from "../components/profile/ProfileContent"
 import EditableProfileContent from "../components/profile/EditableProfileContent"
-import type { PrivacySettingsType } from "../components/profile/PrivacySettings"
-import PrivacySettings from "../components/profile/PrivacySettings"
 import { request } from "../utils/fetch"
-import {
-  useProfileComponents,
-  useProfileContent,
-  usePrivacySettings,
-} from "../utils/profile"
-
-export type UserProfile = {
-  profile_content: ProfileContentType
-  privacy_settings: PrivacySettingsType
-  userId: number
-}
+import { useProfileContent } from "../utils/profile"
 
 const useStyles = makeStyles({
   root: {
     flexGrow: 1,
-    paddingBottom: "100px",
-    backgroundColor: "rgb(234, 232, 224)",
-  },
-  sideBar: {
-    padding: "10px",
-    backgroundColor: "rgb(238, 235, 228)",
-  },
-  section: {
-    padding: "50px",
+    padding: "5px 20px 100px 20px",
   },
 })
 
 export default function Profile(): JSX.Element {
   const classes = useStyles()
-  const [userId, setUserId] = React.useState<number>(-1)
 
   // Profile content hooks.
   const [
@@ -50,29 +28,14 @@ export default function Profile(): JSX.Element {
     interests: [],
     image: null,
     video: null,
+    id: -1,
   })
   const { editableContent, contentSetters } = useProfileContent(readonlyContent)
 
-  // Privacy settings hooks.
-  const [
-    readonlySettings,
-    setPrivacySettings,
-  ] = React.useState<PrivacySettingsType>({
-    first_name_privacy: "",
-    last_name_privacy: "",
-    birth_date_privacy: "",
-    gender_privacy: "",
-    interests_privacy: "",
-  })
-  const { editableSettings, privacySetters } = usePrivacySettings(
-    readonlySettings
-  )
-
   React.useEffect(() => {
-    request<UserProfile>({ path: "/api/profile/", method: "get" })
+    request<ProfileContentType>({ path: "/api/profile/", method: "get" })
       .then((res) => {
-        const { profile_content, privacy_settings, userId } = res.parsedBody
-        setUserId(userId)
+        const profile_content = res.parsedBody
 
         if (profile_content.birth_date !== null) {
           profile_content.birth_date = new Date(
@@ -87,6 +50,7 @@ export default function Profile(): JSX.Element {
           interests: profile_content.interests,
           image: profile_content.image,
           video: profile_content.video,
+          id: profile_content.id,
         }
 
         setProfileContent(profileContent)
@@ -97,61 +61,20 @@ export default function Profile(): JSX.Element {
         contentSetters.setInterests(profileContent.interests)
         contentSetters.setImage(profileContent.image)
         contentSetters.setVideo(profileContent.video)
-
-        const privacySettings: PrivacySettingsType = {
-          first_name_privacy: privacy_settings.first_name_privacy,
-          last_name_privacy: privacy_settings.last_name_privacy,
-          birth_date_privacy: privacy_settings.birth_date_privacy,
-          gender_privacy: privacy_settings.gender_privacy,
-          interests_privacy: privacy_settings.interests_privacy,
-        }
-
-        setPrivacySettings(privacySettings)
-        privacySetters.setFirstNamePrivacy(privacySettings.first_name_privacy)
-        privacySetters.setLastNamePrivacy(privacySettings.last_name_privacy)
-        privacySetters.setBirthDatePrivacy(privacySettings.birth_date_privacy)
-        privacySetters.setGenderPrivacy(privacySettings.gender_privacy)
-        privacySetters.setInterestsPrivacy(privacySettings.interests_privacy)
       })
       .catch((error) => {
         console.log(error)
       })
   }, [])
 
-  // Component state hooks.
-  const { componentStates, componentSetters } = useProfileComponents()
-  const { isProfileActive, isPrivacyActive } = componentStates
-
   return (
     <Grid container className={classes.root}>
-      <Grid item className={classes.sideBar} xs={3}>
-        <ProfileSidebar
-          firstName={readonlyContent.first_name}
-          lastName={readonlyContent.last_name}
-          image={readonlyContent.image}
-          componentStateSetters={componentSetters}
-        />
-      </Grid>
-      <Grid item className={classes.section} xs={9}>
-        {isProfileActive && (
-          <EditableProfileContent
-            readonlyContent={readonlyContent}
-            editableContent={editableContent}
-            contentSetters={contentSetters}
-            setProfileContent={setProfileContent}
-            userId={userId}
-          />
-        )}
-        {isPrivacyActive && (
-          <PrivacySettings
-            readonlySettings={readonlySettings}
-            editableSettings={editableSettings}
-            privacySetters={privacySetters}
-            setPrivacySettings={setPrivacySettings}
-            userId={userId}
-          />
-        )}
-      </Grid>
+      <EditableProfileContent
+        readonlyContent={readonlyContent}
+        editableContent={editableContent}
+        contentSetters={contentSetters}
+        setProfileContent={setProfileContent}
+      />
     </Grid>
   )
 }

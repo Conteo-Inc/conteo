@@ -7,7 +7,7 @@ import type {
 import type {
   PrivacySettingsType,
   PrivacyKey,
-} from "../components/profile/PrivacySettings"
+} from "../FullPageRoutes/PrivacySettings"
 import type { SetStateDispatch, Nullable } from "./context"
 
 export type ProfileComponentStates = {
@@ -94,6 +94,7 @@ export function useProfileContent(
     interests: interests,
     image: image,
     video: video,
+    id: content.id,
   }
 
   const contentSetters: ProfileContentSetters = {
@@ -109,9 +110,9 @@ export function useProfileContent(
   return { editableContent, contentSetters }
 }
 
-// TODO: fix the or Interest[].
+// TODO: fix the or Interest[]/number.
 type ProfileUpdates = {
-  [key: string]: string | Interest[]
+  [key: string]: string | Interest[] | number
 }
 
 export function getProfileContentUpdates(
@@ -145,70 +146,50 @@ export function getProfileContentUpdates(
 }
 
 export type PrivacySetters = {
-  setFirstNamePrivacy: SetStateDispatch<PrivacyKey>
-  setLastNamePrivacy: SetStateDispatch<PrivacyKey>
-  setBirthDatePrivacy: SetStateDispatch<PrivacyKey>
-  setGenderPrivacy: SetStateDispatch<PrivacyKey>
-  setInterestsPrivacy: SetStateDispatch<PrivacyKey>
+  setFirstName: SetStateDispatch<PrivacyKey>
+  setLastName: SetStateDispatch<PrivacyKey>
+  setBirthDate: SetStateDispatch<PrivacyKey>
+  setGender: SetStateDispatch<PrivacyKey>
+  setInterests: SetStateDispatch<PrivacyKey>
 }
 
 // Custom privacy settings hook. This separates saved privacy settings
 // from edited and unsaved privacy settings.
-export function usePrivacySettings(
-  settings: PrivacySettingsType
-): {
+export function usePrivacySettings({
+  first_name,
+  last_name,
+  birth_date,
+  gender,
+  interests,
+  profile,
+}: PrivacySettingsType): {
   editableSettings: PrivacySettingsType
   privacySetters: PrivacySetters
 } {
-  const [firstNamePrivacy, setFirstNamePrivacy] = useState<PrivacyKey>(
-    settings.first_name_privacy
-  )
-  const [lastNamePrivacy, setLastNamePrivacy] = useState<PrivacyKey>(
-    settings.last_name_privacy
-  )
-  const [birthDatePrivacy, setBirthDatePrivacy] = useState<PrivacyKey>(
-    settings.birth_date_privacy
-  )
-  const [genderPrivacy, setGenderPrivacy] = useState<PrivacyKey>(
-    settings.gender_privacy
-  )
-  const [interestsPrivacy, setInterestsPrivacy] = useState<PrivacyKey>(
-    settings.interests_privacy
-  )
+  const [firstName, setFirstName] = useState<PrivacyKey>(first_name)
+  const [lastName, setLastName] = useState<PrivacyKey>(last_name)
+  const [birthDate, setBirthDate] = useState<PrivacyKey>(birth_date)
+  const [_gender, setGender] = useState<PrivacyKey>(gender)
+  const [_interests, setInterests] = useState<PrivacyKey>(interests)
 
   const editableSettings: PrivacySettingsType = {
-    first_name_privacy: firstNamePrivacy,
-    last_name_privacy: lastNamePrivacy,
-    birth_date_privacy: birthDatePrivacy,
-    gender_privacy: genderPrivacy,
-    interests_privacy: interestsPrivacy,
+    first_name: firstName,
+    last_name: lastName,
+    birth_date: birthDate,
+    gender: _gender,
+    interests: _interests,
+    profile: profile,
   }
 
   const privacySetters: PrivacySetters = {
-    setFirstNamePrivacy: setFirstNamePrivacy,
-    setLastNamePrivacy: setLastNamePrivacy,
-    setBirthDatePrivacy: setBirthDatePrivacy,
-    setGenderPrivacy: setGenderPrivacy,
-    setInterestsPrivacy: setInterestsPrivacy,
+    setFirstName: setFirstName,
+    setLastName: setLastName,
+    setBirthDate: setBirthDate,
+    setGender: setGender,
+    setInterests: setInterests,
   }
 
   return { editableSettings, privacySetters }
-}
-
-export function getPrivacySettingsUpdates(
-  original: ProfileUpdates,
-  updated: ProfileUpdates
-): ProfileUpdates {
-  const result: ProfileUpdates = {}
-  Object.keys(original).map((key) => {
-    const originalValue = original[key]
-    const updatedValue = updated[key]
-    if (originalValue != updatedValue) {
-      result[key] = updatedValue
-    }
-  })
-
-  return result
 }
 
 export function toDateString(date: Date): string {
