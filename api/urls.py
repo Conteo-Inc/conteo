@@ -11,8 +11,9 @@ urlpatterns = [
     path("video/<int:sender>/", views.VideoRetrieveView.as_view()),
     path("intro/<int:profile_id>/", views.IntroVideoRetrieveView.as_view()),
     path("matches/", views.Matches.as_view({"get": "list", "put": "partial_update"})),
+    path("profiles/<int:user_id>/", views.PenpalProfileRetrieveView.as_view()),
     path("profile/", views.ProfileRetrieveUpdateView.as_view()),
-    path("privacy/<int:pk>/", views.PrivacyRetrieveUpdateView.as_view()),
+    path("privacy/", views.PrivacyRetrieveUpdateView.as_view()),
     path("interests/", views.InterestRetrieveView.as_view()),
     # When we get into matching with real data,
     # let's discuss if this needs to be broken into

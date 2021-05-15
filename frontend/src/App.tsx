@@ -3,6 +3,7 @@ import { render } from "react-dom"
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom"
 import TokenPage from "./FullPageRoutes/TokenPage"
 import ProfilePage from "./FullPageRoutes/Profile"
+import PrivacySettings from "./FullPageRoutes/PrivacySettings"
 import MatchingPage from "./FullPageRoutes/Matching"
 import { Box, makeStyles, Grid } from "@material-ui/core"
 import RecordPage from "./FullPageRoutes/RecordPage"
@@ -59,6 +60,10 @@ export default function App(): JSX.Element {
     {
       path: "/profile/",
       pageJsx: <ProfilePage />,
+    },
+    {
+      path: "/privacy/",
+      pageJsx: <PrivacySettings />,
     },
     {
       path: "/watch/",

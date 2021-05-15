@@ -23,7 +23,6 @@ import CameraAltIcon from "@material-ui/icons/CameraAlt"
 import ProfileContent, { GENDER_CHOICES } from "./ProfileContent"
 import type { ProfileContentType, GenderKey, Interest } from "./ProfileContent"
 import UploadImageModal from "./UploadImageModal"
-import Video from "../video/Video"
 import { Colors } from "../../utils/colors"
 import { request } from "../../utils/fetch"
 import {
@@ -37,7 +36,6 @@ type EditableProfileContentProps = {
   editableContent: ProfileContentType
   contentSetters: ProfileContentSetters
   setProfileContent: React.Dispatch<React.SetStateAction<ProfileContentType>>
-  userId: number
 }
 
 const MAX_FIRST_NAME_LENGTH = 50
@@ -250,7 +248,6 @@ export default function EditableProfileContent({
   editableContent,
   contentSetters,
   setProfileContent,
-  userId,
 }: EditableProfileContentProps): JSX.Element {
   const classes = useStyles()
 
@@ -294,7 +291,7 @@ export default function EditableProfileContent({
       })
       .catch((error) => {
         console.log(error)
-        setErrorMessage(error)
+        setErrorMessage("Error while saving profile content.")
       })
   }
 
@@ -355,23 +352,16 @@ export default function EditableProfileContent({
                   </Grid>
                 </Grid>
               </Grid>
-              {editableContent.video ? (
-                <Video
-                  src={editableContent.video}
-                  className={classes.introVideo}
-                />
-              ) : (
-                <Grid item>
-                  <Button
-                    className={classes.recordButton}
-                    size="large"
-                    component={Link}
-                    to={`/record/${userId}`}
-                  >
-                    <Typography variant="h6">Record Intro Video</Typography>
-                  </Button>
-                </Grid>
-              )}
+              <Grid item>
+                <Button
+                  className={classes.recordButton}
+                  size="large"
+                  component={Link}
+                  to={`/record/${readonlyContent.id}/`}
+                >
+                  <Typography variant="h6">Record Intro Video</Typography>
+                </Button>
+              </Grid>
             </Grid>
           </Grid>
           <Grid item xs={12}>

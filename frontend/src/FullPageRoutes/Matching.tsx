@@ -372,18 +372,23 @@ export default function MatchingPage(): JSX.Element {
             alignItems="center"
             direction="column"
           >
-            <Typography>{`${match.first_name} ${match.last_name}`}</Typography>
+            <Typography>
+              {match.first_name ?? "Hidden"} {match.last_name ?? "Hidden"}
+            </Typography>
             <Avatar />
           </Grid>
           <Grid item container direction="row" justify="space-around">
             {/* TODO: Replace with forEach and don't include empty */}
-            <Typography>{`Gender: ${match.gender}`}</Typography>
-            <Typography>{`Birthday: ${match.birth_date}`}</Typography>
-            <Typography>{`Email: ${match.email}`}</Typography>
+            <Typography>Gender: {match.gender ?? "Hidden"}</Typography>
+            <Typography>Birthday: {match.birth_date ?? "Hidden"}</Typography>
+            <Typography>Email: {match.email ?? "Hidden"}</Typography>
           </Grid>
           <Grid item container direction="row" justify="center">
             <Typography>
-              Interests: {match.interests.map(interestString).join(", ")}
+              Interests:{" "}
+              {match.interests
+                ? match.interests.map(interestString).join(", ")
+                : "Hidden"}
             </Typography>
           </Grid>
           <Grid item>

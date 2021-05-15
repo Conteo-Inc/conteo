@@ -18,6 +18,7 @@ export type ProfileContentType = {
   interests: Interest[]
   image: Nullable<string>
   video: Nullable<string>
+  id: number
 }
 
 export type GenderKey = "" | "M" | "F" | "O"
