@@ -15,7 +15,6 @@ const useStyles = makeStyles({
 
 export default function Profile(): JSX.Element {
   const classes = useStyles()
-  const [userId, setUserId] = React.useState<number>(-1)
 
   // Profile content hooks.
   const [
@@ -36,19 +35,32 @@ export default function Profile(): JSX.Element {
   React.useEffect(() => {
     request<ProfileContentType>({ path: "/api/profile/", method: "get" })
       .then((res) => {
-        const profile = res.parsedBody
-        setUserId(userId)
+        const profile_content = res.parsedBody
 
-        profile.birth_date = new Date((profile.birth_date as unknown) as string)
+        if (profile_content.birth_date !== null) {
+          profile_content.birth_date = new Date(
+            (profile_content.birth_date as unknown) as string
+          )
+        }
+        const profileContent: ProfileContentType = {
+          first_name: profile_content.first_name,
+          last_name: profile_content.last_name,
+          birth_date: profile_content.birth_date,
+          gender: profile_content.gender,
+          interests: profile_content.interests,
+          image: profile_content.image,
+          video: profile_content.video,
+          id: profile_content.id,
+        }
 
-        setProfileContent(profile)
-        contentSetters.setFirstName(profile.first_name)
-        contentSetters.setLastName(profile.last_name)
-        contentSetters.setGender(profile.gender)
-        contentSetters.setBirthDate(profile.birth_date)
-        contentSetters.setInterests(profile.interests)
-        contentSetters.setImage(profile.image)
-        contentSetters.setVideo(profile.video)
+        setProfileContent(profileContent)
+        contentSetters.setFirstName(profileContent.first_name)
+        contentSetters.setLastName(profileContent.last_name)
+        contentSetters.setGender(profileContent.gender)
+        contentSetters.setBirthDate(profileContent.birth_date)
+        contentSetters.setInterests(profileContent.interests)
+        contentSetters.setImage(profileContent.image)
+        contentSetters.setVideo(profileContent.video)
       })
       .catch((error) => {
         console.log(error)

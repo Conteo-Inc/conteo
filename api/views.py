@@ -180,15 +180,9 @@ class ProfileRetrieveUpdateView(generics.RetrieveUpdateAPIView):
         return self.request.user.profile
 
     def get(self, request):
-        profile = request.user.profile
-        profileData = self.serializer_class(profile).data
-
-        # Add user interests to profile content.
-        interestObjects = profile.interest_set.all()
-        interestData = InterestSerializer(interestObjects, many=True).data
-        profileData["interests"] = interestData
-
-        return response.Response(data=profileData, status=status.HTTP_200_OK)
+        profile_object = request.user.profile
+        data = get_profile_data(profile_object)
+        return response.Response(data=data, status=status.HTTP_200_OK)
 
     def put(self, request):
         self.updateImage(request)
@@ -234,6 +228,17 @@ class ProfileRetrieveUpdateView(generics.RetrieveUpdateAPIView):
             profile.interest_set.set(idList)
 
 
+def get_profile_data(profile_object):
+    profile = ProfileSerializer(profile_object).data
+
+    # Add user interests to profile content.
+    interest_objects = profile_object.interest_set.all()
+    interests = InterestSerializer(interest_objects, many=True).data
+    profile["interests"] = interests
+
+    return profile
+
+
 class PrivacyRetrieveUpdateView(generics.RetrieveUpdateAPIView):
     serializer_class = PrivacySerializer
     queryset = Privacy.objects.all()
@@ -254,6 +259,85 @@ class PrivacyRetrieveUpdateView(generics.RetrieveUpdateAPIView):
 class InterestRetrieveView(generics.ListAPIView):
     serializer_class = InterestSerializer
     queryset = Interest.objects.all()
+
+
+class PenpalProfileRetrieveView(generics.RetrieveAPIView):
+    serializer_class = ProfileSerializer
+
+    def get_object(self):
+        return self.request.user.profile
+
+    def get(self, request, user_id):
+        profile_object = Profile.objects.get(user=user_id)
+        profile = get_profile_data(profile_object)
+
+        # Get privacy object related to user profile.
+        privacy_object = Privacy.objects.get(profile=profile_object)
+        privacy = PrivacySerializer(privacy_object).data
+
+        data = filter_profile_data(
+            profile,
+            privacy,
+            Privacy.Setting.HIDDEN,
+        )
+
+        return response.Response(data=data, status=status.HTTP_200_OK)
+
+
+def filter_profile_data(profile_content, privacy_settings, privacy_level):
+    """
+    Returns the profile content which does not have a privacy level
+    equal to the privacy_level argument.
+    To be used when a user requests to view another's profile.
+    """
+
+    filtered_data = {}
+    for name in profile_content:
+        is_permitted = True
+        try:
+            # Test if profile content is restricted.
+            if privacy_settings[name] == privacy_level:
+                is_permitted = False
+        except KeyError:
+            # Privacy setting does not exist.
+            pass
+
+        if is_permitted:
+            filtered_data[name] = profile_content[name]
+
+    return filtered_data
+
+
+def split_mail(mail):
+    # 2 variables: created_at and viewed_at
+    # 4 total cases, but viewed_at must be None if created_at is None
+    # so 3 actual cases
+    both = []
+    neither = []
+    c_not_v = []
+
+    # helper function
+    def lens(x):
+        return (x.get("created_at"), x.get("viewed_at"))
+
+    for item in mail:
+        c, v = lens(item)
+        if c is None:
+            neither.append(item)
+        elif v is None:
+            c_not_v.append(item)
+        else:
+            both.append(item)
+
+    return both, c_not_v, neither
+
+
+def sort_mail(mail):
+    both, c_not_v, neither = split_mail(mail)
+    both_sorted = sorted(both, key=lambda x: x.get("viewed_at"))
+    c_not_v_sorted = sorted(c_not_v, key=lambda x: x.get("created_at"))
+
+    return c_not_v_sorted + both_sorted + neither
 
 
 class MailListView(generics.ListAPIView):
@@ -280,13 +364,24 @@ class MailListView(generics.ListAPIView):
         penpals = self.get_mail_list(request.user)
         undecided = self.get_mail_list(request.user, None)
         data = {
-            "penpals": penpals,
+            "penpals": sort_mail(penpals),
             "undecided": undecided,
         }
 
         return response.Response(
             data=data,
             status=status.HTTP_200_OK,
+        )
+
+
+class MailUpdateView(generics.UpdateAPIView):
+    def put(self, request, video_id):
+        video_object = Video.objects.get(id=video_id)
+        viewed_at = now()
+        video_object.viewed_at = viewed_at
+        video_object.save()
+        return response.Response(
+            data={"viewed_at": str(viewed_at)}, status=status.HTTP_200_OK
         )
 
 
@@ -300,9 +395,27 @@ class VideoListCreate(generics.ListCreateAPIView):
             data=request.data, context={"data": data, "user": request.user}
         )
         if serializer.is_valid():
+            # Test if video is intro video.
+            sender_id = request.user.id
+            receiver_id = request.data["receiver"]
+            if (self.is_intro_video(sender_id, receiver_id)):
+                self.delete_old_intro(sender_id)
+
+            # Save new intro video.
             serializer.save()
             return response.Response(serializer.data, status=status.HTTP_201_CREATED)
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def is_intro_video(self, sender, receiver):
+        return sender == receiver
+
+    def delete_old_intro(self, user_id):
+        try:
+            video_instance = Video.objects.get(sender=user_id, receiver=user_id)
+            video_instance.delete()
+        except Exception as e:
+            # No previous intro video exists.
+            pass
 
     # def get(self, request):
     #     queryset = self.filter_queryset(self.get_queryset())

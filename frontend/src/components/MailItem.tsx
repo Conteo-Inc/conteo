@@ -1,8 +1,14 @@
 import * as React from "react"
 import { Link } from "react-router-dom"
-import { Grid, IconButton, makeStyles, Typography } from "@material-ui/core"
 import {
-  AccountCircle,
+  Grid,
+  IconButton,
+  makeStyles,
+  Typography,
+  Button,
+  Avatar,
+} from "@material-ui/core"
+import {
   Delete,
   DraftsRounded,
   MailOutlineRounded,
@@ -10,6 +16,9 @@ import {
 } from "@material-ui/icons"
 import ViewVideo from "./video/ViewVideo"
 import { Nullable } from "../utils/context"
+import { request } from "../utils/fetch"
+import ProfileContent from "./profile/ProfileContent"
+import type { ProfileContentType } from "./profile/ProfileContent"
 import AbstractModal from "./AbstractModal"
 
 const useStyles = makeStyles({
@@ -33,6 +42,7 @@ export type MailListItem = {
   id: number
   paused: boolean
   removePenpal: (id: number) => void
+  video_id: number
   isDecided: boolean
 }
 
@@ -44,12 +54,56 @@ export default function MailItem({
   id,
   paused,
   removePenpal,
+  video_id,
   isDecided,
 }: MailListItem): JSX.Element {
   const { mailItem, undecidedMatch } = useStyles()
   const [visible, setVisible] = React.useState<boolean>(false)
   const [showConfirmRemove, setConfirmRemove] = React.useState<boolean>(false)
   const video_date = new Date(created_at)
+  const [
+    profileContent,
+    setProfileContent,
+  ] = React.useState<ProfileContentType>({
+    first_name: "",
+    last_name: "",
+    birth_date: null,
+    gender: null,
+    interests: [],
+    image: null,
+    video: null,
+    id: -1,
+  })
+  const [showProfile, setShowProfile] = React.useState<boolean>(false)
+
+  React.useEffect(() => {
+    request<ProfileContentType>({ path: `/api/profiles/${id}/`, method: "get" })
+      .then((res) => {
+        const profile_content = res.parsedBody
+
+        // Fields that are restricted on a user's profile (i.e. Private or Hidden)
+        // are not returned for privacy purposes. Test if certain field were not
+        // returned to avoid frontend errors related to undefined values.
+        if (typeof profile_content.birth_date === "undefined") {
+          profile_content.birth_date = null
+        } else {
+          profile_content.birth_date = new Date(
+            (profile_content.birth_date as unknown) as string
+          )
+        }
+        if (typeof profile_content.interests === "undefined") {
+          profile_content.interests = []
+        }
+
+        setProfileContent(profile_content)
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+  }, [id, setProfileContent])
+  const [timeViewed, setTimeViewed] = React.useState<Nullable<string>>(
+    viewed_at
+  )
 
   const onConfirmRemove = () => {
     setConfirmRemove(false)
@@ -58,6 +112,23 @@ export default function MailItem({
 
   const onCancelRemove = () => {
     setConfirmRemove(false)
+  }
+
+  const viewVideo = () => {
+    setVisible(true)
+
+    // Test if video has not already been viewed.
+    if (timeViewed === null) {
+      // Update video viewed_at field.
+      request<{ viewed_at: Nullable<string> }>({
+        path: `/api/mailviewed/${video_id}/`,
+        method: "put",
+      })
+        .then((res) => {
+          setTimeViewed(res.parsedBody.viewed_at)
+        })
+        .catch((err) => console.error(err))
+    }
   }
 
   return (
@@ -75,10 +146,37 @@ export default function MailItem({
         handleConfirm={onConfirmRemove}
         handleCancel={onCancelRemove}
       />
-      <Grid item container direction="row" xs={3} wrap="nowrap">
-        <AccountCircle fontSize="large" style={{ color: "#4b5e82" }} />
+      <AbstractModal
+        title="View Profile"
+        isModalOpen={showProfile}
+        handleCancel={() => setShowProfile(false)}
+        isActionable={false}
+      >
+        <ProfileContent readonlyContent={profileContent} />
+      </AbstractModal>
+      <Grid
+        item
+        container
+        direction="row"
+        xs={3}
+        wrap="nowrap"
+        alignItems="center"
+      >
+        <IconButton onClick={() => setShowProfile(true)}>
+          <Avatar
+            src={profileContent.image ? profileContent.image : ""}
+            alt={profileContent.first_name}
+          />
+        </IconButton>
         <Typography variant="h6">{`${first_name} ${last_name}`}</Typography>
       </Grid>
+      <Button
+        variant="contained"
+        color="default"
+        onClick={() => setShowProfile(true)}
+      >
+        <Typography>View Profile</Typography>
+      </Button>
       <Typography variant="h6">
         {created_at ? video_date.toLocaleDateString() : "No video"}
       </Typography>
@@ -86,10 +184,10 @@ export default function MailItem({
         <Delete fontSize="large" style={{ color: "#4b5282" }} />
       </IconButton>
       <IconButton
-        onClick={() => setVisible(true)}
-        disabled={!created_at || paused || isDecided}
+        onClick={viewVideo}
+        disabled={!created_at || paused || !isDecided}
       >
-        {viewed_at ? (
+        {timeViewed ? (
           <DraftsRounded fontSize="large" style={{ color: "#4b5e82" }} />
         ) : (
           <MailOutlineRounded fontSize="large" style={{ color: "#4b5282" }} />
