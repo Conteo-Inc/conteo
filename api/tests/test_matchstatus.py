@@ -3,7 +3,7 @@ from datetime import date, timedelta
 from django.contrib.auth.models import User
 from rest_framework.test import APITestCase
 
-from api.models import Interest, MatchStatus, Profile
+from api.models import Interest, MatchStatus, Privacy, Profile
 
 
 def firstnames(data):
@@ -25,6 +25,11 @@ class MatchesViewTestCase(APITestCase):
             )
             p.interest_set.add(interests)
             p.save()
+            Privacy.objects.create(
+                profile=p,
+                birth_date_privacy=Privacy.Setting.PUBLIC,
+                gender_privacy=Privacy.Setting.PUBLIC,
+            )
             return user
 
         ale = make_user("ale", interests=Interest.objects.get(pk=1))

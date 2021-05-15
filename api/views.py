@@ -391,7 +391,7 @@ class VideoListCreate(generics.ListCreateAPIView):
             # Test if video is intro video.
             sender_id = request.user.id
             receiver_id = request.data["receiver"]
-            if (self.is_intro_video(sender_id, receiver_id)):
+            if self.is_intro_video(sender_id, receiver_id):
                 self.delete_old_intro(sender_id)
 
             # Save new intro video.
@@ -406,7 +406,7 @@ class VideoListCreate(generics.ListCreateAPIView):
         try:
             video_instance = Video.objects.get(sender=user_id, receiver=user_id)
             video_instance.delete()
-        except Exception as e:
+        except Exception:
             # No previous intro video exists.
             pass
 
