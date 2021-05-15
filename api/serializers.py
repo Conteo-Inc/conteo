@@ -77,14 +77,14 @@ class ProfileFromUserSerializer(serializers.ModelSerializer):
         profile_dict = user.profile.__dict__
         privacy_dict = user.profile.privacy.__dict__
         filtered = profile_dict.copy()
-        del filtered["_state"]  # Not meant to be serialized
-        for k, v in filtered.items():
+        for k, v in profile_dict.items():
             priv_key = f"{k}"
             if (
                 priv_key in privacy_dict
                 and privacy_dict[priv_key] != Privacy.Setting.PUBLIC
             ):
                 del filtered[k]
+        # del filtered["_state"]  # Not meant to be serialized
         return filtered
 
     def to_representation(self, instance: User):

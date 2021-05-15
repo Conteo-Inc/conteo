@@ -51,7 +51,6 @@ class VideoViewTestCase(APITestCase):
         self.client.login(username="lo", password="lo")
         res = self.client.get("/api/videos/")
         results = res.json()
-        print(results)
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0]["video_file"], self.video)
 
