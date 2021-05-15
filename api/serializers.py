@@ -71,11 +71,27 @@ class UserAuthSerializer(serializers.ModelSerializer):
 
 
 class ProfileFromUserSerializer(serializers.ModelSerializer):
+    """Serializes public Profile data from the related User."""
+
+    def filter_public_data(self, user: User):
+        profile_dict = user.profile.__dict__
+        privacy_dict = user.profile.privacy.__dict__
+        filtered = profile_dict.copy()
+        del filtered["_state"]  # Not meant to be serialized
+        for k, v in profile_dict.items():
+            priv_key = f"{k}_privacy"
+            if (
+                priv_key in privacy_dict
+                and privacy_dict[priv_key] != Privacy.Setting.PUBLIC
+            ):
+                del filtered[k]
+        return filtered
+
     def to_representation(self, instance: User):
         rep = super().to_representation(instance)  # type: OrderedDict
-        rep.update(instance.profile.__dict__)
-        rep.update({"interests": instance.profile.interest_set.values()})
-        del rep["_state"]  # Not meant to be serialized
+        rep.update(self.filter_public_data(instance))
+        if instance.profile.privacy.interests_privacy == Privacy.Setting.PUBLIC:
+            rep.update({"interests": instance.profile.interest_set.values()})
 
         # check for video
         rep["has_intro"] = False
