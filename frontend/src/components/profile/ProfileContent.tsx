@@ -86,25 +86,29 @@ function buildProfileFieldList({
   return [
     {
       title: "First Name",
-      value: first_name,
+      value: first_name ?? "Hidden",
     },
     {
       title: "Last Name",
-      value: last_name,
+      value: last_name ?? "Hidden",
     },
     {
       title: "Birthday",
-      value: birth_date !== null ? toDateString(birth_date) : "",
+      value: birth_date !== null ? toDateString(birth_date) : "Hidden",
     },
     {
       title: "Gender",
-      value: gender !== null ? GENDER_CHOICES[gender] : "",
+      value: gender !== null ? GENDER_CHOICES[gender] : "Hidden",
     },
     {
       title: "Interests",
       value: interests
-        .map((interest: Interest) => `${interest.category}: ${interest.title}`)
-        .join(", "),
+        ? interests
+            .map(
+              (interest: Interest) => `${interest.category}: ${interest.title}`
+            )
+            .join(", ")
+        : "Hidden",
     },
   ]
 }

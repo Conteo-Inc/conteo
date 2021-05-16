@@ -31,6 +31,7 @@ const useStyles = makeStyles({
   },
   appRoot: {
     minHeight: "55rem",
+    backgroundColor: "#ede8db",
   },
   appBody: {
     minHeight: "49rem",

@@ -304,6 +304,8 @@ def filter_profile_data(profile_content, privacy_settings, privacy_level):
 
         if is_permitted:
             filtered_data[name] = profile_content[name]
+        else:
+            filtered_data[name] = None
 
     return filtered_data
 
