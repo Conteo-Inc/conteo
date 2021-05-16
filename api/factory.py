@@ -5,7 +5,7 @@ from django.db.models.signals import post_save
 from factory.helpers import lazy_attribute, post_generation
 from factory.random import random
 
-from api.models import MatchStatus, Profile, User, Video
+from api.models import MatchStatus, Privacy, Profile, User, Video
 
 
 @factory.django.mute_signals()
@@ -21,6 +21,9 @@ class ProfileFactory(factory.django.DjangoModelFactory):
     phone_number = factory.Faker("phone_number")
     user = factory.SubFactory("api.factory.UserFactory", profile=None)
     birth_date = factory.Faker("date")
+    privacy = factory.RelatedFactory(
+        "api.factory.PrivacyFactory", factory_related_name="profile"
+    )
 
     @factory.lazy_attribute
     def gender(self):
@@ -100,3 +103,14 @@ class VideoFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = Video
+
+
+class PrivacyFactory(factory.django.DjangoModelFactory):
+    first_name = Privacy.Setting.PUBLIC
+    last_name = Privacy.Setting.PUBLIC
+    birth_date = Privacy.Setting.PUBLIC
+    gender = Privacy.Setting.PUBLIC
+    interests = Privacy.Setting.PUBLIC
+
+    class Meta:
+        model = Privacy
